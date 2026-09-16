@@ -63,7 +63,20 @@ Los volúmenes y la red están declarados con nombre explícito para que no depe
 init.sql: Crea la base de datos exclusiva de n8n al levantar PostgreSQL por primera vez.
 
 ## Estado del proyecto
-Este repositorio está terminado y congelado en la versión v1.0.0. Todo lo que hay acá fue desarrollado por mí.
-El trabajo continúa en https://github.com/Juand13go/radar_motor_difuso, donde la decisión de escalación (que hoy es binaria y la toma el modelo) se reemplaza por un motor
-de lógica difusa que asigna una prioridad continua y puede explicar con qué reglas llegó a ella.
-Las decisiones de diseño que se tomaron durante el desarrollo, con la razón de cada una, están en DECISIONES.md.
+
+Este repositorio está en desarrollo activo. Es la continuación de
+https://github.com/Juand13go/triaje_leads_comerciales, que quedó congelado en la versión
+v1.0.0 con el sistema de triaje funcionando y la escalación resuelta con una condición
+binaria.
+
+Lo que se está construyendo acá es un motor de lógica difusa que reemplaza esa condición:
+en vez de decidir sí o no, calcula una prioridad continua a partir de varias variables del
+lead y devuelve, junto con el resultado, las reglas que se activaron y con qué grado. La
+idea es que cuando alguien pregunte por qué se priorizó un lead sobre otro, el sistema
+pueda responder.
+
+Este desarrollo es el entregable del diplomado en Inteligencia Artificial Avanzada y
+Aplicada de la Universidad EIA para la Cámara de Comercio Aburrá Sur.
+
+Las decisiones de diseño que se tomaron durante el desarrollo, con la razón de cada una,
+están en DECISIONES.md.
