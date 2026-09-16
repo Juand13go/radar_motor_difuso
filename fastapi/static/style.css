@@ -1,10 +1,9 @@
 /* ============================================================
    Radar - Panel de asesores
-   Identidad visual tomada de la web de Halua Studio
+   Identidad visual tomada de la web de Halua Studio:
+   tipografia grande, mucho blanco y lineas finas. Sin cajas.
    ============================================================ */
 
-/* Tokens de la marca. Los colores salen de los componentes de
-   la web de Halua (Navbar.jsx y Section1.jsx) */
 :root {
     --color-texto: #4C4C4C;         /* gris oscuro, el color principal de la marca */
     --color-acento: #4C3ACA;        /* violeta, el acento fuerte */
@@ -14,27 +13,20 @@
     --color-gris-claro: #CCCCCC;
     --color-linea: #E5E5E5;
     --color-fondo: #FFFFFF;
-    --color-fondo-suave: #FAFAFA;
 
-    /* Colores del semaforo de prioridad. No son de la marca:
-       son semanticos, y se leen igual que en un triaje medico */
+    /* Colores del semaforo de prioridad. No son de la marca: son
+       semanticos, y se leen igual que en un triaje medico */
     --prioridad-critica: #E5484D;
     --prioridad-alta: #FF9E10;
     --prioridad-media: #F2C94C;
     --prioridad-baja: #27AE60;
 
-    /* Si la fuente Inter no carga (por ejemplo sin internet en una
-       demo) cae en la tipografia del sistema sin romper el diseno */
+    /* Si Inter no carga (por ejemplo en una demo sin internet)
+       cae en la tipografia del sistema sin romper el diseno */
     --fuente: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-    --radio: 10px;
-    --espacio: 16px;
-    --margen-lateral: 60px;         /* el margen que usa la web de Halua */
+    --margen-lateral: 60px;         /* el mismo margen que usa la web de Halua */
 }
-
-/* ============================================================
-   Base
-   ============================================================ */
 
 * {
     box-sizing: border-box;
@@ -64,12 +56,12 @@ body {
 }
 
 .navbar__logo {
-    font-weight: 800;
-    font-size: 18px;
-    letter-spacing: -0.3px;
+    width: 75px;
+    height: 19px;
+    display: block;
 }
 
-/* La linea divisoria con los tres puntos al final, igual que en la web */
+/* Linea divisoria con los tres puntos al final, igual que en la web */
 .navbar__linea {
     display: flex;
     align-items: center;
@@ -105,62 +97,104 @@ body {
 
 .contenido {
     margin: 0 var(--margen-lateral);
-    padding: 64px 0 40px;
-    max-width: 1100px;
-}
-
-.encabezado {
-    margin-bottom: 48px;
-}
-
-.encabezado__producto {
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--color-gris-medio);
-    margin-bottom: 8px;
-}
-
-.encabezado__titulo {
-    font-size: 56px;
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -1.5px;
-}
-
-.acento {
-    color: var(--color-acento);
-}
-
-.encabezado__descripcion {
-    margin-top: 16px;
-    max-width: 520px;
-    color: var(--color-gris-medio);
+    padding-bottom: 40px;
 }
 
 /* ============================================================
-   Tarjetas
+   Portada
+   Titular gigante partido en dos lineas, con la segunda en violeta,
+   y una columna de texto a la derecha que va aclarando de gris
    ============================================================ */
 
-.tarjeta {
-    border: 1px solid var(--color-linea);
-    border-radius: var(--radio);
-    padding: 28px;
-    margin-bottom: 24px;
-    background-color: var(--color-fondo);
+.portada {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    padding: 160px 0 120px;
 }
 
-.tarjeta__titulo {
-    font-size: 20px;
+.portada__titulo {
+    position: relative;
+    flex: 1 1 640px;
+    min-width: 0;
+}
+
+.titular {
+    font-size: 84px;
     font-weight: 800;
-    margin-bottom: 4px;
+    line-height: 0.92;
+    letter-spacing: -3px;
+    color: var(--color-texto);
 }
 
-.tarjeta__ayuda {
-    font-size: 14px;
+.titular--acento {
+    color: var(--color-acento);
+}
+
+/* La regla se sale del contenedor por la izquierda, como en la web */
+.regla-larga {
+    position: relative;
+    left: calc(var(--margen-lateral) * -1);
+    width: calc(100% + var(--margen-lateral));
+    height: 2px;
+    border: none;
+    background-color: var(--color-texto);
+    margin-top: 18px;
+}
+
+.subtitular {
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-top: 20px;
+}
+
+.portada__texto {
+    flex: 0 1 438px;
+    padding-top: 8px;
+}
+
+.parrafo {
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--color-texto);
+}
+
+.parrafo--medio {
+    margin-top: 20px;
     color: var(--color-gris-medio);
-    margin-bottom: 20px;
+}
+
+.parrafo--claro {
+    margin-top: 20px;
+    color: var(--color-gris-claro);
+}
+
+/* ============================================================
+   Bloques de trabajo
+   Sin recuadros: solo una linea fina arriba y espacio en blanco
+   ============================================================ */
+
+.bloque {
+    border-top: 1px solid var(--color-linea);
+    padding: 48px 0;
+}
+
+.bloque__encabezado {
+    margin-bottom: 28px;
+}
+
+.bloque__titulo {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+}
+
+.bloque__ayuda {
+    margin-top: 6px;
+    max-width: 520px;
+    color: var(--color-gris-medio);
 }
 
 /* ============================================================
@@ -168,7 +202,7 @@ body {
    ============================================================ */
 
 .controles {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .controles__fila {
@@ -177,29 +211,22 @@ body {
     flex-wrap: wrap;
 }
 
-.etiqueta {
-    display: block;
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 6px;
-    color: var(--color-gris-medio);
-}
-
+/* Campo sin caja: solo una linea abajo, en la logica de la marca */
 .campo {
     flex: 1;
     min-width: 260px;
     font-family: var(--fuente);
-    font-size: 14px;
+    font-size: 15px;
     color: var(--color-texto);
-    padding: 11px 14px;
-    border: 1px solid var(--color-gris-claro);
-    border-radius: var(--radio);
-    background-color: var(--color-fondo);
+    padding: 10px 2px;
+    border: none;
+    border-bottom: 2px solid var(--color-gris-claro);
+    background-color: transparent;
 }
 
 .campo:focus {
     outline: none;
-    border-color: var(--color-acento);
+    border-bottom-color: var(--color-acento);
 }
 
 .campo::placeholder {
@@ -208,11 +235,10 @@ body {
 
 .boton {
     font-family: var(--fuente);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
-    padding: 11px 22px;
+    padding: 12px 28px;
     border: none;
-    border-radius: var(--radio);
     cursor: pointer;
     transition: opacity 0.15s ease;
 }
@@ -235,17 +261,10 @@ body {
 }
 
 .lista li {
-    font-size: 14px;
-    padding: 14px 16px;
-    border: 1px solid var(--color-linea);
-    border-radius: var(--radio);
-    margin-bottom: 10px;
-    background-color: var(--color-fondo-suave);
+    font-size: 15px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--color-linea);
     word-break: break-word;
-}
-
-.lista li:last-child {
-    margin-bottom: 0;
 }
 
 /* Los li de los leads los genera script.js con dos botones adentro
@@ -254,22 +273,22 @@ body {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
-    border-left: 4px solid var(--color-gris-claro);
+    gap: 12px;
+    padding-left: 16px;
+    border-left: 3px solid var(--color-gris-claro);
 }
 
 #contenedorLeads button {
     font-family: var(--fuente);
     font-size: 13px;
     font-weight: 600;
-    padding: 7px 16px;
-    border-radius: 8px;
+    padding: 7px 18px;
     border: 1px solid var(--color-gris-claro);
-    background-color: var(--color-fondo);
+    background-color: transparent;
     color: var(--color-texto);
     cursor: pointer;
-    margin-left: 0 !important;      /* el estilo en linea de script.js pone 10px */
-    transition: background-color 0.15s ease, color 0.15s ease;
+    margin-left: 0 !important;      /* script.js le pone 10px en linea */
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 /* El primer boton que crea script.js es "Venta" y el segundo "No venta" */
@@ -314,7 +333,7 @@ body {
 .insignia--baja    { background-color: var(--prioridad-baja); }
 
 /* ============================================================
-   Pie
+   Pie con la grilla de circulos de la marca
    ============================================================ */
 
 .pie {
@@ -322,29 +341,60 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 20px;
     margin: 0 var(--margen-lateral);
-    padding: 24px 0 40px;
-    border-top: 1px solid var(--color-linea);
-    font-size: 13px;
-    color: var(--color-gris-medio);
+    padding: 32px 0 48px;
+    border-top: 2px solid var(--color-texto);
+    font-size: 15px;
+    color: var(--color-texto);
+}
+
+.circulos {
+    display: grid;
+    grid-template-columns: repeat(3, 21px);
+    gap: 8px 6px;
+}
+
+.circulo {
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    display: block;
+}
+
+.circulo--violeta  { background-color: var(--color-acento); }
+.circulo--naranja  { background-color: var(--color-naranja); }
+.circulo--cian     { background-color: var(--color-cian); }
+
+.circulo--cuadrado {
+    border-radius: 0;
+    background-color: var(--color-texto);
 }
 
 /* ============================================================
    Pantallas angostas
    ============================================================ */
 
-@media (max-width: 720px) {
+@media (max-width: 900px) {
     :root {
-        --margen-lateral: 20px;
+        --margen-lateral: 24px;
     }
 
-    .encabezado__titulo {
-        font-size: 36px;
-        letter-spacing: -1px;
+    .portada {
+        flex-direction: column;
+        padding: 80px 0 60px;
     }
 
-    .contenido {
-        padding-top: 40px;
+    .titular {
+        font-size: 48px;
+        letter-spacing: -2px;
+    }
+
+    .subtitular {
+        font-size: 24px;
+    }
+
+    .bloque__titulo {
+        font-size: 22px;
     }
 }
