@@ -1,21 +1,429 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar · Panel de asesores</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
-    <title>Document</title>
+    <script src="/static/script.js" defer></script>
 </head>
+<style>
+    /* ============================================================
+   Radar - Panel de asesores
+   Identidad visual tomada de la web de Halua Studio
+   ============================================================ */
+
+/* Tokens de la marca. Los colores salen de los componentes de
+   la web de Halua (Navbar.jsx y Section1.jsx) */
+:root {
+    --color-texto: #4C4C4C;         /* gris oscuro, el color principal de la marca */
+    --color-acento: #4C3ACA;        /* violeta, el acento fuerte */
+    --color-naranja: #FF9E10;
+    --color-cian: #18CFED;
+    --color-gris-medio: #999999;
+    --color-gris-claro: #CCCCCC;
+    --color-linea: #E5E5E5;
+    --color-fondo: #FFFFFF;
+    --color-fondo-suave: #FAFAFA;
+
+    /* Colores del semaforo de prioridad. No son de la marca:
+       son semanticos, y se leen igual que en un triaje medico */
+    --prioridad-critica: #E5484D;
+    --prioridad-alta: #FF9E10;
+    --prioridad-media: #F2C94C;
+    --prioridad-baja: #27AE60;
+
+    /* Si la fuente Inter no carga (por ejemplo sin internet en una
+       demo) cae en la tipografia del sistema sin romper el diseno */
+    --fuente: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    --radio: 10px;
+    --espacio: 16px;
+    --margen-lateral: 60px;         /* el margen que usa la web de Halua */
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--fuente);
+    color: var(--color-texto);
+    background-color: var(--color-fondo);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   Barra superior
+   ============================================================ */
+
+.navbar {
+    padding-top: 20px;
+}
+
+.navbar__marca {
+    margin: 0 var(--margen-lateral);
+    padding-bottom: 20px;
+}
+
+.navbar__logo {
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.3px;
+}
+
+/* La linea divisoria con los tres puntos al final, igual que en la web */
+.navbar__linea {
+    display: flex;
+    align-items: center;
+    margin: 0 var(--margen-lateral);
+}
+
+.navbar__linea hr {
+    flex: 1;
+    border: none;
+    border-bottom: 2px solid var(--color-texto);
+}
+
+.puntos {
+    display: flex;
+    gap: 8px;
+    margin-left: 16px;
+}
+
+.punto {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: block;
+}
+
+.punto--claro  { background-color: var(--color-gris-claro); }
+.punto--medio  { background-color: var(--color-gris-medio); }
+.punto--oscuro { background-color: var(--color-texto); }
+
+/* ============================================================
+   Contenido
+   ============================================================ */
+
+.contenido {
+    margin: 0 var(--margen-lateral);
+    padding: 64px 0 40px;
+    max-width: 1100px;
+}
+
+.encabezado {
+    margin-bottom: 48px;
+}
+
+.encabezado__producto {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--color-gris-medio);
+    margin-bottom: 8px;
+}
+
+.encabezado__titulo {
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+}
+
+.acento {
+    color: var(--color-acento);
+}
+
+.encabezado__descripcion {
+    margin-top: 16px;
+    max-width: 520px;
+    color: var(--color-gris-medio);
+}
+
+/* ============================================================
+   Tarjetas
+   ============================================================ */
+
+.tarjeta {
+    border: 1px solid var(--color-linea);
+    border-radius: var(--radio);
+    padding: 28px;
+    margin-bottom: 24px;
+    background-color: var(--color-fondo);
+}
+
+.tarjeta__titulo {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.tarjeta__ayuda {
+    font-size: 14px;
+    color: var(--color-gris-medio);
+    margin-bottom: 20px;
+}
+
+/* ============================================================
+   Controles
+   ============================================================ */
+
+.controles {
+    margin-bottom: 20px;
+}
+
+.controles__fila {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.etiqueta {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--color-gris-medio);
+}
+
+.campo {
+    flex: 1;
+    min-width: 260px;
+    font-family: var(--fuente);
+    font-size: 14px;
+    color: var(--color-texto);
+    padding: 11px 14px;
+    border: 1px solid var(--color-gris-claro);
+    border-radius: var(--radio);
+    background-color: var(--color-fondo);
+}
+
+.campo:focus {
+    outline: none;
+    border-color: var(--color-acento);
+}
+
+.campo::placeholder {
+    color: var(--color-gris-claro);
+}
+
+.boton {
+    font-family: var(--fuente);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 11px 22px;
+    border: none;
+    border-radius: var(--radio);
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+
+.boton:hover {
+    opacity: 0.85;
+}
+
+.boton--primario {
+    background-color: var(--color-acento);
+    color: #FFFFFF;
+}
+
+/* ============================================================
+   Listas
+   ============================================================ */
+
+.lista {
+    list-style: none;
+}
+
+.lista li {
+    font-size: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--color-linea);
+    border-radius: var(--radio);
+    margin-bottom: 10px;
+    background-color: var(--color-fondo-suave);
+    word-break: break-word;
+}
+
+.lista li:last-child {
+    margin-bottom: 0;
+}
+
+/* Los li de los leads los genera script.js con dos botones adentro
+   y sin clases, por eso se estilan por selector y no por clase */
+#contenedorLeads li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    border-left: 4px solid var(--color-gris-claro);
+}
+
+#contenedorLeads button {
+    font-family: var(--fuente);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--color-gris-claro);
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    cursor: pointer;
+    margin-left: 0 !important;      /* el estilo en linea de script.js pone 10px */
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* El primer boton que crea script.js es "Venta" y el segundo "No venta" */
+#contenedorLeads button:first-of-type:hover {
+    background-color: var(--prioridad-baja);
+    border-color: var(--prioridad-baja);
+    color: #FFFFFF;
+}
+
+#contenedorLeads button:last-of-type:hover {
+    background-color: var(--prioridad-critica);
+    border-color: var(--prioridad-critica);
+    color: #FFFFFF;
+}
+
+/* ============================================================
+   Semaforo de prioridad
+   Todavia no se usa: queda listo para cuando el motor de logica
+   difusa devuelva la prioridad. Solo habra que agregarle la clase
+   al li desde script.js
+   ============================================================ */
+
+.prioridad-critica { border-left-color: var(--prioridad-critica) !important; }
+.prioridad-alta    { border-left-color: var(--prioridad-alta) !important; }
+.prioridad-media   { border-left-color: var(--prioridad-media) !important; }
+.prioridad-baja    { border-left-color: var(--prioridad-baja) !important; }
+
+.insignia {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 999px;
+    color: #FFFFFF;
+}
+
+.insignia--critica { background-color: var(--prioridad-critica); }
+.insignia--alta    { background-color: var(--prioridad-alta); }
+.insignia--media   { background-color: var(--prioridad-media); color: var(--color-texto); }
+.insignia--baja    { background-color: var(--prioridad-baja); }
+
+/* ============================================================
+   Pie
+   ============================================================ */
+
+.pie {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 var(--margen-lateral);
+    padding: 24px 0 40px;
+    border-top: 1px solid var(--color-linea);
+    font-size: 13px;
+    color: var(--color-gris-medio);
+}
+
+/* ============================================================
+   Pantallas angostas
+   ============================================================ */
+
+@media (max-width: 720px) {
+    :root {
+        --margen-lateral: 20px;
+    }
+
+    .encabezado__titulo {
+        font-size: 36px;
+        letter-spacing: -1px;
+    }
+
+    .contenido {
+        padding-top: 40px;
+    }
+}
+</style>
 <body>
-    <label>Listar información asesores</label>
-    <button id="btnListarAsesores">Listar Asesores</button>  
-    <ul id="contenedorAsesores"></ul>
-    <br>
-    <br>
-    <label>Ingrese el ID del asesor: </label>
-    <input type="text" id="inputAsesorId" placeholder="UUID Asesor">
-    <button id="btnBuscarLeads">Buscar</button>
-    <ul id="contenedorLeads"></ul>
+
+    <!-- Barra superior: logo, linea divisoria y los tres puntos de la marca -->
+    <nav class="navbar">
+        <div class="navbar__marca">
+            <span class="navbar__logo">halua.studio</span>
+        </div>
+        <div class="navbar__linea">
+            <hr>
+            <div class="puntos">
+                <span class="punto punto--claro"></span>
+                <span class="punto punto--medio"></span>
+                <span class="punto punto--oscuro"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="contenido">
+
+        <!-- Encabezado de la pagina -->
+        <header class="encabezado">
+            <p class="encabezado__producto">Radar</p>
+            <h1 class="encabezado__titulo">Panel de <span class="acento">asesores</span></h1>
+            <p class="encabezado__descripcion">
+                Triaje y enrutamiento de las solicitudes comerciales que entran por los canales de la empresa.
+            </p>
+        </header>
+
+        <!-- Bloque 1: listado de asesores -->
+        <section class="tarjeta">
+            <h2 class="tarjeta__titulo">Asesores</h2>
+            <p class="tarjeta__ayuda">Consulta los asesores registrados y copia el identificador del que quieras revisar.</p>
+
+            <div class="controles">
+                <button id="btnListarAsesores" class="boton boton--primario">Listar asesores</button>
+            </div>
+
+            <ul id="contenedorAsesores" class="lista lista--asesores"></ul>
+        </section>
+
+        <!-- Bloque 2: leads asignados a un asesor -->
+        <section class="tarjeta">
+            <h2 class="tarjeta__titulo">Leads asignados</h2>
+            <p class="tarjeta__ayuda">Ingresa el identificador de un asesor para ver los leads que tiene a cargo.</p>
+
+            <div class="controles">
+                <label for="inputAsesorId" class="etiqueta">Identificador del asesor</label>
+                <div class="controles__fila">
+                    <input type="text" id="inputAsesorId" class="campo" placeholder="UUID del asesor" autocomplete="off">
+                    <button id="btnBuscarLeads" class="boton boton--primario">Buscar</button>
+                </div>
+            </div>
+
+            <ul id="contenedorLeads" class="lista lista--leads"></ul>
+        </section>
+
+    </main>
+
+    <footer class="pie">
+        <small>Medellin, Col.</small>
+        <small>Radar · un producto de halua.studio</small>
+    </footer>
+
 </body>
-<script src="/static/script.js" defer></script>
 </html>
