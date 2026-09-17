@@ -49,11 +49,13 @@ Terminada cuando: el contenido está escrito y aprobado para pasarlo a YAML.
 Problema: si las reglas viven en el código, cambiarlas exige tocar Python.
 Solución: app/motor/reglas.yaml con variables, conjuntos, reglas y umbral, y app/motor/reglas.py que lo carga y valida (toda regla nombra variables y conjuntos que existen). Una configuración inválida lanza una excepción propia del dominio.
 Terminada cuando: hay pruebas para un archivo válido y para cada tipo de error.
+Cada variable declara su universo con un mínimo y un máximo.
 
 ### 1.6 Resultado explicable
 Problema: una prioridad sola no dice por qué.
 Solución: la función pública del motor recibe las cuatro variables y devuelve la prioridad, el nivel y las reglas activadas con su grado, ordenadas de mayor a menor.
 Terminada cuando: las pruebas pasan con dos o tres leads de ejemplo calculados a mano.
+Antes de calcular pertenencias, cada entrada se recorta a su universo, de modo que un plazo vencido cuenta como cero días y un monto por encima del máximo cuenta como el máximo.
 
 ## Fase 2. Esquema y dominio (21 de septiembre)
 
