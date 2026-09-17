@@ -1,73 +1,362 @@
 [
-    { 
-        "id_woocommerce": 1,
-        "nombre_producto" : "Colchon R1", 
-        "precio_regular" : 6793000, 
-        "precio_venta" : 2717200, 
-        "categoria" : "Colchones suaves"
+    {
+        "id_producto": 1,
+        "referencia": "TOR-001",
+        "nombre_producto": "Tornillo drywall punta fina 6x1\" caja x100",
+        "categoria": "Fijación y tornillería",
+        "unidad": "caja",
+        "precio_unitario": 14500,
+        "existencias": 320
     },
     {
-        "id_woocommerce": 2,
-        "nombre_producto" : "Colchon R22", 
-        "precio_regular" : 3426000,
-        "precio_venta" : 1541700, 
-        "categoria" : "Colchones suaves"
-    },
-        { 
-        "id_woocommerce": 3,
-        "nombre_producto" : "Colchon R5", 
-        "precio_regular" : 5740000,  
-        "precio_venta" : 2296000,
-        "categoria" : "Colchones suaves"
+        "id_producto": 2,
+        "referencia": "TOR-002",
+        "nombre_producto": "Tornillo autoperforante cabeza hexagonal 12x1\" caja x100",
+        "categoria": "Fijación y tornillería",
+        "unidad": "caja",
+        "precio_unitario": 32000,
+        "existencias": 180
     },
     {
-        "id_woocommerce": 4,
-        "nombre_producto" : "Pillow en Viscoelastica",  
-        "precio_regular" : 608000,  
-        "precio_venta" : 516800, 
-        "categoria" : "Colchones suaves"
-    },
-    { 
-        "id_woocommerce": 5,
-        "nombre_producto" : "Pillow Relajante", 
-        "precio_regular" : 288000, 
-        "precio_venta" : 244800, 
-        "categoria" : "Colchones suaves"
+        "id_producto": 3,
+        "referencia": "TOR-003",
+        "nombre_producto": "Perno hexagonal grado 5 1/2x2\" caja x50",
+        "categoria": "Fijación y tornillería",
+        "unidad": "caja",
+        "precio_unitario": 68000,
+        "existencias": 60
     },
     {
-        "id_woocommerce": 6,
-        "nombre_producto" : "Colchon Confortop", 
-        "precio_regular" : 3102000,  
-        "precio_venta" : 1395900, 
-        "categoria" : "Colchones semifirmes"
-    },
-    { 
-        "id_woocommerce": 7,
-        "nombre_producto" : "Colchon Flexy", 
-        "precio_regular" : 1522000,
-        "precio_venta" : 684900, 
-        "categoria" : "Colchones semifirmes"
-    },                                                                                 
-
-    {
-        "id_woocommerce": 8,
-        "nombre_producto" : "Colchon R3", 
-        "precio_regular" : 3252000,  
-        "precio_venta" : 1463000,
-        "categoria" : "Colchones semifirmes"
-    },
-    { 
-        "id_woocommerce": 9,
-        "nombre_producto" : "Colchon R30 1P", 
-        "precio_regular" : 3216000,  
-        "precio_venta" : 1447200, 
-        "categoria" : "Colchones semifirmes"
+        "id_producto": 4,
+        "referencia": "TOR-004",
+        "nombre_producto": "Chazo expansivo metálico 3/8\" caja x50",
+        "categoria": "Fijación y tornillería",
+        "unidad": "caja",
+        "precio_unitario": 42000,
+        "existencias": 0
     },
     {
-        "id_woocommerce": 10,
-        "nombre_producto" : "Colchon R30 2P", 
-        "precio_regular" : 3472000, 
-        "precio_venta" : 1562400, 
-        "categoria" : "Colchones semifirmes"
+        "id_producto": 5,
+        "referencia": "TOR-005",
+        "nombre_producto": "Arandela plana galvanizada 1/2\" caja x100",
+        "categoria": "Fijación y tornillería",
+        "unidad": "caja",
+        "precio_unitario": 18000,
+        "existencias": 400
+    },
+    {
+        "id_producto": 6,
+        "referencia": "TOR-006",
+        "nombre_producto": "Varilla roscada 1/2\" x 1 m",
+        "categoria": "Fijación y tornillería",
+        "unidad": "unidad",
+        "precio_unitario": 12500,
+        "existencias": 150
+    },
+    {
+        "id_producto": 7,
+        "referencia": "ABR-001",
+        "nombre_producto": "Disco de corte para metal 4-1/2\" x 1 mm",
+        "categoria": "Abrasivos y corte",
+        "unidad": "unidad",
+        "precio_unitario": 4800,
+        "existencias": 900
+    },
+    {
+        "id_producto": 8,
+        "referencia": "ABR-002",
+        "nombre_producto": "Disco de corte para metal 7\"",
+        "categoria": "Abrasivos y corte",
+        "unidad": "unidad",
+        "precio_unitario": 9500,
+        "existencias": 35
+    },
+    {
+        "id_producto": 9,
+        "referencia": "ABR-003",
+        "nombre_producto": "Disco flap grano 60 4-1/2\"",
+        "categoria": "Abrasivos y corte",
+        "unidad": "unidad",
+        "precio_unitario": 11800,
+        "existencias": 260
+    },
+    {
+        "id_producto": 10,
+        "referencia": "ABR-004",
+        "nombre_producto": "Lija de agua grano 220",
+        "categoria": "Abrasivos y corte",
+        "unidad": "pliego",
+        "precio_unitario": 2600,
+        "existencias": 1200
+    },
+    {
+        "id_producto": 11,
+        "referencia": "ABR-005",
+        "nombre_producto": "Disco diamantado segmentado 7\"",
+        "categoria": "Abrasivos y corte",
+        "unidad": "unidad",
+        "precio_unitario": 78000,
+        "existencias": 0
+    },
+    {
+        "id_producto": 12,
+        "referencia": "SOL-001",
+        "nombre_producto": "Soldadura electrodo 6013 1/8\"",
+        "categoria": "Soldadura",
+        "unidad": "kg",
+        "precio_unitario": 21000,
+        "existencias": 350
+    },
+    {
+        "id_producto": 13,
+        "referencia": "SOL-002",
+        "nombre_producto": "Soldadura electrodo 7018 1/8\"",
+        "categoria": "Soldadura",
+        "unidad": "kg",
+        "precio_unitario": 27500,
+        "existencias": 12
+    },
+    {
+        "id_producto": 14,
+        "referencia": "SOL-003",
+        "nombre_producto": "Soldadora inverter 200 A",
+        "categoria": "Soldadura",
+        "unidad": "unidad",
+        "precio_unitario": 1850000,
+        "existencias": 8
+    },
+    {
+        "id_producto": 15,
+        "referencia": "SOL-004",
+        "nombre_producto": "Careta fotosensible para soldar",
+        "categoria": "Soldadura",
+        "unidad": "unidad",
+        "precio_unitario": 145000,
+        "existencias": 22
+    },
+    {
+        "id_producto": 16,
+        "referencia": "SOL-005",
+        "nombre_producto": "Alambre MIG ER70S-6 0.9 mm rollo 15 kg",
+        "categoria": "Soldadura",
+        "unidad": "rollo",
+        "precio_unitario": 265000,
+        "existencias": 0
+    },
+    {
+        "id_producto": 17,
+        "referencia": "SOL-006",
+        "nombre_producto": "Guantes de carnaza para soldador",
+        "categoria": "Soldadura",
+        "unidad": "par",
+        "precio_unitario": 24000,
+        "existencias": 140
+    },
+    {
+        "id_producto": 18,
+        "referencia": "EPP-001",
+        "nombre_producto": "Casco de seguridad dieléctrico con ratchet",
+        "categoria": "Protección personal",
+        "unidad": "unidad",
+        "precio_unitario": 38000,
+        "existencias": 210
+    },
+    {
+        "id_producto": 19,
+        "referencia": "EPP-002",
+        "nombre_producto": "Gafas de seguridad lente claro",
+        "categoria": "Protección personal",
+        "unidad": "unidad",
+        "precio_unitario": 7500,
+        "existencias": 600
+    },
+    {
+        "id_producto": 20,
+        "referencia": "EPP-003",
+        "nombre_producto": "Guantes de nitrilo recubiertos",
+        "categoria": "Protección personal",
+        "unidad": "par",
+        "precio_unitario": 8900,
+        "existencias": 1500
+    },
+    {
+        "id_producto": 21,
+        "referencia": "EPP-004",
+        "nombre_producto": "Botas de seguridad puntera de acero",
+        "categoria": "Protección personal",
+        "unidad": "par",
+        "precio_unitario": 165000,
+        "existencias": 40
+    },
+    {
+        "id_producto": 22,
+        "referencia": "EPP-005",
+        "nombre_producto": "Protector auditivo tipo copa",
+        "categoria": "Protección personal",
+        "unidad": "unidad",
+        "precio_unitario": 29000,
+        "existencias": 15
+    },
+    {
+        "id_producto": 23,
+        "referencia": "EPP-006",
+        "nombre_producto": "Arnés de cuerpo completo certificado",
+        "categoria": "Protección personal",
+        "unidad": "unidad",
+        "precio_unitario": 285000,
+        "existencias": 0
+    },
+    {
+        "id_producto": 24,
+        "referencia": "EPP-007",
+        "nombre_producto": "Respirador media cara con filtros",
+        "categoria": "Protección personal",
+        "unidad": "unidad",
+        "precio_unitario": 98000,
+        "existencias": 30
+    },
+    {
+        "id_producto": 25,
+        "referencia": "HEL-001",
+        "nombre_producto": "Pulidora angular 4-1/2\" 850 W",
+        "categoria": "Herramienta eléctrica",
+        "unidad": "unidad",
+        "precio_unitario": 289000,
+        "existencias": 25
+    },
+    {
+        "id_producto": 26,
+        "referencia": "HEL-002",
+        "nombre_producto": "Pulidora angular 7\" 2200 W",
+        "categoria": "Herramienta eléctrica",
+        "unidad": "unidad",
+        "precio_unitario": 615000,
+        "existencias": 6
+    },
+    {
+        "id_producto": 27,
+        "referencia": "HEL-003",
+        "nombre_producto": "Taladro percutor 1/2\" 800 W",
+        "categoria": "Herramienta eléctrica",
+        "unidad": "unidad",
+        "precio_unitario": 345000,
+        "existencias": 18
+    },
+    {
+        "id_producto": 28,
+        "referencia": "HEL-004",
+        "nombre_producto": "Rotomartillo SDS Plus 1000 W",
+        "categoria": "Herramienta eléctrica",
+        "unidad": "unidad",
+        "precio_unitario": 890000,
+        "existencias": 3
+    },
+    {
+        "id_producto": 29,
+        "referencia": "HEL-005",
+        "nombre_producto": "Tronzadora de metal 14\" 2200 W",
+        "categoria": "Herramienta eléctrica",
+        "unidad": "unidad",
+        "precio_unitario": 1250000,
+        "existencias": 45
+    },
+    {
+        "id_producto": 30,
+        "referencia": "HEL-006",
+        "nombre_producto": "Atornillador inalámbrico 20 V con batería",
+        "categoria": "Herramienta eléctrica",
+        "unidad": "unidad",
+        "precio_unitario": 420000,
+        "existencias": 14
+    },
+    {
+        "id_producto": 31,
+        "referencia": "HMA-001",
+        "nombre_producto": "Juego de llaves combinadas 12 piezas",
+        "categoria": "Herramienta manual y medición",
+        "unidad": "juego",
+        "precio_unitario": 185000,
+        "existencias": 20
+    },
+    {
+        "id_producto": 32,
+        "referencia": "HMA-002",
+        "nombre_producto": "Flexómetro 8 m",
+        "categoria": "Herramienta manual y medición",
+        "unidad": "unidad",
+        "precio_unitario": 32000,
+        "existencias": 90
+    },
+    {
+        "id_producto": 33,
+        "referencia": "HMA-003",
+        "nombre_producto": "Nivel de aluminio 24\"",
+        "categoria": "Herramienta manual y medición",
+        "unidad": "unidad",
+        "precio_unitario": 46000,
+        "existencias": 35
+    },
+    {
+        "id_producto": 34,
+        "referencia": "HMA-004",
+        "nombre_producto": "Pinza voltiamperimétrica digital",
+        "categoria": "Herramienta manual y medición",
+        "unidad": "unidad",
+        "precio_unitario": 235000,
+        "existencias": 10
+    },
+    {
+        "id_producto": 35,
+        "referencia": "HMA-005",
+        "nombre_producto": "Llave de tubo 18\"",
+        "categoria": "Herramienta manual y medición",
+        "unidad": "unidad",
+        "precio_unitario": 72000,
+        "existencias": 28
+    },
+    {
+        "id_producto": 36,
+        "referencia": "ELE-001",
+        "nombre_producto": "Cable encauchado 3x12 AWG",
+        "categoria": "Material eléctrico",
+        "unidad": "metro",
+        "precio_unitario": 9800,
+        "existencias": 2500
+    },
+    {
+        "id_producto": 37,
+        "referencia": "ELE-002",
+        "nombre_producto": "Cable THHN 12 AWG rollo 100 m",
+        "categoria": "Material eléctrico",
+        "unidad": "rollo",
+        "precio_unitario": 385000,
+        "existencias": 4
+    },
+    {
+        "id_producto": 38,
+        "referencia": "ELE-003",
+        "nombre_producto": "Cinta aislante 3/4\" x 20 m",
+        "categoria": "Material eléctrico",
+        "unidad": "unidad",
+        "precio_unitario": 5200,
+        "existencias": 800
+    },
+    {
+        "id_producto": 39,
+        "referencia": "ELE-004",
+        "nombre_producto": "Extensión industrial 3x14 AWG 15 m",
+        "categoria": "Material eléctrico",
+        "unidad": "unidad",
+        "precio_unitario": 118000,
+        "existencias": 25
+    },
+    {
+        "id_producto": 40,
+        "referencia": "ELE-005",
+        "nombre_producto": "Clavija industrial trifásica 32 A",
+        "categoria": "Material eléctrico",
+        "unidad": "unidad",
+        "precio_unitario": 64000,
+        "existencias": 0
     }
 ]

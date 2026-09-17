@@ -80,3 +80,17 @@ Aplicada de la Universidad EIA para la Cámara de Comercio Aburrá Sur.
 
 Las decisiones de diseño que se tomaron durante el desarrollo, con la razón de cada una,
 están en DECISIONES.md.
+
+## Levantamiento
+La primera vez: 
+git clone https://github.com/Juand13go/radar_motor_difuso.git
+cd radar_motor_difuso
+cp .env.example .env
+
+Cada sesion (3 terminales Ubuntu): 
+1a terminal: cloudflared tunnel --url http://localhost:5678
+2da terminal: cd ~/radar_motor_difuso
+              nano .env          
+              docker compose up
+3ra terminal: cd ~/radar_motor_difuso
+              code .
