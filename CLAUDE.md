@@ -143,3 +143,6 @@ Todo lo que PLAN.md lista como trabajo futuro, además de CI/CD, conversión a a
 ## Documentación
 
 README.md y DECISIONES.md van en la redacción de Juan Diego: párrafos corridos, paréntesis para aclarar, sin tablas, sin diagramas en ASCII, sin negritas repartidas, sin emojis y sin guiones largos. Solo se editan cuando la instrucción lo pide.
+
+
+Las excepciones ConfiguracionMotorInvalida y EntradaMotorInvalida son las únicas que no tienen manejador en main.py, porque son errores de programación o de configuración del motor y deben detectarse en desarrollo, no convertirse en una respuesta HTTP.

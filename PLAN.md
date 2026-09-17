@@ -44,6 +44,7 @@ Terminada cuando: las pruebas pasan, incluido el caso sin reglas activas.
 Problema: las funciones existen pero falta el contenido de negocio.
 Solución: sesión en el chat, sin código. Se definen los universos y conjuntos de monto estimado, relación con el cliente, completitud y plazo en días (incluido qué pasa cuando no hay fecha), las salidas de cada nivel, entre quince y veinte reglas, y el umbral de escalación.
 Terminada cuando: el contenido está escrito y aprobado para pasarlo a YAML.
+Con la escala decidida, se agrega a la validación de la 1.5 que los valores de salidas, cortes y umbral_escalacion sean números dentro de esa escala.
 
 ### 1.5 Reglas en YAML
 Problema: si las reglas viven en el código, cambiarlas exige tocar Python.

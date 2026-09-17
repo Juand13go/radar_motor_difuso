@@ -1,0 +1,47 @@
+# Valores de prueba del motor. No son las reglas de Tornalba: esas viven en app/motor/reglas.yaml
+variables:
+  monto_estimado:
+    minimo: 0
+    maximo: 100
+    conjuntos:
+      bajo:
+        tipo: trapezoidal
+        puntos: [0, 0, 20, 50]
+      alto:
+        tipo: trapezoidal
+        puntos: [20, 50, 100, 100]
+  plazo_dias:
+    minimo: 0
+    maximo: 30
+    conjuntos:
+      corto:
+        tipo: triangular
+        puntos: [0, 0, 10]
+      largo:
+        tipo: trapezoidal
+        puntos: [5, 15, 30, 30]
+salidas:
+  baja: 0.2
+  media: 0.4
+  alta: 0.7
+  critica: 0.9
+cortes:
+  media: 0.25
+  alta: 0.5
+  critica: 0.75
+umbral_escalacion: 0.5
+reglas:
+  - nombre: pedido_grande_urgente
+    si:
+      monto_estimado: alto
+      plazo_dias: corto
+    entonces: critica
+  - nombre: pedido_pequeno_sin_afan
+    si:
+      monto_estimado: bajo
+      plazo_dias: largo
+    entonces: baja
+  - nombre: pedido_grande
+    si:
+      monto_estimado: alto
+    entonces: alta
