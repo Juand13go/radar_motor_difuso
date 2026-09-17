@@ -12,3 +12,6 @@ class SinAsesoresDisponibles(Exception):
 
 class ConfiguracionInvalida(Exception):
     pass
+
+class ConfiguracionMotorInvalida(Exception):
+    pass
