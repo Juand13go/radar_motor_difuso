@@ -7,7 +7,7 @@ import logging
 from fastapi.responses import FileResponse
 
 
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
 app.include_router(router)

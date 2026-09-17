@@ -1,107 +1,86 @@
-name: radar # Fija el nombre del proyecto. Sin esto, Compose usa el nombre de la carpeta y renombrarla rompe los volúmenes
+name: radar # Sin esto Compose usa el nombre de la carpeta, y renombrarla rompe los volúmenes
 
-services: # Sección principal que agrupa y define los contenedores individuales (servicios) que componen el ecosistema
+services:
 
-  # =========================================================================
-  # --- CONFIGURACIÓN DEL MOTOR DE BASE DE DATOS (POSTGRESQL) --------------
-  # =========================================================================
-  postgres: # Nombre identificador único del servicio dentro de la red interna de Docker (actúa como el DNS)
-    image: postgres:16-alpine # Descarga la imagen oficial de PostgreSQL versión 16 empaquetada sobre una distribución Linux Alpine ultra ligera
-    container_name: radar_postgres # Nombre exacto que se le asignará al contenedor físico y que verás listado en tu Docker Desktop
-    restart: unless-stopped # Regla de reinicio: se levanta solo ante fallos o reinicios de la PC, a menos que tú lo apagues manualmente
-    environment: # Bloque para inyectar variables de entorno dinámicas que configuran el comportamiento interno del contenedor
-      POSTGRES_DB: ${POSTGRES_DB} # Nombre de la base de datos inicial que se creará de forma automática al arrancar por primera vez
-      POSTGRES_USER: ${POSTGRES_USER} # Nombre del usuario administrador principal con superpoderes dentro de esta base de datos
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # Contraseña de acceso para ese administrador (extraída de forma segura desde el archivo externo .env)
+  postgres:
+    image: postgres:16-alpine
+    container_name: radar_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-    volumes: # Mapeo de almacenamiento para asegurar que la información no sea efímera ni se destruya (PERSISTENCIA)
-      - postgres_data:/var/lib/postgresql/data  # Conecta el volumen 'postgres_data' con la ruta interna donde Linux almacena físicamente los registros
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Mapea tu script SQL local. Si el volumen está vacío, Postgres lo ejecuta automáticamente al nacer
-
-    networks: # Asigna este contenedor a la red virtual aislada del proyecto para que pueda comunicarse con los demás
-      - radar_net
-
-    # Bloque avanzado que audita en tiempo real si el motor interno de la base de datos ya está operativo
-    healthcheck: # Monitorea los estados del contenedor: starting (arrancando), healthy (sano), y unhealthy (enfermo)
-      # Comando nativo de Postgres ejecutado internamente para verificar si el puerto acepta conexiones con ese usuario y BD
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      # Frecuencia: Docker ejecutará la prueba de conectividad cada 10 segundos exactos
-      interval: 10s # Cada cuánto docker hace la prueba mientras PostgreSQL está arrancando
-      # Tiempo de gracia: si el comando tarda más de 5 segundos en responder, se considera un intento fallido
-      timeout: 5s # Cuánto espera Docker a que pg_isready responda antes de considerar el intento fallido.
-      # Margen de error: Docker intentará la prueba hasta 5 veces antes de marcar oficialmente el contenedor como "enfermo"
-      retries: 5 # ¿Cuántos fallos consecutivos toleras antes de declarar el contenedor como enfermo?
-
-  # =========================================================================
-  # --- CONFIGURACIÓN DE TU BACKEND / API (FASTAPI) -----------------------
-  # =========================================================================
-  fastapi: # Nombre identificador único del servicio para tu lógica de negocio en Python
-    build: ./fastapi # En lugar de bajar una imagen de internet, compila una propia buscando el archivo 'Dockerfile' dentro de la carpeta local ./fastapi
-    command: sh -c "alembic upgrade head && python seed.py && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
-    container_name: radar_fastapi # Nombre físico que identificará a tu backend en la consola y Docker Desktop
-    restart: unless-stopped # Si Python se cae por un error inesperado, Docker lo reinicia automáticamente en milisegundos
-    ports: # Mapeo de puertos para abrir canales de comunicación entre tu computadora física y el contenedor
-      - "8000:8000" # Vincula el puerto 8000 de tu máquina real (izquierda) con el puerto 8000 del contenedor interno de FastAPI (derecha)
-    environment: # Variables de entorno que se le inyectarán a los procesos de Python mediante os.getenv()
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB} # Construye la URL de conexión usando el nombre del servicio 'postgres' como host
-      # ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY} # Línea comentada/desactivada (no se inyecta en el contenedor actualmente)
-      GROQ_API_KEY: ${GROQ_API_KEY} # Pasa la API Key de Groq guardada en tu .env para que el cliente OpenAI en main.py pueda autenticarse con los modelos Llama
-      GROQ_MODEL: ${GROQ_MODEL}
-    networks: # Conecta el contenedor a la misma red compartida para que tenga línea directa con el motor de base de datos
-      - radar_net
-    depends_on: # Control de secuencia de arranque y dependencias estructurales
-      postgres: # Le indica a FastAPI que depende estrictamente del servicio de la base de datos para funcionar
-        condition: service_healthy # Condición estricta: FastAPI NO encenderá hasta que el healthcheck de 'postgres' marque que está 100% "healthy"
     volumes:
-      - ./fastapi:/app # Monta tu código local dentro del contenedor. Solo para desarrollo: en el servidor esto se quita (ver notas)
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Postgres solo lo ejecuta cuando el volumen está vacío
 
-  # =========================================================================
-  # --- CONFIGURACIÓN DEL ORQUESTADOR DE AUTOMATIZACIÓN (N8N) -------------
-  # =========================================================================
-  n8n: # Nombre identificador del servicio para la plataforma de automatizaciones visuales
-    image: n8nio/n8n:latest # Descarga la última imagen estable de n8n. Considera fijar una versión antes de la feria (ver notas)
-    container_name: radar_n8n # Nombre del contenedor físico que verás en la interfaz de usuario de Docker
-    restart: unless-stopped # Se asegura de mantener n8n encendido permanentemente a menos que lo apagues manualmente con 'docker compose down'
-    ports: # Abre las puertas de acceso de red hacia el contenedor
-      - "5678:5678" # Vincula el puerto 5678 de tu PC real con el interno de n8n para que puedas abrir el panel visual en tu navegador usando http://localhost:5678
-    environment: # Bloque masivo de variables que configuran el comportamiento interno, idioma y base de datos de n8n
-      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true" # Obliga a n8n a respetar de forma estricta los permisos de lectura/escritura de archivos en Linux por seguridad
-      N8N_PROXY_HOPS: "1" # Indica cuántos proxies o balanceadores de carga inversos cruzará la petición web antes de llegar a n8n (útil para leer IPs reales)
-      DB_TYPE: postgresdb # Configuración crucial: le dice a n8n que cambie su base de datos interna por defecto (SQLite) y use un motor PostgreSQL
-      DB_POSTGRESDB_HOST: postgres # Indica el servidor de base de datos. Gracias al DNS interno de Docker, usa la palabra clave del servicio 'postgres'
-      DB_POSTGRESDB_PORT: 5432 # El puerto estándar de red interna sobre el cual corre PostgreSQL
-      DB_POSTGRESDB_DATABASE: ${N8N_DB} # Base de datos exclusiva para n8n leída de tu .env. Separa los flujos y credenciales de n8n de tus tablas de negocio
-      DB_POSTGRESDB_USER: ${POSTGRES_USER} # Usuario administrador reutilizado para que n8n pueda iniciar sesión en el motor de Postgres
-      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD} # Contraseña del usuario administrador para completar la autenticación de n8n en Postgres
-      N8N_BASIC_AUTH_ACTIVE: "true" # Activa la autenticación básica de credenciales para proteger el acceso al panel visual de n8n
-      N8N_BASIC_AUTH_USER: ${N8N_USER} # Usuario de la autenticación básica. OJO: el nombre correcto de la variable lleva BASIC_AUTH (ver notas)
-      N8N_BASIC_AUTH_PASSWORD: ${N8N_PASSWORD} # Contraseña de la autenticación básica, leída desde tu archivo .env
-      N8N_DEFAULT_LOCALE: es # Configura el idioma de la interfaz gráfica del panel de control de n8n completamente a Español
-      GENERIC_TIMEZONE: "America/Bogota" # Ajusta la zona horaria del sistema a Colombia para que las automatizaciones y nodos de tiempo coincidan con la hora local real
-      N8N_HIDE_USAGE_PAGE: "true" # Desactiva el envío de métricas de telemetría y páginas de uso hacia los servidores de la empresa n8n por privacidad
-      N8N_ATTRIBUTION: "false" # Oculta marcas de atribución o logos promocionales innecesarios dentro de la interfaz del software
-      # N8N_HOST: localhost # Línea de configuración comentada (desactivada)
-      N8N_PROTOCOL: https # Configura a n8n para estructurar y entender que sus URLs externas e internas deben viajar cifradas bajo protocolo HTTPS
-      WEBHOOK_URL: ${WEBHOOK_URL} # URL pública (cloudflared o servidor) indispensable para que Telegram sepa a dónde enviar los mensajes en tiempo real
-    volumes: # Mapeo de almacenamiento persistente para el contenedor de automatización
-      - n8n_data:/home/node/.n8n # Enlaza el volumen 'n8n_data' con la ruta donde n8n guarda su configuración y LA CLAVE DE CIFRADO de las credenciales
-
-    networks: # Une a n8n a la red unificada para que pueda enviar peticiones HTTP a FastAPI y consultas SQL a Postgres
+    networks:
       - radar_net
-    depends_on: # Control de orden secuencial
-      postgres: # Declara dependencia directa sobre el motor de base de datos
-        condition: service_healthy # Congela el arranque de n8n en el estado 'starting' hasta que el contenedor de Postgres reporte estar 100% sano y listo
 
-# =========================================================================
-# --- SECCIÓN DE INFRAESTRUCTURA GLOBAL (REDES Y VOLÚMENES) --------------
-# =========================================================================
-networks: # Bloque estructural que le dice a Docker qué redes virtuales debe crear desde cero en la máquina anfitriona
-  radar_net: # Clave interna con la que los servicios de arriba referencian esta red
-    name: radar_net # Nombre real en Docker. Al ser explícito, Compose no le antepone el nombre del proyecto
-    driver: bridge # Tipo de red. El driver 'bridge' crea un puente virtual que interconecta exclusivamente a los contenedores de este archivo
+    # FastAPI corre alembic al arrancar, así que no puede encenderse antes de que Postgres acepte conexiones
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-volumes: # Bloque estructural que obliga a Docker a registrar y reservar espacio persistente en el disco duro físico
-  postgres_data: # Clave interna del volumen donde viven los registros reales de tus tablas de PostgreSQL
-    name: radar_postgres_data # Nombre real en Docker. Explícito para que renombrar la carpeta nunca vuelva a romper la persistencia
-  n8n_data: # Clave interna del volumen que resguarda la configuración de n8n y la clave con la que cifra las credenciales
-    name: radar_n8n_data # Nombre real en Docker, también explícito
+  fastapi:
+    build: ./fastapi
+    command: sh -c "alembic upgrade head && python seed.py && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    container_name: radar_fastapi
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GROQ_MODEL: ${GROQ_MODEL}
+    networks:
+      - radar_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./fastapi:/app # Solo para desarrollo: en un servidor esto se quita
+
+  n8n:
+    image: n8nio/n8n:2.37.7 # Fija en la versión que quedó probada; en latest se actualizó sola y rompió el entorno
+    container_name: radar_n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+      N8N_PROXY_HOPS: "1"
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: ${N8N_DB} # Base aparte para que los flujos de n8n no se mezclen con las tablas de negocio
+      DB_POSTGRESDB_USER: ${POSTGRES_USER}
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+      N8N_DEFAULT_LOCALE: es
+      GENERIC_TIMEZONE: "America/Bogota"
+      N8N_HIDE_USAGE_PAGE: "true"
+      N8N_ATTRIBUTION: "false"
+      N8N_PROTOCOL: https
+      N8N_WEBHOOK_URL: ${WEBHOOK_URL} # URL pública del túnel, la que Telegram necesita para entregar los mensajes
+    volumes:
+      - n8n_data:/home/node/.n8n # Aquí vive la clave con la que n8n cifra las credenciales; si se pierde, se pierden
+
+    networks:
+      - radar_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  radar_net:
+    name: radar_net # Explícito para que Compose no le anteponga el nombre del proyecto
+    driver: bridge
+
+volumes:
+  postgres_data:
+    name: radar_postgres_data # Explícito para que renombrar la carpeta no vuelva a romper la persistencia
+  n8n_data:
+    name: radar_n8n_data

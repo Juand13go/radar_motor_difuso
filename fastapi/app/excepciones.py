@@ -9,3 +9,6 @@ class AsesorNoEncontrado(Exception):
 
 class SinAsesoresDisponibles(Exception):
     pass
+
+class ConfiguracionInvalida(Exception):
+    pass

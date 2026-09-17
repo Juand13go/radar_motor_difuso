@@ -67,3 +67,12 @@ productos_interes se guarda como texto libre, sin normalizar contra el catálogo
 La imagen de n8n está en latest, así que se puede actualizar sola y romper el entorno; convendría fijar la versión.
 El prompt del agente vive dentro de conversacion.py, sin historial propio ni manera de evaluar si un cambio lo mejoró o lo empeoró.
 No hay pruebas automatizadas ni un conjunto de casos para verificar el comportamiento del agente.
+
+## El backend es síncrono y la concurrencia se resuelve en la base de datos
+Los endpoints de FastAPI están declarados como funciones normales y no como async. FastAPI corre ese tipo de funciones en un grupo de hilos, así que varios mensajes que llegan al mismo tiempo se atienden en paralelo sin que uno bloquee a los demás.
+Casi todo el tiempo de cada mensaje se va en la llamada al modelo (uno o dos segundos), y al volumen de conversaciones que recibe una distribuidora por Telegram los hilos alcanzan de sobra.
+Pasar a async no es cambiar def por async def: exige cambiar el driver de PostgreSQL, las sesiones, cada función del repositorio y el cliente del modelo. Y hacerlo a medias es peor que no hacerlo, porque una función async que llama algo síncrono bloquea el servidor completo mientras espera. Por eso no se hizo.
+El motor difuso tampoco ganaría nada, porque es cálculo puro sin esperas de red ni de disco, que es lo único que async acelera.
+Lo que sí había que resolver es otro problema que suele confundirse con este. Si un cliente manda dos mensajes casi al mismo tiempo, las dos solicitudes pueden buscar el lead abierto, no encontrarlo y crear cada una el suyo. Eso es una condición de carrera y async no la evita, porque con async las solicitudes también se intercalan.
+La solución quedó en PostgreSQL: un índice único parcial sobre id_conversacion para los leads en estado en_proceso. Si la segunda inserción choca con el índice, se deshace y se continúa con el lead que creó el primer mensaje.
+Así, la regla de un lead abierto por conversación no depende de que el código esté bien escrito: la garantiza la base de datos.

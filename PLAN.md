@@ -66,6 +66,7 @@ Terminada cuando: la base arranca con las 40 referencias de Tornalba.
 Problema: el lead solo guarda texto libre y no tiene cómo registrar prioridad, escalación ni tiempos.
 Solución: agregar monto_estimado, fecha_requerida, prioridad, nivel_prioridad, escalado, motivo_escalacion, escalado_en y cerrado_en; ciudad y productos_interes pasan a nullable. cerrar_lead empieza a registrar cerrado_en.
 Terminada cuando: la migración corre sobre la base y cerrar un lead guarda la fecha.
+Se agrega un índice único parcial sobre id_conversacion para las filas con estado_lead en_proceso, de modo que la base de datos impida dos leads abiertos para la misma conversación.
 
 ### 2.3 Ítems solicitados
 Problema: lo que pidió el cliente no queda estructurado, así que la demanda no se puede contar.
@@ -100,6 +101,7 @@ Terminada cuando: las pruebas de las cuatro variables pasan.
 Problema: hoy se crea un lead nuevo cada vez que el modelo decide escalar.
 Solución: una conversación tiene máximo un lead en_proceso. Si llegan ítems y no hay lead abierto se crea; si hay lead abierto se actualiza y sus ítems se reemplazan con la foto de precio y existencias. Sin ítems y sin lead no se crea nada.
 Terminada cuando: una conversación de varios mensajes deja un solo lead con los ítems del último mensaje.
+Si la creación del lead falla por el índice único, se hace rollback, se busca el lead abierto existente y se continúa con ese.
 
 ### 4.3 Evaluación y escalación
 Problema: la decisión de escalar tiene que ser del motor y quedar registrada con su motivo.

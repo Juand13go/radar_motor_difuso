@@ -1,7 +1,7 @@
 from sqlmodel import Session
 from app.excepciones import LeadNoEncontrado, SinAsesoresDisponibles
 from app.persistencia.repositorio import creacion_conversacion, verificacion_existencia_conversacion, historial_conversacion, guardar_mensaje_por_rol, obtener_lead_por_id
-from app.persistencia.repositorio import crear_lead, actualizar_estado_conversacion, obtener_productos, lista_asesores, comparacion, actualizar_asesor, obtener_asesor_por_id
+from app.persistencia.repositorio import crear_lead, actualizar_estado_conversacion, obtener_productos, asesor_menos_cargado, actualizar_asesor, obtener_asesor_por_id
 from app.persistencia.repositorio import obtener_leads_por_asesor, actualizar_estado_cierre, lista_asesores_para_front
 import uuid
 from openai import OpenAI, OpenAIError
@@ -12,7 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def obtener_o_crear_conversacion(canal_user_id: str, canal: str, nombre: str, session):
-    conversacion = verificacion_existencia_conversacion(canal_user_id, session)
+    conversacion = verificacion_existencia_conversacion(canal=canal, canal_user_id=canal_user_id, session=session)
     if conversacion:
         return conversacion
     else: 
@@ -32,7 +32,7 @@ def creacion_lead(id_conversacion: uuid.UUID, productos_interes: str, ciudad: st
 
 def catalogo_a_texto(session: Session):
     producto = obtener_productos(session)
-    catalogo_productos = [f" Producto: {c.nombre_producto} | Precio Regular:  {c.precio_regular} | Precio venta:  {c.precio_venta} | Categoría: {c.categoria} " for c in producto]
+    catalogo_productos = [f" Producto: {c.nombre_producto} | Referencia: {c.referencia} | Precio unitario:  {c.precio_unitario} | Unidad: {c.unidad} | Existencias: {c.existencias} | Categoría: {c.categoria} " for c in producto]
     catalogo_productos_variable = "\n".join(catalogo_productos)
     return catalogo_productos_variable
 
@@ -48,19 +48,19 @@ def comunicacion_agente(id_conversacion: uuid.UUID, session: Session):
             model = MODELO_AGENTE,
             max_tokens = 1024,
             messages=[{
-                        "role": "system", "content": f"""Eres el agente encargado del manejo de cotizaciones de Industrias Rambler S.A, vas a recibir el historial de un chat con los mensajes del cliente + el catalogo con los productos: {catalogo_productos_variable}. Ten en cuenta que el publico al que te diriges es de Colombia; 
+                        "role": "system", "content": f"""Eres el agente encargado del manejo de cotizaciones de Tornalba Suministros Técnicos S.A.S., una distribuidora de suministros industriales y ferretería técnica, vas a recibir el historial de un chat con los mensajes del cliente + el catalogo con los productos: {catalogo_productos_variable}. Ten en cuenta que el publico al que te diriges es de Colombia;
                         empieza el chat saludando al cliente y preguntandole por su ubicación;
                         Primero consigue ciudad y productos_interes, solo cuando tengas ambos si el cliente tiene clara intención de compra (ej. quiere dejar sus datos, pide cotización formal, pregunta dónde pagar), si está muy enojado o si pide explícitamente hablar con un asesor humano actualiza el estado de escalación a True. De lo contrario, marca False (Como booleano).
                         Si el cliente no proporciona información en ciudad o productos_interes, llena esas variables con un string vacío ("").
                         El cliente no debe saber el estado de escalación del Lead, ni si sera conectado con un asesor."""
-            }] + [{"role" : m.rol, "content" : m.contenido} for m in reversed(historial)],
+            }] + [{"role" : m.rol, "content" : m.contenido} for m in historial],
             tools=[
                 {
                     "type" : "function",
                     "function": {
 
                         "name" : "evaluar_y_responder",
-                        "description" : "Herramienta obligatoria para generar la respuesta al cliente de Industrias Rambler S.A y decidir si se requiere atención humana.",
+                        "description" : "Herramienta obligatoria para generar la respuesta al cliente de Tornalba Suministros Técnicos S.A.S. y decidir si se requiere atención humana.",
 
                         "parameters":{
                             "type" : "object",
@@ -71,8 +71,8 @@ def comunicacion_agente(id_conversacion: uuid.UUID, session: Session):
                                     "description" : "El mensaje de texto amigable, comercial y profesional que el bot le enviará al usuario por Telegram respondiendo sus dudas usando el catalogo"
                                 },
                                 "productos_interes" : {
-                                    "type" : ["string"],
-                                    "description" : "Retornar los productos de interes del cliente."
+                                    "type" : "string",
+                                    "description" : "Retornar los productos de interes del cliente, separados por comas si son varios."
                                 },
                                 "ciudad" : {
                                     "type" : "string",
@@ -95,8 +95,12 @@ def comunicacion_agente(id_conversacion: uuid.UUID, session: Session):
 
         respuesta = datos_parseados.get("respuesta_cliente", "")
         escalar = True if (datos_parseados.get("debe_escalar", False) in [True, "True", "true"]) else False
-        productos_interes = (datos_parseados.get("productos_interes") or  "").strip()
-        ciudad = (datos_parseados.get("ciudad") or "").strip()
+        productos_interes = datos_parseados.get("productos_interes") or ""
+        # El modelo a veces devuelve los productos como lista aunque la herramienta pida un texto
+        if isinstance(productos_interes, list):
+            productos_interes = ", ".join(str(p) for p in productos_interes)
+        productos_interes = str(productos_interes).strip()
+        ciudad = str(datos_parseados.get("ciudad") or "").strip()
 
         if not ciudad or not productos_interes:
             escalar = False
@@ -110,30 +114,14 @@ def comunicacion_agente(id_conversacion: uuid.UUID, session: Session):
     except (OpenAIError, json.JSONDecodeError, IndexError, TypeError):
         logger.exception(f"Error en la comunicación con el Agente de Groq [Conversación ID: {id_conversacion}]")
         return {
-            "respuesta" : "Lo sentimos, en este momento nuestro sistema de atención presenta un inconveniente técnico temporal. 🛠️ Te invitamos a escribirnos nuevamente en unos minutos mientras lo solucionamos. ¡Agradecemos tu paciencia!", 
+            "respuesta" : "Tuvimos un inconveniente técnico con nuestro sistema, pero tu solicitud ya quedó registrada y un asesor te va a contactar en breve.",
             "escalar" : True,
             "productos_interes": "Por confirmar",
             "ciudad": "Por confirmar"
         }
 
-# def menos_cargado(session: Session):
-#     asesores = lista_asesores(session)
-#     menos_cargado = 999
-#     id_menos_cargado = None
-#     for id_asesor in asesores:
-#         comp = comparacion(id_asesor, session)
-#         if comp < menos_cargado:
-#             menos_cargado = comp
-#             id_menos_cargado = id_asesor
-#     return id_menos_cargado
-
 def menos_cargado(session: Session):
-    asesores = lista_asesores(session)
-
-    if not asesores: 
-        return None
-    
-    return min(asesores, key=lambda id_asesor: comparacion(id_asesor, session))
+    return asesor_menos_cargado(session=session)
 
 def actualizacion_asesor(id_lead: uuid.UUID, session: Session):
     lead = obtener_lead_por_id(id_lead, session)

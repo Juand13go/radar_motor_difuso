@@ -9,10 +9,9 @@ with open("productos.json", "r", encoding="utf-8") as f:
 def poblar_productos():
     with Session(engine) as session:
         for prod in datos_productos:
-            existe = session.exec(select(productos).where(productos.id_woocommerce == prod["id_woocommerce"])).first()
+            existe = session.exec(select(productos).where(productos.id_producto == prod["id_producto"])).first()
             if not existe:
                 producto = productos(**prod)
-                # producto = productos(id_woocommerce = prod["id_woocommerce"], nombre_producto = prod["nombre_producto"], precio_regular = prod["precio_regular"], precio_venta = prod["precio_venta"], categoria = prod["categoria"])
                 session.add(producto)
                 print(f"El producto {prod['nombre_producto']} fue agregado con éxito.")
             else: 
@@ -27,6 +26,7 @@ def poblar_asesores():
     with Session(engine) as session:
         for ases in datos_asesores:
             id_asesor = ases.get("id_asesor")
+            existe = None
 
             if id_asesor:
                 existe = session.exec(select(asesores).where(asesores.id_asesor == id_asesor)).first()
