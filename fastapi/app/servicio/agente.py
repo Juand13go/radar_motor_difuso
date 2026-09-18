@@ -68,7 +68,7 @@ HERRAMIENTA_AGENTE = {
                     "description": "Verdadero solo si el cliente pidió explícitamente hablar con una persona. Falso en cualquier otro caso."
                 }
             },
-            "required": ["respuesta_cliente"]
+            "required": ["respuesta_cliente", "items", "ciudad", "fecha_requerida", "solicita_asesor"]
         }
     }
 }
@@ -91,19 +91,32 @@ def convertir_fecha(texto: str):
     except ValueError:
         return None
 
+def convertir_id_producto(valor: int):
+    # bool es subclase de int: sin este filtro un True pasaria como el producto 1
+    if isinstance(valor, bool):
+        return None
+    if isinstance(valor, str):
+        try:
+            return int(valor)
+        except ValueError:
+            return None
+    return valor
+
 def validar_extraccion(extraccion: dict, ids_validos: list[int], hoy: date):
     if not isinstance(extraccion, dict):
         extraccion = {}
 
     respuesta_cliente = extraccion.get("respuesta_cliente")
+    fallo_tecnico = False
     if not isinstance(respuesta_cliente, str) or not respuesta_cliente.strip():
         respuesta_cliente = TEXTO_FALLO_TECNICO
+        fallo_tecnico = True
 
     items = []
     for item in extraccion.get("items") or []:
         if not isinstance(item, dict):
             continue
-        id_producto = item.get("id_producto")
+        id_producto = convertir_id_producto(item.get("id_producto"))
         if id_producto not in ids_validos:
             id_producto = None
         items.append({"id_producto": id_producto, "descripcion": item.get("descripcion"), "cantidad": item.get("cantidad")})
@@ -119,7 +132,8 @@ def validar_extraccion(extraccion: dict, ids_validos: list[int], hoy: date):
         "ciudad": extraccion.get("ciudad"),
         "fecha_requerida": fecha_requerida,
         "plazo_dias": plazo_dias,
-        "solicita_asesor": extraccion.get("solicita_asesor") is True
+        "solicita_asesor": extraccion.get("solicita_asesor") is True,
+        "fallo_tecnico": fallo_tecnico
     }
 
 def comunicacion_agente(id_conversacion: uuid.UUID, session: Session):
@@ -138,9 +152,7 @@ def comunicacion_agente(id_conversacion: uuid.UUID, session: Session):
         )
         texto_respuesta = response.choices[0].message.tool_calls[0].function.arguments
         extraccion = json.loads(texto_respuesta)
-        resultado = validar_extraccion(extraccion=extraccion, ids_validos=ids_validos, hoy=hoy_bogota())
-        resultado["fallo_tecnico"] = False
-        return resultado
+        return validar_extraccion(extraccion=extraccion, ids_validos=ids_validos, hoy=hoy_bogota())
     except (OpenAIError, json.JSONDecodeError, IndexError, TypeError):
         logger.exception(f"Error en la comunicación con el Agente de Groq [Conversación ID: {id_conversacion}]")
         return {
