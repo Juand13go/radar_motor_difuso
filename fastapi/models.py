@@ -3,11 +3,16 @@ import uuid
 from uuid import UUID
 from typing import Optional
 from decimal import Decimal
+from zoneinfo import ZoneInfo
 from sqlalchemy import Column, DateTime, Index, JSON, text
 from sqlmodel import SQLModel, Field
 
 def ahora_utc():
     return datetime.now(timezone.utc)
+
+# Las marcas de tiempo se guardan en UTC, pero el hoy del negocio es el de Colombia
+def hoy_bogota():
+    return datetime.now(ZoneInfo("America/Bogota")).date()
 
 # Las columnas de fecha se declaran con zona para que Postgres devuelva datetimes comparables con ahora_utc()
 def columna_fecha(nullable: bool = False):
