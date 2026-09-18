@@ -1,5 +1,7 @@
 from models import conversaciones, mensajes, leads, productos, asesores, items_solicitados, evaluaciones_motor, ahora_utc
 from sqlmodel import select, Session, func
+from sqlalchemy.exc import IntegrityError
+from datetime import date
 import uuid
 from app.excepciones import ConversacionNoEncontrada, AsesorNoEncontrado, LeadNoEncontrado
 
@@ -118,6 +120,42 @@ def guardar_evaluacion(id_lead: uuid.UUID, id_mensaje: uuid.UUID, monto_estimado
 
 def evaluaciones_de_lead(id_lead: uuid.UUID, session: Session):
     return session.exec(select(evaluaciones_motor).where(evaluaciones_motor.id_lead == id_lead).order_by(evaluaciones_motor.creado_en.asc())).all()
+
+def obtener_lead_abierto(id_conversacion: uuid.UUID, session: Session):
+    return session.exec(select(leads).where(leads.id_conversacion == id_conversacion, leads.estado_lead == "en_proceso")).first()
+
+def crear_solicitud(id_conversacion: uuid.UUID, ciudad: str, fecha_requerida: date, session: Session):
+    existe = session.get(conversaciones, id_conversacion)
+    if existe is None:
+        raise ConversacionNoEncontrada
+    if not isinstance(ciudad, str) or not ciudad.strip():
+        ciudad = None
+    lead = leads(id_conversacion=id_conversacion, ciudad=ciudad, fecha_requerida=fecha_requerida, estado_lead="en_proceso")
+    session.add(lead)
+    try:
+        session.commit()
+    except IntegrityError:
+        # Se deshace aqui para que la sesion quede usable; quien llama decide que hacer con el error
+        session.rollback()
+        raise
+    session.refresh(lead)
+    return lead
+
+def actualizar_datos_solicitud(id_lead: uuid.UUID, ciudad: str, fecha_requerida: date, session: Session):
+    lead = session.get(leads, id_lead)
+    if not lead:
+        raise LeadNoEncontrado
+    if isinstance(ciudad, str) and ciudad.strip():
+        lead.ciudad = ciudad
+    if fecha_requerida is not None:
+        lead.fecha_requerida = fecha_requerida
+    session.add(lead)
+    session.commit()
+    session.refresh(lead)
+    return lead
+
+def obtener_productos_por_ids(ids: list[int], session: Session):
+    return session.exec(select(productos).where(productos.id_producto.in_(ids))).all()
     
     
 
