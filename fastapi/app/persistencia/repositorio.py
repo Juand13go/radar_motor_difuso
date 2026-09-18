@@ -1,4 +1,4 @@
-from models import conversaciones, mensajes, leads, productos, asesores
+from models import conversaciones, mensajes, leads, productos, asesores, items_solicitados, evaluaciones_motor, ahora_utc
 from sqlmodel import select, Session, func
 import uuid
 from app.excepciones import ConversacionNoEncontrada, AsesorNoEncontrado, LeadNoEncontrado
@@ -84,10 +84,40 @@ def actualizar_estado_cierre(id_lead: uuid.UUID, estado_lead: str, session: Sess
     if not lead: 
         raise LeadNoEncontrado
     lead.estado_lead = estado_lead
+    lead.cerrado_en = ahora_utc()
     session.add(lead)
     session.commit()
     session.refresh(lead)
     return lead
+
+def reemplazar_items_de_lead(id_lead: uuid.UUID, items: list[dict], session: Session):
+    lead = session.get(leads, id_lead)
+    if not lead:
+        raise LeadNoEncontrado
+    anteriores = session.exec(select(items_solicitados).where(items_solicitados.id_lead == id_lead)).all()
+    for anterior in anteriores:
+        session.delete(anterior)
+    nuevos = [items_solicitados(id_lead=id_lead, **item) for item in items]
+    for nuevo in nuevos:
+        session.add(nuevo)
+    # Borrado e insercion van en el mismo commit para que el lead nunca quede a medias
+    session.commit()
+    for nuevo in nuevos:
+        session.refresh(nuevo)
+    return nuevos
+
+def obtener_items_de_lead(id_lead: uuid.UUID, session: Session):
+    return session.exec(select(items_solicitados).where(items_solicitados.id_lead == id_lead)).all()
+
+def guardar_evaluacion(id_lead: uuid.UUID, id_mensaje: uuid.UUID, monto_estimado: float, relacion_cliente: float, completitud: float, plazo_dias: int, prioridad: float, nivel_prioridad: str, reglas_activadas: list, session: Session):
+    evaluacion = evaluaciones_motor(id_lead=id_lead, id_mensaje=id_mensaje, monto_estimado=monto_estimado, relacion_cliente=relacion_cliente, completitud=completitud, plazo_dias=plazo_dias, prioridad=prioridad, nivel_prioridad=nivel_prioridad, reglas_activadas=reglas_activadas)
+    session.add(evaluacion)
+    session.commit()
+    session.refresh(evaluacion)
+    return evaluacion
+
+def evaluaciones_de_lead(id_lead: uuid.UUID, session: Session):
+    return session.exec(select(evaluaciones_motor).where(evaluaciones_motor.id_lead == id_lead).order_by(evaluaciones_motor.creado_en.asc())).all()
     
     
 

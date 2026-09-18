@@ -15,3 +15,6 @@ class ConfiguracionInvalida(Exception):
 
 class ConfiguracionMotorInvalida(Exception):
     pass
+
+class EntradaMotorInvalida(Exception):
+    pass

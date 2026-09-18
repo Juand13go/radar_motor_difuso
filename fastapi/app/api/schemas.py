@@ -60,9 +60,9 @@ class ObtenerAsesorSalida(BaseModel):
 
 class LeadsPorAsesor(BaseModel):
     id_lead: uuid.UUID 
-    id_conversacion: uuid.UUID 
-    productos_interes: str
-    ciudad: str
+    id_conversacion: uuid.UUID
+    productos_interes: Optional[str]
+    ciudad: Optional[str]
 
 class EstadoCierreEnum(str, Enum):
     venta = "venta"
