@@ -111,6 +111,7 @@ def cerrar_lead(datos: CerrarLeadEntrada, session=Depends(get_session)):
 ## Pruebas
 
 Se usa pytest. Las pruebas viven en fastapi/tests/ con la misma forma de carpetas que app/ (las del motor en fastapi/tests/motor/). Son funciones sueltas, sin clases, con nombres en español que dicen el caso: test_triangular_en_el_pico_vale_uno. Cada prueba verifica una sola cosa con assert, y los flotantes se comparan con pytest.approx. No se usan fixtures salvo que la instrucción lo pida. Las pruebas del motor y de las variables se corren desde fastapi/ sin Docker.
+Las pruebas se corren dentro del contenedor de FastAPI, que es donde están fijadas las versiones. El código del motor no depende del contenedor y se puede ejecutar con el Python del sistema, pero pytest solo está instalado en la imagen.
 
 ## Estilo del frontend
 

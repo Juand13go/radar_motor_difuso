@@ -5,6 +5,7 @@ from app.persistencia.repositorio import crear_lead, asesor_menos_cargado, actua
 from app.persistencia.repositorio import obtener_leads_por_asesor, actualizar_estado_cierre, lista_asesores_para_front
 from app.persistencia.repositorio import obtener_lead_abierto, crear_solicitud, actualizar_datos_solicitud, obtener_productos_por_ids, reemplazar_items_de_lead
 from datetime import date
+from decimal import Decimal
 import uuid
 import logging
 
@@ -75,6 +76,42 @@ def texto_estado_solicitud(ciudad: str, fecha_requerida: date, items: list):
     if not lineas:
         return "Sin solicitud abierta"
     return "\n".join(lineas)
+
+def calcular_monto_estimado(items: list):
+    monto = Decimal("0")
+    for item in items:
+        precio = item.get("precio_al_momento")
+        if precio is None:
+            continue
+        cantidad = item.get("cantidad")
+        # Un producto pedido sin cantidad no puede dejar el monto en cero: cuenta como una unidad
+        if cantidad is None:
+            cantidad = 1
+        monto += precio * cantidad
+    return monto
+
+def calcular_relacion_cliente(leads_cerrados: list):
+    return sum(1 for lead in leads_cerrados if lead.estado_lead == "venta")
+
+def calcular_completitud(items: list, ciudad: str):
+    completitud = 0.0
+    if items:
+        completitud += 0.25
+        if all(item.get("id_producto") is not None for item in items):
+            completitud += 0.25
+        if all(item.get("cantidad") is not None for item in items):
+            completitud += 0.25
+    if isinstance(ciudad, str) and ciudad.strip():
+        completitud += 0.25
+    return completitud
+
+def armar_entradas_del_motor(monto_estimado: Decimal, relacion_cliente: int, completitud: float, plazo_dias: int):
+    return {
+        "monto_estimado": float(monto_estimado),
+        "relacion_cliente": relacion_cliente,
+        "completitud": completitud,
+        "plazo_dias": plazo_dias
+    }
 
 def registrar_solicitud(id_conversacion: uuid.UUID, extraccion: dict, session: Session):
     lead = obtener_lead_abierto(id_conversacion=id_conversacion, session=session)

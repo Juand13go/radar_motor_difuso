@@ -4,6 +4,7 @@ from app.servicio.conversacion import obtener_historial_conversacion
 from models import hoy_bogota
 from datetime import date, datetime
 from pathlib import Path
+from functools import lru_cache
 from openai import OpenAI, OpenAIError
 import uuid
 import json
@@ -12,7 +13,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-client = OpenAI(api_key=os.getenv("GROQ_API_KEY"), base_url="https://api.groq.com/openai/v1", max_retries=4, timeout=20.0)
+# Se crea en el primer uso y no al importar, para que importar el modulo no exija GROQ_API_KEY
+@lru_cache(maxsize=1)
+def obtener_cliente_modelo():
+    return OpenAI(api_key=os.getenv("GROQ_API_KEY"), base_url="https://api.groq.com/openai/v1", max_retries=4, timeout=20.0)
 
 MODELO_AGENTE = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
 
@@ -141,7 +145,7 @@ def comunicacion_agente(id_conversacion: uuid.UUID, session: Session):
     catalogo_productos_variable = catalogo_a_texto(session)
     ids_validos = [producto.id_producto for producto in obtener_productos(session)]
     try:
-        response = client.chat.completions.create(
+        response = obtener_cliente_modelo().chat.completions.create(
             model = MODELO_AGENTE,
             max_tokens = 1024,
             messages=[{
