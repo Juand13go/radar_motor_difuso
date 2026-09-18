@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends
 from database import get_session
 from app.servicio.conversacion import obtener_o_crear_conversacion, obtener_historial_conversacion, guardado_mensajes, actualizacion_estado, creacion_lead, funcion_listado_asesores
-from app.servicio.conversacion import comunicacion_agente, actualizacion_asesor, obtener_nombre_asesor, listar_leads_por_asesor, cambiar_estado_lead_para_cierre
+from app.servicio.conversacion import actualizacion_asesor, obtener_nombre_asesor, listar_leads_por_asesor, cambiar_estado_lead_para_cierre
+from app.servicio.agente import comunicacion_agente
 import uuid
 from app.api.schemas import ConversacionCrear, GuardarMensajeEntrada, EstadoEntrada, LeadEntrada, ProcesarEntrada, LeadSalida, LeadsPorAsesor, CerrarLeadSalida
 from app.api.schemas import (ConversacionRespuesta, MensajeRespuesta, EstadoSalida, ProcesarSalida, ConfirmacionRespuesta, AsesorSalida, ObtenerAsesorSalida, 
