@@ -64,6 +64,7 @@ Antes de calcular pertenencias, cada entrada se recorta a su universo, de modo q
 Problema: el catálogo son colchones de Rambler y no tiene existencias.
 Solución: migración que reforma productos (id_producto, referencia, nombre_producto, categoria, unidad, precio_unitario, existencias), el productos.json nuevo y el seed ajustado. Se reinicia el volumen de la base una vez, porque la data anterior es de otro dominio.
 Terminada cuando: la base arranca con las 40 referencias de Tornalba.
+Hecha, dentro del commit de la fase 0.
 
 ### 2.2 Leads por agregado
 Problema: el lead solo guarda texto libre y no tiene cómo registrar prioridad, escalación ni tiempos.
@@ -110,6 +111,7 @@ Si la creación del lead falla por el índice único, se hace rollback, se busca
 Problema: la decisión de escalar tiene que ser del motor y quedar registrada con su motivo.
 Solución: se evalúa el motor, se guarda la evaluación y se actualiza el lead. Se escala si la prioridad supera el umbral, si el cliente pidió un asesor o si falló el modelo, solo si el lead no estaba escalado. Escalar asigna el asesor menos cargado, marca escalado_en y arma el texto de notificación para el asesor.
 Terminada cuando: los tres motivos de escalación se prueban con conversaciones reales.
+Los leads que el motor deja en verde y nunca se escalan se cierran a mano desde el panel, porque el asesor puede cerrar cualquier lead y no solo los suyos. El cierre automático por inactividad queda como trabajo futuro.
 
 ### 4.4 Endpoint único
 Problema: la lógica del flujo está repartida entre nodos de n8n.
@@ -121,23 +123,28 @@ Problema: el flujo de n8n y las rutas viejas quedan sobrando.
 Solución: Juan Diego arma el flujo nuevo a mano en n8n (disparador de Telegram, llamada al endpoint, respuesta al cliente, y un condicional que envía la notificación al asesor) y lo exporta a n8n/. Se retiran las rutas que ya no se usan.
 Terminada cuando: una conversación real por Telegram crea, evalúa y escala un lead.
 
+### 4.6 WhatsApp como segundo canal (opcional)
+Problema: demostrar que el canal es intercambiable.
+Solución: un disparador de WhatsApp en n8n que llama al mismo endpoint con canal whatsapp, usando el número de prueba de Meta, que es gratis y no exige verificación del negocio pero solo habla con cinco destinatarios cargados de antemano. Por ese límite no reemplaza a Telegram en la feria.
+Solo se hace si la 4.5 cerró el 24 de septiembre. Si no, se descarta sin reemplazo.
+
 ## Fase 5. Panel (25 al 27 de septiembre)
 
-### 5.1 Selector de asesores
+### 5.1 Simulador de chat
+Problema: hasta que el canal esté reconectado no hay forma de mostrar el sistema, y en la feria Telegram depende del túnel y del wifi.
+Solución: una sección del panel con un campo de texto que llama a /mensaje_entrante con canal simulador. Medio día como máximo.
+
+### 5.2 Selector de asesores
 Problema: para ver los leads hay que copiar y pegar un UUID.
 Solución: una lista desplegable con los asesores que carga sus leads al elegir.
 
-### 5.2 Bandeja priorizada
+### 5.3 Bandeja priorizada
 Problema: el asesor ve los leads sin orden ni contexto.
 Solución: leads_por_asesor devuelve los leads ordenados por prioridad con nivel, monto e ítems, y el panel los muestra con el semáforo y la insignia.
 
-### 5.3 Explicación de la prioridad
+### 5.4 Explicación de la prioridad
 Problema: el asesor no sabe por qué un lead está arriba.
 Solución: al abrir un lead se ven las reglas activadas con su grado y cómo fue cambiando la prioridad en cada mensaje.
-
-### 5.4 Simulador de chat
-Problema: si Telegram falla en la feria, no hay demo.
-Solución: una sección del panel con un campo de texto que llama a /mensaje_entrante con canal simulador. Medio día como máximo.
 
 ## Fase 6. Demanda invisible (28 de septiembre)
 
@@ -152,6 +159,11 @@ Solución: tres consultas en app/servicio/analitica.py y el repositorio. Demanda
 ### 6.3 Pantalla de demanda
 Problema: las consultas no sirven si nadie las ve.
 Solución: una sección del panel con las tres listas.
+Arriba de las tres listas va una franja de contexto con las solicitudes recibidas, cuántas se escalaron, cuántas cerraron en venta y el monto total pedido, para que los montos no cubiertos se lean con escala. El encabezado dice de qué habla el reporte (solicitudes recibidas por mensajería en el periodo), porque el sistema no ve las ventas de mostrador ni las compras a proveedores.
+
+### 6.4 Gráficos e impresión
+Problema: tres listas de números no se leen de un vistazo, y el reporte mensual tiene que poder entregarse.
+Solución: barras horizontales dibujadas como SVG generado en JavaScript, sin librerías ni CDN, y una hoja de estilos de impresión que esconde la navegación para exportar a PDF desde el navegador. Se descarta si el calendario aprieta.
 
 ## Fase 7. Cierre (29 de septiembre)
 
@@ -159,7 +171,8 @@ Solución: una sección del panel con las tres listas.
 Actualizar el README al dominio de Tornalba, al flujo nuevo y al motor.
 
 ### 7.2 DECISIONES
-Juan Diego escribe las entradas nuevas: la solicitud nace con el primer ítem, prioridad y escalación son decisiones separadas, la urgencia se mide en días a partir de una fecha, n8n queda como canal y Python orquesta, y la sección de trabajo futuro.
+Juan Diego escribe las entradas nuevas: la solicitud nace con el primer ítem, prioridad y escalación son decisiones separadas, la urgencia se mide en días a partir de una fecha, n8n queda como canal y Python orquesta, las fechas se guardan en UTC y se interpretan en la zona de Colombia, y la sección de trabajo futuro.
+También se reescribe la sección de deuda técnica conocida, que hoy describe un estado que ya cambió: n8n ya no está en latest, el prompt ya no vive en conversacion.py, ya hay pruebas automatizadas y productos_interes ya no es el único registro de lo que pidió el cliente.
 
 ## Trabajo futuro
 
@@ -167,14 +180,22 @@ No se construye antes de la feria. Los datos que necesita ya quedan guardados.
 
 Tiempo real de respuesta humana. El asesor responde por fuera del sistema, así que hoy no queda registro de cuándo contactó al cliente; hace falta que marque ese momento desde el panel. Con escalado_en y cerrado_en ya se puede medir el tiempo hasta el cierre.
 
+Cierre automático de los leads que quedan abiertos sin actividad.
+
 Conversión por segmento: por ciudad, por categoría de producto y por asesor.
 
 Productos que se piden juntos, a partir de los ítems de cada solicitud, para combos, compras y ubicación de mercancía.
 
 Informe mensual de demanda invisible enviado al dueño del negocio.
 
+Una herramienta de exploración de datos conectada a la base, para que el cliente arme sus propios reportes.
+
+Entorno de desarrollo local con las dependencias instaladas fuera de Docker, para correr las pruebas sin levantar los contenedores.
+
 Búsqueda semántica sobre el catálogo, calibración del motor con los cierres reales, otros canales como WhatsApp, autenticación del panel y despliegue en servidor.
 
 ## Limitaciones conocidas
 
-Si un cliente manda dos mensajes casi al mismo tiempo, n8n puede procesarlos en paralelo y crear dos leads. Cada función del repositorio hace su propio commit, así que un fallo a mitad del flujo puede dejar datos parciales.
+Cada función del repositorio hace su propio commit, así que un fallo a mitad del flujo puede dejar datos parciales.
+
+Las pruebas solo corren dentro del contenedor de FastAPI. El Python del sistema es 3.14 y no trae pip ni ensurepip, y las versiones del proyecto están fijadas contra la 3.11 de la imagen.

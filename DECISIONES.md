@@ -76,3 +76,5 @@ El motor difuso tampoco ganaría nada, porque es cálculo puro sin esperas de re
 Lo que sí había que resolver es otro problema que suele confundirse con este. Si un cliente manda dos mensajes casi al mismo tiempo, las dos solicitudes pueden buscar el lead abierto, no encontrarlo y crear cada una el suyo. Eso es una condición de carrera y async no la evita, porque con async las solicitudes también se intercalan.
 La solución quedó en PostgreSQL: un índice único parcial sobre id_conversacion para los leads en estado en_proceso. Si la segunda inserción choca con el índice, se deshace y se continúa con el lead que creó el primer mensaje.
 Así, la regla de un lead abierto por conversación no depende de que el código esté bien escrito: la garantiza la base de datos.
+
+Entorno de desarrollo local con las dependencias instaladas fuera de Docker, para correr las pruebas sin levantar los contenedores.
