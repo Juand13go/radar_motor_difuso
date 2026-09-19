@@ -7,12 +7,25 @@ const inputSimuladorNombre = document.getElementById("inputSimuladorNombre");
 const inputSimuladorTexto = document.getElementById("inputSimuladorTexto");
 const btnEnviarSimulador = document.getElementById("btnEnviarSimulador");
 const contenedorSimulador = document.getElementById("contenedorSimulador");
+const aviso = document.getElementById("aviso");
+
+let temporizadorAviso = null;
 
 const MOTIVOS_ESCALACION = {
     motor: "prioridad calculada por el motor",
     solicitud_cliente: "el cliente pidió hablar con un asesor",
     fallo_tecnico: "fallo técnico del asistente"
 };
+
+function mostrarAviso(texto, tipo) {
+    aviso.textContent = texto;
+    aviso.className = `aviso aviso--${tipo} aviso--visible`;
+    // Un aviso nuevo cancela el temporizador del anterior, asi el que se ve siempre dura sus cuatro segundos
+    clearTimeout(temporizadorAviso);
+    temporizadorAviso = setTimeout(() => {
+        aviso.classList.remove("aviso--visible");
+    }, 4000);
+}
 
 async function listarInformacionAsesores(){
     try {
@@ -27,6 +40,7 @@ async function listarInformacionAsesores(){
         return asesores;
     }catch(error){
         console.error("Hubo un error al cargar los asesores. ", error);
+        mostrarAviso("No se pudieron cargar los asesores.", "error");
     }
 }
 
@@ -44,6 +58,7 @@ async function cargarLeadsPorAsesor(idAsesor) {
         return leads;
     }catch(error){
         console.error("Hubo un error al cargar los leads. ", error);
+        mostrarAviso("No se pudieron cargar los leads del asesor.", "error");
     }
 }
 
@@ -70,6 +85,7 @@ async function ejecutarCierreLead(idLead, estado) {
         return resultado
     } catch(error) {
         console.error("Error al cerrar el lead", error);
+        mostrarAviso("No se pudo cerrar el lead. Intente de nuevo.", "error");
     }
 }
 
@@ -86,6 +102,7 @@ async function cargarLeadsSinAsignar() {
         return leads;
     } catch (error) {
         console.error("Hubo un error al cargar los leads sin asignar. ", error);
+        mostrarAviso("No se pudieron cargar las solicitudes sin asignar.", "error");
     }
 }
 
@@ -102,6 +119,7 @@ async function cargarEvaluacionesLead(idLead) {
         return evaluaciones;
     } catch (error) {
         console.error("Hubo un error al cargar las evaluaciones del lead. ", error);
+        mostrarAviso("No se pudo cargar la explicación del lead.", "error");
     }
 }
 
@@ -230,7 +248,8 @@ function renderizarBotonCierre(lead, estado, texto) {
     boton.addEventListener("click", async () => {
         const res = await ejecutarCierreLead(lead.id_lead, estado);
         if (res) {
-            alert(`Lead ${lead.id_lead} cerrado como ${estado.replace("_", " ")}.`);
+            const cliente = lead.nombre_cliente && lead.nombre_cliente.trim() ? lead.nombre_cliente : lead.canal_user_id;
+            mostrarAviso(`El lead de ${cliente} se cerró como ${estado.replace("_", " ")}.`, "exito");
             refrescarLeads();
         }
     });
@@ -386,6 +405,7 @@ async function enviarMensajeSimulador(canalUserId, nombre, texto) {
         return resultado;
     } catch (error) {
         console.error("Error al enviar el mensaje del simulador", error);
+        mostrarAviso("El simulador no pudo obtener respuesta del sistema.", "error");
         return { error: error.message };
     }
 }
@@ -428,7 +448,7 @@ async function enviarDesdeSimulador() {
     }
 
     if (!canalUserId) {
-        alert("Por favor ingrese un identificador para el cliente.");
+        mostrarAviso("Ingrese un identificador para el cliente antes de enviar.", "error");
         return;
     }
 

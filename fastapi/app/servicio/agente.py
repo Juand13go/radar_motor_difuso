@@ -39,7 +39,7 @@ HERRAMIENTA_AGENTE = {
                 },
                 "items": {
                     "type": "array",
-                    "description": "Lista completa y actual de los productos que el cliente ha pedido en toda la conversación, no solo los de su último mensaje. Vacía si todavía no ha pedido ninguno.",
+                    "description": "Lista completa y actual de los productos que el cliente sigue queriendo, sin los que haya descartado o corregido, no solo los de su último mensaje. Vacía si todavía no ha pedido ninguno.",
                     "items": {
                         "type": "object",
                         "properties": {

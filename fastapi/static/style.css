@@ -50,6 +50,38 @@ body {
     padding-top: 20px;
 }
 
+/* ============================================================
+   Aviso de exito o error
+   Franja fija arriba que reemplaza a los alert del navegador.
+   Arranca oculta y se desvanece sola cuando script.js le quita
+   la clase aviso--visible
+   ============================================================ */
+
+.aviso {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    padding: 14px var(--margen-lateral);
+    font-size: 15px;
+    font-weight: 600;
+    color: #FFFFFF;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-100%);
+    transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+}
+
+.aviso--visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.aviso--exito { background-color: var(--prioridad-baja); }
+.aviso--error { background-color: var(--prioridad-critica); }
+
 /* Tornalba a la izquierda y Halua en el extremo derecho */
 .encabezado {
     display: flex;
