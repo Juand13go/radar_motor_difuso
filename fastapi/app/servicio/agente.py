@@ -5,7 +5,7 @@ from models import hoy_bogota
 from datetime import date, datetime
 from pathlib import Path
 from functools import lru_cache
-from openai import OpenAI, OpenAIError
+from openai import OpenAI, OpenAIError, BadRequestError
 import uuid
 import json
 import os
@@ -44,8 +44,8 @@ HERRAMIENTA_AGENTE = {
                         "type": "object",
                         "properties": {
                             "id_producto": {
-                                "type": ["integer", "null"],
-                                "description": "ID exacto del producto en el catálogo. Nulo si el producto no está en el catálogo."
+                                "type": "integer",
+                                "description": "ID exacto del producto en el catálogo. Siempre es un entero: 0 significa que el producto no está en el catálogo."
                             },
                             "descripcion": {
                                 "type": "string",
@@ -121,7 +121,8 @@ def validar_extraccion(extraccion: dict, ids_validos: list[int], hoy: date):
         if not isinstance(item, dict):
             continue
         id_producto = convertir_id_producto(item.get("id_producto"))
-        if id_producto not in ids_validos:
+        # 0 es como el modelo marca un producto fuera de catalogo, y se guarda nulo igual que un id que no existe
+        if id_producto == 0 or id_producto not in ids_validos:
             id_producto = None
         items.append({"id_producto": id_producto, "descripcion": item.get("descripcion"), "cantidad": item.get("cantidad")})
 
@@ -140,21 +141,32 @@ def validar_extraccion(extraccion: dict, ids_validos: list[int], hoy: date):
         "fallo_tecnico": fallo_tecnico
     }
 
+def llamar_al_modelo(mensajes: list, id_conversacion: uuid.UUID):
+    parametros = {
+        "model": MODELO_AGENTE,
+        "max_tokens": 1024,
+        "messages": mensajes,
+        "tools": [HERRAMIENTA_AGENTE],
+        "tool_choice": {"type": "function", "function": {"name": "registrar_solicitud"}}
+    }
+    try:
+        return obtener_cliente_modelo().chat.completions.create(**parametros)
+    except BadRequestError as error:
+        # El cliente no reintenta los 400, pero un JSON mal formado del modelo suele salir bien a la segunda
+        if error.code != "tool_use_failed":
+            raise
+        logger.info(f"El modelo devolvió argumentos inválidos para la herramienta, se reintenta una vez [Conversación ID: {id_conversacion}]")
+        return obtener_cliente_modelo().chat.completions.create(**parametros)
+
 # estado_solicitud va al final y con valor por defecto para que /procesar, que se retira en la 4.5, siga llamandola igual
 def comunicacion_agente(id_conversacion: uuid.UUID, session: Session, estado_solicitud: str = "Sin solicitud abierta"):
     historial = obtener_historial_conversacion(id_conversacion=id_conversacion, session=session)
     catalogo_productos_variable = catalogo_a_texto(session)
     ids_validos = [producto.id_producto for producto in obtener_productos(session)]
+    mensajes = [{"role": "system", "content": armar_prompt_agente(catalogo=catalogo_productos_variable, estado_solicitud=estado_solicitud)}]
+    mensajes += [{"role" : m.rol, "content" : m.contenido} for m in historial]
     try:
-        response = obtener_cliente_modelo().chat.completions.create(
-            model = MODELO_AGENTE,
-            max_tokens = 1024,
-            messages=[{
-                        "role": "system", "content": armar_prompt_agente(catalogo=catalogo_productos_variable, estado_solicitud=estado_solicitud)
-            }] + [{"role" : m.rol, "content" : m.contenido} for m in historial],
-            tools=[HERRAMIENTA_AGENTE],
-            tool_choice={"type": "function", "function": {"name": "registrar_solicitud"}}
-        )
+        response = llamar_al_modelo(mensajes=mensajes, id_conversacion=id_conversacion)
         texto_respuesta = response.choices[0].message.tool_calls[0].function.arguments
         extraccion = json.loads(texto_respuesta)
         return validar_extraccion(extraccion=extraccion, ids_validos=ids_validos, hoy=hoy_bogota())

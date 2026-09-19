@@ -120,11 +120,12 @@ def calcular_relacion_cliente(leads_cerrados: list):
 
 def calcular_completitud(items: list, ciudad: str):
     completitud = 0.0
-    if items:
-        completitud += 0.25
-        if all(item.get("id_producto") is not None for item in items):
-            completitud += 0.25
-        if all(item.get("cantidad") is not None for item in items):
+    # Un item fuera de catalogo no es un dato faltante sino un producto que no se vende: no cuenta para las senales
+    items_del_catalogo = [item for item in items if item.get("id_producto") is not None]
+    if items_del_catalogo:
+        # "Hay un item del catalogo" y "al menos un item hizo match" son la misma condicion y suman juntas
+        completitud += 0.5
+        if all(item.get("cantidad") is not None for item in items_del_catalogo):
             completitud += 0.25
     if isinstance(ciudad, str) and ciudad.strip():
         completitud += 0.25

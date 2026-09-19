@@ -113,6 +113,21 @@ function formatearFecha(textoFecha) {
     return new Date(textoFecha).toLocaleString("es-CO", { timeZone: "America/Bogota", dateStyle: "short", timeStyle: "short" });
 }
 
+function diasHastaFecha(fechaRequerida) {
+    const hoyBogota = new Date().toLocaleDateString("en-CA", { timeZone: "America/Bogota" });
+    // Las dos fechas se leen como medianoche UTC para restar dias calendario sin que la hora local mueva el resultado
+    return Math.round((Date.parse(fechaRequerida) - Date.parse(hoyBogota)) / 86400000);
+}
+
+function textoPlazo(fechaRequerida) {
+    const dias = diasHastaFecha(fechaRequerida);
+    if (dias === 0) return "hoy";
+    if (dias === 1) return "mañana";
+    if (dias === -1) return "vencida hace 1 día";
+    if (dias < 0) return `vencida hace ${-dias} días`;
+    return `en ${dias} días`;
+}
+
 function renderizarEtiqueta(texto, variante) {
     const etiqueta = document.createElement("span");
     etiqueta.className = `etiqueta ${variante}`;
@@ -255,7 +270,8 @@ function renderizarTarjetaLead(lead) {
 
     const datos = document.createElement("div");
     datos.className = "tarjeta-lead__datos";
-    datos.append(renderizarDatoLead("Ciudad", lead.ciudad), renderizarDatoLead("Fecha requerida", lead.fecha_requerida));
+    const fechaRequerida = lead.fecha_requerida ? `${lead.fecha_requerida} (${textoPlazo(lead.fecha_requerida)})` : null;
+    datos.append(renderizarDatoLead("Ciudad", lead.ciudad), renderizarDatoLead("Fecha requerida", fechaRequerida));
     if (lead.escalado) {
         datos.appendChild(renderizarDatoLead("Escalado por", MOTIVOS_ESCALACION[lead.motivo_escalacion] || lead.motivo_escalacion));
     }

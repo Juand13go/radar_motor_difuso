@@ -97,14 +97,20 @@ def test_completitud_sin_items_y_con_ciudad_es_un_cuarto():
 def test_completitud_sin_ciudad_es_tres_cuartos():
     assert calcular_completitud(items=[item(1, 10, Decimal("14500"))], ciudad=None) == pytest.approx(0.75)
 
-def test_completitud_con_un_item_fuera_de_catalogo_es_tres_cuartos():
-    assert calcular_completitud(items=[item(1, 10, Decimal("14500")), item(None, 3, None)], ciudad="Cali") == pytest.approx(0.75)
+def test_completitud_con_un_item_fuera_de_catalogo_con_cantidad_no_baja():
+    assert calcular_completitud(items=[item(1, 10, Decimal("14500")), item(None, 3, None)], ciudad="Cali") == pytest.approx(1.0)
 
 def test_completitud_con_un_item_sin_cantidad_es_tres_cuartos():
     assert calcular_completitud(items=[item(1, None, Decimal("14500"))], ciudad="Cali") == pytest.approx(0.75)
 
 def test_completitud_sin_items_y_con_ciudad_vacia_es_cero():
     assert calcular_completitud(items=[], ciudad="") == pytest.approx(0.0)
+
+def test_completitud_de_pedido_mixto_con_el_fuera_de_catalogo_sin_cantidad_es_uno():
+    assert calcular_completitud(items=[item(26, 3, Decimal("615000")), item(None, None, None)], ciudad="Cali") == pytest.approx(1.0)
+
+def test_completitud_de_un_solo_item_fuera_de_catalogo_con_ciudad_es_un_cuarto():
+    assert calcular_completitud(items=[item(None, 1, None)], ciudad="Cali") == pytest.approx(0.25)
 
 def test_entradas_del_motor_traen_las_cuatro_claves():
     entradas = armar_entradas_del_motor(monto_estimado=Decimal("305000"), relacion_cliente=2, completitud=0.75, plazo_dias=7)

@@ -102,3 +102,8 @@ def test_id_producto_como_texto_que_no_es_entero_queda_nulo():
     extraccion = extraccion_completa()
     extraccion["items"] = [{"id_producto": "abc", "descripcion": "brocha de 3 pulgadas", "cantidad": 4}]
     assert validar(extraccion)["items"] == [{"id_producto": None, "descripcion": "brocha de 3 pulgadas", "cantidad": 4}]
+
+def test_id_producto_cero_es_fuera_de_catalogo_y_conserva_descripcion_y_cantidad():
+    extraccion = extraccion_completa()
+    extraccion["items"] = [{"id_producto": 0, "descripcion": "hamburguesa", "cantidad": 1}]
+    assert validar(extraccion)["items"] == [{"id_producto": None, "descripcion": "hamburguesa", "cantidad": 1}]
