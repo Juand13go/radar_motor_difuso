@@ -109,7 +109,7 @@ Si la creación del lead falla por el índice único, se hace rollback, se busca
 
 ### 4.3 Evaluación y escalación
 Problema: la decisión de escalar tiene que ser del motor y quedar registrada con su motivo.
-Solución: se evalúa el motor, se guarda la evaluación y se actualiza el lead. Se escala si la prioridad supera el umbral, si el cliente pidió un asesor o si falló el modelo, solo si el lead no estaba escalado. Escalar asigna el asesor menos cargado, marca escalado_en y arma el texto de notificación para el asesor.
+Solución: se evalúa el motor, se guarda la evaluación y se actualiza el lead. Se escala si la prioridad alcanza o supera el umbral, si el cliente pidió un asesor o si falló el modelo, solo si el lead no estaba escalado. Escalar asigna el asesor menos cargado, marca escalado_en y arma el texto de notificación para el asesor.
 Terminada cuando: los tres motivos de escalación se prueban con conversaciones reales.
 Los leads que el motor deja en verde y nunca se escalan se cierran a mano desde el panel, porque el asesor puede cerrar cualquier lead y no solo los suyos. El cierre automático por inactividad queda como trabajo futuro.
 
