@@ -11,10 +11,20 @@
     <script src="/static/script.js" defer></script>
 </head>
 <body>
-    <!-- Barra superior: logo chico, linea divisoria y los tres puntos -->
+    <!-- Barra superior: a la izquierda la empresa que usa el panel, a la derecha quien lo construyo -->
     <nav class="navbar">
-        <div class="navbar__marca">
-            <img src="/static/Halua.png" alt="Halua Studio" class="navbar__logo">
+        <div class="encabezado">
+            <div class="encabezado__cliente">
+                <img src="/static/tornalba.png" alt="Tornalba Suministros Técnicos S.A.S." class="encabezado__logo-cliente">
+                <div>
+                    <p class="encabezado__nombre">Tornalba Suministros Técnicos S.A.S.</p>
+                    <p class="encabezado__bajada">Distribuidora de suministros industriales y ferretería técnica</p>
+                </div>
+            </div>
+            <div class="encabezado__proveedor">
+                <img src="/static/Halua.png" alt="Halua Studio" class="encabezado__logo-proveedor">
+                <span class="encabezado__firma">Radar, de Halua Studio</span>
+            </div>
         </div>
         <div class="navbar__linea">
             <hr>
@@ -24,6 +34,7 @@
                 <span class="punto punto--oscuro"></span>
             </div>
         </div>
+        <p class="encabezado__descripcion">Este es el sistema que recibe las solicitudes de los clientes por mensajería, calcula su prioridad y las enruta a los asesores.</p>
     </nav>
 
     <main class="contenido">

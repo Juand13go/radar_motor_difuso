@@ -50,15 +50,67 @@ body {
     padding-top: 20px;
 }
 
-.navbar__marca {
+/* Tornalba a la izquierda y Halua en el extremo derecho */
+.encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px 40px;
     margin: 0 var(--margen-lateral);
     padding-bottom: 20px;
 }
 
-.navbar__logo {
-    width: 75px;
-    height: 19px;
+.encabezado__cliente {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Los logos se fijan por altura y el ancho sale de su proporcion, asi no se deforman.
+   Las alturas son distintas porque Tornalba es casi cuadrado y Halua es un logotipo ancho:
+   con estas dos quedan de un ancho parecido */
+.encabezado__logo-cliente {
+    height: 72px;
+    width: auto;
     display: block;
+    flex-shrink: 0;
+}
+
+.encabezado__logo-proveedor {
+    height: 26px;
+    width: auto;
+    display: block;
+}
+
+.encabezado__nombre {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+}
+
+.encabezado__bajada {
+    font-size: 14px;
+    color: var(--color-gris-medio);
+}
+
+.encabezado__proveedor {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.encabezado__firma {
+    font-size: 13px;
+    color: var(--color-gris-medio);
+}
+
+.encabezado__descripcion {
+    max-width: 640px;
+    margin: 16px var(--margen-lateral) 0;
+    color: var(--color-gris-medio);
 }
 
 /* Linea divisoria con los tres puntos al final, igual que en la web */
@@ -561,6 +613,16 @@ body {
 @media (max-width: 900px) {
     :root {
         --margen-lateral: 24px;
+    }
+
+    /* En angosto el encabezado se apila en dos filas en vez de encoger los logos */
+    .encabezado {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .encabezado__proveedor {
+        align-items: flex-start;
     }
 
     .portada {
