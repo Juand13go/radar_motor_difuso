@@ -23,7 +23,7 @@ MODELO_AGENTE = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
 # Se arma con str.format, asi que una llave literal dentro de agente.md tiene que ir doble
 PROMPT_AGENTE = (Path(__file__).resolve().parents[2] / "prompts" / "agente.md").read_text(encoding="utf-8")
 
-TEXTO_FALLO_TECNICO = "Tuvimos un inconveniente técnico con nuestro sistema, pero tu solicitud ya quedó registrada y un asesor te va a contactar en breve."
+TEXTO_FALLO_TECNICO = "Tuvimos un inconveniente técnico con nuestro sistema, pero su solicitud ya quedó registrada y un asesor lo va a contactar en breve."
 
 HERRAMIENTA_AGENTE = {
     "type": "function",

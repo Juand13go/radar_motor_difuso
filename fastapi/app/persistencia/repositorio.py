@@ -1,7 +1,8 @@
 from models import conversaciones, mensajes, leads, productos, asesores, items_solicitados, evaluaciones_motor, ahora_utc
 from sqlmodel import select, Session, func
 from sqlalchemy.exc import IntegrityError
-from datetime import date
+from datetime import date, datetime
+from decimal import Decimal
 import uuid
 from app.excepciones import ConversacionNoEncontrada, AsesorNoEncontrado, LeadNoEncontrado
 
@@ -156,6 +157,42 @@ def actualizar_datos_solicitud(id_lead: uuid.UUID, ciudad: str, fecha_requerida:
 
 def obtener_productos_por_ids(ids: list[int], session: Session):
     return session.exec(select(productos).where(productos.id_producto.in_(ids))).all()
+
+def obtener_mensaje_por_id(id_mensaje: uuid.UUID, session: Session):
+    return session.get(mensajes, id_mensaje)
+
+def obtener_conversacion_por_id(id_conversacion: uuid.UUID, session: Session):
+    conversacion = session.get(conversaciones, id_conversacion)
+    if not conversacion:
+        raise ConversacionNoEncontrada
+    return conversacion
+
+def obtener_leads_cerrados(id_conversacion: uuid.UUID, session: Session):
+    return session.exec(select(leads).where(leads.id_conversacion == id_conversacion, leads.estado_lead.in_(["venta", "no_venta"]))).all()
+
+def actualizar_prioridad_lead(id_lead: uuid.UUID, monto_estimado: Decimal, prioridad: float, nivel_prioridad: str, session: Session):
+    lead = session.get(leads, id_lead)
+    if not lead:
+        raise LeadNoEncontrado
+    lead.monto_estimado = monto_estimado
+    lead.prioridad = prioridad
+    lead.nivel_prioridad = nivel_prioridad
+    session.add(lead)
+    session.commit()
+    session.refresh(lead)
+    return lead
+
+def marcar_lead_escalado(id_lead: uuid.UUID, motivo_escalacion: str, escalado_en: datetime, session: Session):
+    lead = session.get(leads, id_lead)
+    if not lead:
+        raise LeadNoEncontrado
+    lead.escalado = True
+    lead.motivo_escalacion = motivo_escalacion
+    lead.escalado_en = escalado_en
+    session.add(lead)
+    session.commit()
+    session.refresh(lead)
+    return lead
     
     
 

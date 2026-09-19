@@ -4,12 +4,24 @@ from app.excepciones import LeadNoEncontrado, SinAsesoresDisponibles
 from app.persistencia.repositorio import crear_lead, asesor_menos_cargado, actualizar_asesor, obtener_asesor_por_id, obtener_lead_por_id
 from app.persistencia.repositorio import obtener_leads_por_asesor, actualizar_estado_cierre, lista_asesores_para_front
 from app.persistencia.repositorio import obtener_lead_abierto, crear_solicitud, actualizar_datos_solicitud, obtener_productos_por_ids, reemplazar_items_de_lead
+from app.persistencia.repositorio import obtener_items_de_lead, guardar_evaluacion, obtener_mensaje_por_id, obtener_leads_cerrados, actualizar_prioridad_lead, marcar_lead_escalado
+from app.persistencia.repositorio import obtener_conversacion_por_id
+from app.motor.reglas import cargar_configuracion
+from app.motor.inferencia import evaluar_prioridad
+from models import ahora_utc, hoy_bogota
 from datetime import date
 from decimal import Decimal
+from functools import lru_cache
+from pathlib import Path
 import uuid
 import logging
 
 logger = logging.getLogger(__name__)
+
+# Se lee una sola vez; si reglas.yaml es invalido, el error sube y detiene el primer uso
+@lru_cache(maxsize=1)
+def obtener_configuracion():
+    return cargar_configuracion(ruta=str(Path(__file__).resolve().parents[1] / "motor" / "reglas.yaml"))
 
 def creacion_lead(id_conversacion: uuid.UUID, productos_interes: str, ciudad: str, session: Session):
     return crear_lead(id_conversacion, productos_interes, ciudad, session)
@@ -113,6 +125,19 @@ def armar_entradas_del_motor(monto_estimado: Decimal, relacion_cliente: int, com
         "plazo_dias": plazo_dias
     }
 
+def abrir_solicitud(id_conversacion: uuid.UUID, ciudad: str, fecha_requerida: date, session: Session):
+    try:
+        lead = crear_solicitud(id_conversacion=id_conversacion, ciudad=ciudad, fecha_requerida=fecha_requerida, session=session)
+        logger.info(f"Solicitud creada con id_lead {lead.id_lead} [Conversación ID: {id_conversacion}]")
+        return lead
+    except IntegrityError as error:
+        if "ix_un_lead_abierto_por_conversacion" not in str(error.orig):
+            raise
+        # Otro mensaje de la misma conversacion abrio la solicitud primero: se sigue con esa
+        logger.info(f"La solicitud ya estaba abierta por otro mensaje, se continua con ella [Conversación ID: {id_conversacion}]")
+        lead = obtener_lead_abierto(id_conversacion=id_conversacion, session=session)
+        return actualizar_datos_solicitud(id_lead=lead.id_lead, ciudad=ciudad, fecha_requerida=fecha_requerida, session=session)
+
 def registrar_solicitud(id_conversacion: uuid.UUID, extraccion: dict, session: Session):
     lead = obtener_lead_abierto(id_conversacion=id_conversacion, session=session)
     items_extraidos = extraccion.get("items") or []
@@ -129,16 +154,7 @@ def registrar_solicitud(id_conversacion: uuid.UUID, extraccion: dict, session: S
         return None
 
     if not lead:
-        try:
-            lead = crear_solicitud(id_conversacion=id_conversacion, ciudad=ciudad, fecha_requerida=fecha_requerida, session=session)
-            logger.info(f"Solicitud creada con id_lead {lead.id_lead} [Conversación ID: {id_conversacion}]")
-        except IntegrityError as error:
-            if "ix_un_lead_abierto_por_conversacion" not in str(error.orig):
-                raise
-            # Otro mensaje de la misma conversacion abrio la solicitud primero: se sigue con esa
-            logger.info(f"La solicitud ya estaba abierta por otro mensaje, se continua con ella [Conversación ID: {id_conversacion}]")
-            lead = obtener_lead_abierto(id_conversacion=id_conversacion, session=session)
-            lead = actualizar_datos_solicitud(id_lead=lead.id_lead, ciudad=ciudad, fecha_requerida=fecha_requerida, session=session)
+        lead = abrir_solicitud(id_conversacion=id_conversacion, ciudad=ciudad, fecha_requerida=fecha_requerida, session=session)
     else:
         lead = actualizar_datos_solicitud(id_lead=lead.id_lead, ciudad=ciudad, fecha_requerida=fecha_requerida, session=session)
 
@@ -147,3 +163,91 @@ def registrar_solicitud(id_conversacion: uuid.UUID, extraccion: dict, session: S
     items = construir_items_para_guardar(items_extraidos=items_extraidos, productos_por_id=productos_por_id)
     reemplazar_items_de_lead(id_lead=lead.id_lead, items=items, session=session)
     return lead
+
+def decidir_escalacion(prioridad: float, umbral: float, solicita_asesor: bool, fallo_tecnico: bool, ya_escalado: bool):
+    if ya_escalado:
+        return None
+    if fallo_tecnico:
+        return "fallo_tecnico"
+    if solicita_asesor:
+        return "solicitud_cliente"
+    if prioridad is not None and prioridad >= umbral:
+        return "motor"
+    return None
+
+def texto_notificacion_asesor(nombre_cliente: str, canal_user_id: str, nivel_prioridad: str, monto_estimado: Decimal, items: list, fallo_tecnico: bool):
+    if isinstance(nombre_cliente, str) and nombre_cliente.strip():
+        lineas = [f"Nueva solicitud de {nombre_cliente} (ID en el canal: {canal_user_id})."]
+    else:
+        lineas = [f"Nueva solicitud del cliente con ID en el canal {canal_user_id}."]
+    if fallo_tecnico:
+        lineas.append("Hubo un fallo técnico con el asistente y la solicitud no se pudo leer completa: hay que revisar la conversación con el cliente.")
+    lineas.append(f"Prioridad: {nivel_prioridad or 'sin calcular'}")
+    if monto_estimado is None:
+        lineas.append("Monto estimado: sin estimar")
+    else:
+        lineas.append("Monto estimado: $" + f"{monto_estimado:,.0f}".replace(",", "."))
+    if not items:
+        lineas.append("La solicitud todavía no tiene productos registrados.")
+    else:
+        lineas.append("Productos pedidos:")
+        for item in items:
+            cantidad = item.get("cantidad")
+            if cantidad is None:
+                lineas.append(f"- {item.get('descripcion')}, cantidad sin definir")
+            else:
+                lineas.append(f"- {item.get('descripcion')}, cantidad {cantidad}")
+    return "\n".join(lineas)
+
+def frase_confirmacion_cliente(nombre_asesor: str):
+    return f"Su solicitud ya quedó en manos de {nombre_asesor}, que lo va a contactar en breve."
+
+def evaluar_y_escalar(lead, extraccion: dict, id_mensaje: uuid.UUID, session: Session):
+    fallo_tecnico = extraccion.get("fallo_tecnico") is True
+
+    if not lead and not fallo_tecnico:
+        return {"escalado": False, "motivo": None, "notificacion": None, "evaluacion": None}
+
+    if not lead:
+        # El lead llega nulo, asi que la conversacion se toma del mensaje que se esta procesando
+        mensaje = obtener_mensaje_por_id(id_mensaje=id_mensaje, session=session)
+        lead = abrir_solicitud(id_conversacion=mensaje.id_conversacion, ciudad=None, fecha_requerida=None, session=session)
+
+    configuracion = obtener_configuracion()
+    items = [item.model_dump() for item in obtener_items_de_lead(id_lead=lead.id_lead, session=session)]
+    evaluacion = None
+
+    if not fallo_tecnico:
+        monto_estimado = calcular_monto_estimado(items=items)
+        relacion_cliente = calcular_relacion_cliente(leads_cerrados=obtener_leads_cerrados(id_conversacion=lead.id_conversacion, session=session))
+        completitud = calcular_completitud(items=items, ciudad=lead.ciudad)
+        # El plazo sale de la fecha guardada en el lead, que se conserva aunque el cliente no la repita en este mensaje
+        plazo_dias = None
+        if lead.fecha_requerida is not None:
+            plazo_dias = (lead.fecha_requerida - hoy_bogota()).days
+        entradas = armar_entradas_del_motor(monto_estimado=monto_estimado, relacion_cliente=relacion_cliente, completitud=completitud, plazo_dias=plazo_dias)
+        evaluacion = evaluar_prioridad(entradas=entradas, configuracion=configuracion)
+        guardar_evaluacion(id_lead=lead.id_lead, id_mensaje=id_mensaje, monto_estimado=monto_estimado, relacion_cliente=relacion_cliente, completitud=completitud, plazo_dias=plazo_dias, prioridad=evaluacion["prioridad"], nivel_prioridad=evaluacion["nivel"], reglas_activadas=evaluacion["reglas_activadas"], session=session)
+        lead = actualizar_prioridad_lead(id_lead=lead.id_lead, monto_estimado=monto_estimado, prioridad=evaluacion["prioridad"], nivel_prioridad=evaluacion["nivel"], session=session)
+        if evaluacion["prioridad"] is None:
+            logger.error(f"El motor no activo ninguna regla y el lead {lead.id_lead} queda sin prioridad [Conversación ID: {lead.id_conversacion}]")
+        else:
+            logger.info(f"Motor evaluado con prioridad {evaluacion['prioridad']:.2f} y nivel {evaluacion['nivel']} [Conversación ID: {lead.id_conversacion}]")
+
+    prioridad = evaluacion["prioridad"] if evaluacion else None
+    motivo = decidir_escalacion(prioridad=prioridad, umbral=configuracion["umbral_escalacion"], solicita_asesor=extraccion.get("solicita_asesor") is True, fallo_tecnico=fallo_tecnico, ya_escalado=lead.escalado)
+    if not motivo:
+        return {"escalado": False, "motivo": None, "notificacion": None, "evaluacion": evaluacion}
+
+    lead = actualizacion_asesor(id_lead=lead.id_lead, session=session)
+    lead = marcar_lead_escalado(id_lead=lead.id_lead, motivo_escalacion=motivo, escalado_en=ahora_utc(), session=session)
+    asesor = obtener_nombre_asesor(id_asesor=lead.asesor_encargado, session=session)
+    conversacion = obtener_conversacion_por_id(id_conversacion=lead.id_conversacion, session=session)
+    texto = texto_notificacion_asesor(nombre_cliente=conversacion.nombre, canal_user_id=conversacion.canal_user_id, nivel_prioridad=lead.nivel_prioridad, monto_estimado=lead.monto_estimado, items=items, fallo_tecnico=fallo_tecnico)
+    logger.info(f"Lead {lead.id_lead} escalado con motivo {motivo} y prioridad {prioridad} [Conversación ID: {lead.id_conversacion}]")
+    return {
+        "escalado": True,
+        "motivo": motivo,
+        "notificacion": {"chat_id": asesor.chat_id, "nombre_asesor": asesor.nombre_asesor, "texto": texto},
+        "evaluacion": evaluacion
+    }

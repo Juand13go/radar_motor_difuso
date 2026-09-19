@@ -5,6 +5,7 @@ from decimal import Decimal
 from models import productos, leads
 from app.servicio.leads import construir_items_para_guardar, texto_estado_solicitud, calcular_monto_estimado, calcular_relacion_cliente
 from app.servicio.leads import calcular_completitud, armar_entradas_del_motor
+from app.servicio.leads import decidir_escalacion, texto_notificacion_asesor, frase_confirmacion_cliente
 
 def productos_por_id():
     return {
@@ -117,3 +118,58 @@ def test_entradas_del_motor_conservan_plazo_nulo():
 
 def test_entradas_del_motor_conservan_plazo_negativo_sin_recortar():
     assert armar_entradas_del_motor(monto_estimado=Decimal("0"), relacion_cliente=0, completitud=0.0, plazo_dias=-3)["plazo_dias"] == -3
+
+def decidir(prioridad: float, solicita_asesor: bool = False, fallo_tecnico: bool = False, ya_escalado: bool = False):
+    return decidir_escalacion(prioridad=prioridad, umbral=50, solicita_asesor=solicita_asesor, fallo_tecnico=fallo_tecnico, ya_escalado=ya_escalado)
+
+def notificacion_de_pedido_grande():
+    items = [item(14, 8, Decimal("1850000")), {"id_producto": None, "descripcion": "disco diamantado de 9 pulgadas", "cantidad": 2, "precio_al_momento": None, "existencias_al_momento": None}]
+    return texto_notificacion_asesor(nombre_cliente="Juan Diego Ramírez", canal_user_id="6560871955", nivel_prioridad="critica", monto_estimado=Decimal("18700000"), items=items, fallo_tecnico=False)
+
+def test_escalacion_de_lead_ya_escalado_no_se_repite():
+    assert decidir(90, ya_escalado=True) is None
+
+def test_escalacion_por_fallo_tecnico_sin_prioridad():
+    assert decidir(None, fallo_tecnico=True) == "fallo_tecnico"
+
+def test_escalacion_por_fallo_tecnico_gana_a_la_solicitud_del_cliente():
+    assert decidir(None, solicita_asesor=True, fallo_tecnico=True) == "fallo_tecnico"
+
+def test_escalacion_por_solicitud_del_cliente_con_prioridad_baja():
+    assert decidir(20, solicita_asesor=True) == "solicitud_cliente"
+
+def test_escalacion_por_solicitud_del_cliente_sin_prioridad():
+    assert decidir(None, solicita_asesor=True) == "solicitud_cliente"
+
+def test_escalacion_por_motor_sobre_el_umbral():
+    assert decidir(70) == "motor"
+
+def test_escalacion_por_motor_justo_en_el_umbral():
+    assert decidir(50) == "motor"
+
+def test_sin_escalacion_justo_debajo_del_umbral():
+    assert decidir(49.9) is None
+
+def test_sin_escalacion_sin_prioridad_ni_motivo():
+    assert decidir(None) is None
+
+def test_notificacion_nombra_el_nivel():
+    assert "critica" in notificacion_de_pedido_grande()
+
+def test_notificacion_formatea_el_monto_con_miles():
+    assert "18.700.000" in notificacion_de_pedido_grande()
+
+def test_notificacion_incluye_el_segundo_item():
+    assert "disco diamantado de 9 pulgadas" in notificacion_de_pedido_grande()
+
+def test_notificacion_por_fallo_tecnico_lo_menciona():
+    assert "fallo técnico" in texto_notificacion_asesor(nombre_cliente="Juan Diego Ramírez", canal_user_id="6560871955", nivel_prioridad=None, monto_estimado=None, items=[], fallo_tecnico=True)
+
+def test_notificacion_con_nombre_identifica_al_cliente_por_su_canal():
+    assert "6560871955" in notificacion_de_pedido_grande()
+
+def test_notificacion_sin_nombre_identifica_al_cliente_por_su_canal():
+    assert "6560871955" in texto_notificacion_asesor(nombre_cliente=None, canal_user_id="6560871955", nivel_prioridad="alta", monto_estimado=Decimal("14800000"), items=[], fallo_tecnico=False)
+
+def test_frase_para_el_cliente_nombra_al_asesor_y_lo_trata_de_usted():
+    assert frase_confirmacion_cliente(nombre_asesor="Natalia Ramírez Rendón") == "Su solicitud ya quedó en manos de Natalia Ramírez Rendón, que lo va a contactar en breve."
