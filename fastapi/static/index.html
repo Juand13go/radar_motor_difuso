@@ -83,6 +83,30 @@
             <ul id="contenedorLeads" class="lista"></ul>
         </section>
 
+        <!-- Bloque 3: simulador de conversacion, usa el mismo endpoint que Telegram -->
+        <section class="bloque">
+            <div class="bloque__encabezado">
+                <h3 class="bloque__titulo">Simulador de conversación</h3>
+                <p class="bloque__ayuda">Escribe como si fueras un cliente: cada mensaje recorre el mismo camino que uno de Telegram. Cambia el identificador para empezar de cero como otro cliente.</p>
+            </div>
+
+            <div class="controles">
+                <div class="controles__fila">
+                    <input type="text" id="inputSimuladorCliente" class="campo" placeholder="Identificador del cliente" autocomplete="off">
+                    <input type="text" id="inputSimuladorNombre" class="campo" placeholder="Nombre del cliente (opcional)" autocomplete="off">
+                </div>
+            </div>
+
+            <ul id="contenedorSimulador" class="conversacion"></ul>
+
+            <div class="controles">
+                <div class="controles__fila">
+                    <input type="text" id="inputSimuladorTexto" class="campo" placeholder="Escribe el mensaje del cliente" autocomplete="off">
+                    <button id="btnEnviarSimulador" class="boton boton--primario">Enviar</button>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="pie">

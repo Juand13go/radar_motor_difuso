@@ -333,6 +333,77 @@ body {
 .insignia--baja    { background-color: var(--prioridad-baja); }
 
 /* ============================================================
+   Simulador de conversacion
+   Cliente a la derecha y sistema a la izquierda, como en un chat,
+   pero con lineas finas en vez de burbujas para no salir de la marca
+   ============================================================ */
+
+.conversacion {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 480px;
+    overflow-y: auto;
+    margin-bottom: 24px;
+}
+
+.mensaje {
+    max-width: 75%;
+    padding: 10px 16px;
+    font-size: 15px;
+    line-height: 1.45;
+    white-space: pre-line;          /* respeta el salto entre la confirmacion y la respuesta */
+    word-break: break-word;
+}
+
+.mensaje--cliente {
+    align-self: flex-end;
+    text-align: right;
+    border-right: 3px solid var(--color-acento);
+}
+
+.mensaje--sistema {
+    align-self: flex-start;
+    border-left: 3px solid var(--color-gris-claro);
+}
+
+.mensaje--pendiente {
+    align-self: flex-start;
+    color: var(--color-gris-medio);
+    font-style: italic;
+}
+
+/* Lo que le llega al asesor: aparte y en naranja para que no se confunda con la respuesta al cliente */
+.mensaje--notificacion {
+    align-self: flex-start;
+    font-size: 14px;
+    border-left: 3px solid var(--color-naranja);
+    background-color: #FFF6E8;
+}
+
+.mensaje__titulo {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--color-naranja);
+}
+
+.mensaje--error {
+    align-self: flex-start;
+    border-left: 3px solid var(--prioridad-critica);
+    color: var(--prioridad-critica);
+}
+
+.boton:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+/* ============================================================
    Pie con la grilla de circulos de la marca
    ============================================================ */
 
@@ -396,5 +467,9 @@ body {
 
     .bloque__titulo {
         font-size: 22px;
+    }
+
+    .mensaje {
+        max-width: 90%;
     }
 }
