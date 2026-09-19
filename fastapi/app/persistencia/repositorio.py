@@ -80,7 +80,10 @@ def obtener_asesor_por_id(id_asesor: uuid.UUID, session: Session):
     return obtener
 
 def obtener_leads_por_asesor(id_asesor: uuid.UUID, session: Session):
-    return session.exec(select(leads).where(leads.asesor_encargado == id_asesor, leads.estado_lead == "en_proceso")).all()
+    return session.exec(select(leads).where(leads.asesor_encargado == id_asesor, leads.estado_lead == "en_proceso").order_by(leads.prioridad.desc().nulls_last(), leads.lead_creado_en.asc())).all()
+
+def obtener_leads_sin_asignar(session: Session):
+    return session.exec(select(leads).where(leads.asesor_encargado.is_(None), leads.estado_lead == "en_proceso").order_by(leads.prioridad.desc().nulls_last(), leads.lead_creado_en.asc())).all()
 
 def actualizar_estado_cierre(id_lead: uuid.UUID, estado_lead: str, session: Session): 
     lead = session.get(leads, id_lead)

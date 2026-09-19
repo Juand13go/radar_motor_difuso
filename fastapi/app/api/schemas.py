@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
+from datetime import date, datetime
 import uuid
 from enum import Enum
 
@@ -58,11 +59,39 @@ class ObtenerAsesorSalida(BaseModel):
     nombre_asesor : str 
     chat_id : str
 
+class ItemSolicitadoSalida(BaseModel):
+    id_producto: Optional[int]
+    descripcion: str
+    cantidad: Optional[int]
+    precio_al_momento: Optional[float]
+    existencias_al_momento: Optional[int]
+
+# Montos y precios salen como float y no como Decimal para que el JSON los entregue como numero y no como texto
 class LeadsPorAsesor(BaseModel):
-    id_lead: uuid.UUID 
+    id_lead: uuid.UUID
     id_conversacion: uuid.UUID
+    nombre_cliente: Optional[str]
+    canal_user_id: str
     productos_interes: Optional[str]
     ciudad: Optional[str]
+    prioridad: Optional[float]
+    nivel_prioridad: Optional[str]
+    monto_estimado: Optional[float]
+    escalado: bool
+    motivo_escalacion: Optional[str]
+    fecha_requerida: Optional[date]
+    creado_en: datetime
+    items: list[ItemSolicitadoSalida]
+
+class EvaluacionLeadSalida(BaseModel):
+    monto_estimado: Optional[float]
+    relacion_cliente: Optional[float]
+    completitud: Optional[float]
+    plazo_dias: Optional[int]
+    prioridad: Optional[float]
+    nivel_prioridad: Optional[str]
+    reglas_activadas: list[dict]
+    creado_en: datetime
 
 class MensajeEntranteEntrada(BaseModel):
     canal: str

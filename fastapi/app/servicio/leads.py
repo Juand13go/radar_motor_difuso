@@ -5,7 +5,7 @@ from app.persistencia.repositorio import crear_lead, asesor_menos_cargado, actua
 from app.persistencia.repositorio import obtener_leads_por_asesor, actualizar_estado_cierre, lista_asesores_para_front
 from app.persistencia.repositorio import obtener_lead_abierto, crear_solicitud, actualizar_datos_solicitud, obtener_productos_por_ids, reemplazar_items_de_lead
 from app.persistencia.repositorio import obtener_items_de_lead, guardar_evaluacion, obtener_mensaje_por_id, obtener_leads_cerrados, actualizar_prioridad_lead, marcar_lead_escalado
-from app.persistencia.repositorio import obtener_conversacion_por_id
+from app.persistencia.repositorio import obtener_conversacion_por_id, obtener_leads_sin_asignar, evaluaciones_de_lead
 from app.motor.reglas import cargar_configuracion
 from app.motor.inferencia import evaluar_prioridad
 from models import ahora_utc, hoy_bogota
@@ -49,8 +49,21 @@ def actualizacion_asesor(id_lead: uuid.UUID, session: Session):
 def obtener_nombre_asesor(id_asesor: uuid.UUID, session: Session):
     return obtener_asesor_por_id(id_asesor, session)
 
+def lead_para_bandeja(lead, session: Session):
+    items = [item.model_dump() for item in obtener_items_de_lead(id_lead=lead.id_lead, session=session)]
+    conversacion = obtener_conversacion_por_id(id_conversacion=lead.id_conversacion, session=session)
+    return {**lead.model_dump(), "creado_en": lead.lead_creado_en, "items": items, "nombre_cliente": conversacion.nombre, "canal_user_id": conversacion.canal_user_id}
+
 def listar_leads_por_asesor(id_asesor: uuid.UUID, session: Session):
-    return obtener_leads_por_asesor(id_asesor, session)
+    return [lead_para_bandeja(lead=lead, session=session) for lead in obtener_leads_por_asesor(id_asesor, session)]
+
+def listar_leads_sin_asignar(session: Session):
+    return [lead_para_bandeja(lead=lead, session=session) for lead in obtener_leads_sin_asignar(session=session)]
+
+def listar_evaluaciones_lead(id_lead: uuid.UUID, session: Session):
+    if not obtener_lead_por_id(id_lead, session):
+        raise LeadNoEncontrado
+    return evaluaciones_de_lead(id_lead=id_lead, session=session)
 
 def cambiar_estado_lead_para_cierre(id_lead: uuid.UUID, estado_lead: str, session: Session):
     return actualizar_estado_cierre(id_lead=id_lead, estado_lead=estado_lead, session=session)

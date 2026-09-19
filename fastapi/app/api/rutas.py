@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends
 from database import get_session
 from app.servicio.conversacion import obtener_o_crear_conversacion, obtener_historial_conversacion, guardado_mensajes, actualizacion_estado
 from app.servicio.leads import creacion_lead, funcion_listado_asesores, actualizacion_asesor, obtener_nombre_asesor
-from app.servicio.leads import listar_leads_por_asesor, cambiar_estado_lead_para_cierre
+from app.servicio.leads import listar_leads_por_asesor, cambiar_estado_lead_para_cierre, listar_leads_sin_asignar, listar_evaluaciones_lead
 from app.servicio.agente import comunicacion_agente
 from app.servicio.mensajes import procesar_mensaje_entrante
 import uuid
 from app.api.schemas import ConversacionCrear, GuardarMensajeEntrada, EstadoEntrada, LeadEntrada, ProcesarEntrada, LeadSalida, LeadsPorAsesor, CerrarLeadSalida
 from app.api.schemas import (ConversacionRespuesta, MensajeRespuesta, EstadoSalida, ProcesarSalida, ConfirmacionRespuesta, AsesorSalida, ObtenerAsesorSalida, 
                             CerrarLeadEntrada, AsesorEntrada)
-from app.api.schemas import MensajeEntranteEntrada, MensajeEntranteSalida
+from app.api.schemas import MensajeEntranteEntrada, MensajeEntranteSalida, EvaluacionLeadSalida
 
 router = APIRouter()
 
@@ -49,6 +49,14 @@ def obtener_asesor(id_asesor: uuid.UUID, session = Depends(get_session)):
 @router.get('/leads_por_asesor', response_model=list[LeadsPorAsesor])
 def leads_por_asesor(id_asesor: uuid.UUID, session = Depends(get_session)):
     return listar_leads_por_asesor(id_asesor=id_asesor, session=session)
+
+@router.get('/leads_sin_asignar', response_model=list[LeadsPorAsesor])
+def leads_sin_asignar(session=Depends(get_session)):
+    return listar_leads_sin_asignar(session=session)
+
+@router.get('/evaluaciones_lead', response_model=list[EvaluacionLeadSalida])
+def evaluaciones_lead(id_lead: uuid.UUID, session=Depends(get_session)):
+    return listar_evaluaciones_lead(id_lead=id_lead, session=session)
 
 @router.put('/cerrar_lead', response_model=CerrarLeadSalida)
 def cerrar_lead(datos: CerrarLeadEntrada, session=Depends(get_session)):

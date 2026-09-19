@@ -253,32 +253,104 @@ body {
 }
 
 /* ============================================================
-   Listas
+   Bandeja de leads
+   Cada lead es una tarjeta con una linea a la izquierda que toma
+   el color del semaforo segun su nivel de prioridad
    ============================================================ */
 
-.lista {
+.bandeja {
     list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-.lista li {
-    font-size: 15px;
-    padding: 18px 0;
+.bandeja__vacia {
+    color: var(--color-gris-medio);
+}
+
+.tarjeta-lead {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 20px;
+    border-left: 3px solid var(--color-gris-claro);
     border-bottom: 1px solid var(--color-linea);
-    word-break: break-word;
 }
 
-/* Los li de los leads los genera script.js con dos botones adentro
-   y sin clases, por eso se estilan por selector y no por clase */
-#contenedorLeads li {
+.tarjeta-lead--sin-clasificar {
+    color: var(--color-gris-medio);
+}
+
+/* Arriba de todo, porque es lo primero que el asesor necesita para contactar */
+.tarjeta-lead__cliente {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+
+.tarjeta-lead__encabezado {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 12px;
-    padding-left: 16px;
-    border-left: 3px solid var(--color-gris-claro);
 }
 
-#contenedorLeads button {
+.tarjeta-lead__prioridad {
+    font-weight: 600;
+}
+
+.tarjeta-lead__monto {
+    margin-left: auto;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.tarjeta-lead__datos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+    font-size: 14px;
+}
+
+.tarjeta-lead__falta {
+    color: var(--color-gris-medio);
+    font-style: italic;
+}
+
+.tarjeta-lead__items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 14px;
+}
+
+.item-lead--faltante {
+    color: var(--prioridad-critica);
+}
+
+.etiqueta {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border: 1px solid currentColor;
+}
+
+.etiqueta--fuera-catalogo { color: var(--color-acento); }
+.etiqueta--faltante       { color: var(--prioridad-critica); }
+
+.tarjeta-lead__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.boton-tarjeta {
     font-family: var(--fuente);
     font-size: 13px;
     font-weight: 600;
@@ -287,28 +359,67 @@ body {
     background-color: transparent;
     color: var(--color-texto);
     cursor: pointer;
-    margin-left: 0 !important;      /* script.js le pone 10px en linea */
     transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-/* El primer boton que crea script.js es "Venta" y el segundo "No venta" */
-#contenedorLeads button:first-of-type:hover {
+.boton-tarjeta:hover {
+    border-color: var(--color-acento);
+    color: var(--color-acento);
+}
+
+.boton-tarjeta--venta:hover {
     background-color: var(--prioridad-baja);
     border-color: var(--prioridad-baja);
     color: #FFFFFF;
 }
 
-#contenedorLeads button:last-of-type:hover {
+.boton-tarjeta--no-venta:hover {
     background-color: var(--prioridad-critica);
     border-color: var(--prioridad-critica);
     color: #FFFFFF;
 }
 
+.boton-tarjeta:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+/* La explicacion arranca cerrada y la abre el boton de la tarjeta */
+.explicacion {
+    display: none;
+    padding: 4px 0 4px 16px;
+    border-left: 1px solid var(--color-linea);
+    font-size: 14px;
+}
+
+.explicacion--abierta {
+    display: block;
+}
+
+.explicacion__titulo {
+    margin: 12px 0 4px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--color-gris-medio);
+}
+
+.explicacion__titulo:first-child {
+    margin-top: 0;
+}
+
+.explicacion__lista {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
 /* ============================================================
    Semaforo de prioridad
-   Todavia no se usa: queda listo para cuando el motor de logica
-   difusa devuelva la prioridad. Solo habra que agregarle la clase
-   al li desde script.js
+   Se aplica a las tarjetas de la bandeja segun el nivel que
+   calculo el motor, junto con la insignia del mismo color
    ============================================================ */
 
 .prioridad-critica { border-left-color: var(--prioridad-critica) !important; }
@@ -331,6 +442,7 @@ body {
 .insignia--alta    { background-color: var(--prioridad-alta); }
 .insignia--media   { background-color: var(--prioridad-media); color: var(--color-texto); }
 .insignia--baja    { background-color: var(--prioridad-baja); }
+.insignia--sin-clasificar { background-color: var(--color-gris-claro); color: var(--color-texto); }
 
 /* ============================================================
    Simulador de conversacion
