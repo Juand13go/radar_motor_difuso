@@ -63,36 +63,7 @@
         -->
         
 
-        <!-- Bloque 1: leads asignados a un asesor -->
-        <section class="bloque">
-            <div class="bloque__encabezado">
-                <h3 class="bloque__titulo">Leads asignados</h3>
-                <p class="bloque__ayuda">Elige un asesor para ver su bandeja, ordenada de mayor a menor prioridad.</p>
-            </div>
-
-            <div class="controles">
-                <div class="controles__fila">
-                    <select id="selectAsesor" class="campo">
-                        <option value="">Elige un asesor</option>
-                    </select>
-                    <button id="btnActualizarLeads" class="boton boton--primario">Actualizar</button>
-                </div>
-            </div>
-
-            <ul id="contenedorLeads" class="bandeja"></ul>
-        </section>
-
-        <!-- Bloque 2: solicitudes que el motor atendio sin escalar -->
-        <section class="bloque">
-            <div class="bloque__encabezado">
-                <h3 class="bloque__titulo">Solicitudes sin asignar</h3>
-                <p class="bloque__ayuda">Solicitudes que el sistema atendió sin escalar a un asesor. Antes esta demanda no quedaba a la vista de nadie; aquí se puede revisar y cerrar igual que las demás.</p>
-            </div>
-
-            <ul id="contenedorSinAsignar" class="bandeja"></ul>
-        </section>
-
-        <!-- Bloque 3: simulador de conversacion, usa el mismo endpoint que Telegram -->
+        <!-- Bloque 1: simulador de conversacion, usa el mismo endpoint que Telegram -->
         <section class="bloque">
             <div class="bloque__encabezado">
                 <h3 class="bloque__titulo">Simulador de conversación</h3>
@@ -116,10 +87,39 @@
             </div>
         </section>
 
+        <!-- Bloque 2: leads asignados a un asesor -->
+        <section class="bloque">
+            <div class="bloque__encabezado">
+                <h3 class="bloque__titulo">Leads asignados</h3>
+                <p class="bloque__ayuda">Elige un asesor para ver su bandeja, ordenada de mayor a menor prioridad.</p>
+            </div>
+
+            <div class="controles">
+                <div class="controles__fila">
+                    <select id="selectAsesor" class="campo">
+                        <option value="">Elige un asesor</option>
+                    </select>
+                    <button id="btnActualizarLeads" class="boton boton--primario">Actualizar</button>
+                </div>
+            </div>
+
+            <ul id="contenedorLeads" class="bandeja"></ul>
+        </section>
+
+        <!-- Bloque 3: solicitudes que el motor atendio sin escalar -->
+        <section class="bloque">
+            <div class="bloque__encabezado">
+                <h3 class="bloque__titulo">Solicitudes sin asignar</h3>
+                <p class="bloque__ayuda">Solicitudes que el sistema atendió sin escalar a un asesor. Antes esta demanda no quedaba a la vista de nadie; aquí se puede revisar y cerrar igual que las demás.</p>
+            </div>
+
+            <ul id="contenedorSinAsignar" class="bandeja"></ul>
+        </section>
+
     </main>
 
     <footer class="pie">
-        <small>Medellin, Col.</small>
+        <small>Medellín, Colombia</small>
 
         <div class="circulos">
             <span class="circulo circulo--violeta"></span>
