@@ -48,7 +48,7 @@ variables:
         puntos: [0, 0, 0.25, 0.6]
       completa:
         tipo: trapezoidal
-        puntos: [0.4, 0.75, 1, 1]
+        puntos: [0.5, 1, 1, 1]
 salidas:
   baja: 20
   media: 45

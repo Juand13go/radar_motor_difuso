@@ -4,10 +4,12 @@ from app.servicio.conversacion import obtener_o_crear_conversacion, obtener_hist
 from app.servicio.leads import creacion_lead, funcion_listado_asesores, actualizacion_asesor, obtener_nombre_asesor
 from app.servicio.leads import listar_leads_por_asesor, cambiar_estado_lead_para_cierre
 from app.servicio.agente import comunicacion_agente
+from app.servicio.mensajes import procesar_mensaje_entrante
 import uuid
 from app.api.schemas import ConversacionCrear, GuardarMensajeEntrada, EstadoEntrada, LeadEntrada, ProcesarEntrada, LeadSalida, LeadsPorAsesor, CerrarLeadSalida
 from app.api.schemas import (ConversacionRespuesta, MensajeRespuesta, EstadoSalida, ProcesarSalida, ConfirmacionRespuesta, AsesorSalida, ObtenerAsesorSalida, 
                             CerrarLeadEntrada, AsesorEntrada)
+from app.api.schemas import MensajeEntranteEntrada, MensajeEntranteSalida
 
 router = APIRouter()
 
@@ -55,3 +57,7 @@ def cerrar_lead(datos: CerrarLeadEntrada, session=Depends(get_session)):
 @router.get('/listar_asesores')
 def listar_asesores_para_front(session=Depends(get_session)):
     return funcion_listado_asesores(session=session)
+
+@router.post('/mensaje_entrante', response_model=MensajeEntranteSalida)
+def mensaje_entrante(datos: MensajeEntranteEntrada, session=Depends(get_session)):
+    return procesar_mensaje_entrante(canal=datos.canal, canal_user_id=datos.canal_user_id, nombre=datos.nombre, texto=datos.texto, session=session)

@@ -140,7 +140,8 @@ def validar_extraccion(extraccion: dict, ids_validos: list[int], hoy: date):
         "fallo_tecnico": fallo_tecnico
     }
 
-def comunicacion_agente(id_conversacion: uuid.UUID, session: Session):
+# estado_solicitud va al final y con valor por defecto para que /procesar, que se retira en la 4.5, siga llamandola igual
+def comunicacion_agente(id_conversacion: uuid.UUID, session: Session, estado_solicitud: str = "Sin solicitud abierta"):
     historial = obtener_historial_conversacion(id_conversacion=id_conversacion, session=session)
     catalogo_productos_variable = catalogo_a_texto(session)
     ids_validos = [producto.id_producto for producto in obtener_productos(session)]
@@ -149,7 +150,7 @@ def comunicacion_agente(id_conversacion: uuid.UUID, session: Session):
             model = MODELO_AGENTE,
             max_tokens = 1024,
             messages=[{
-                        "role": "system", "content": armar_prompt_agente(catalogo=catalogo_productos_variable, estado_solicitud="Sin solicitud abierta")
+                        "role": "system", "content": armar_prompt_agente(catalogo=catalogo_productos_variable, estado_solicitud=estado_solicitud)
             }] + [{"role" : m.rol, "content" : m.contenido} for m in historial],
             tools=[HERRAMIENTA_AGENTE],
             tool_choice={"type": "function", "function": {"name": "registrar_solicitud"}}

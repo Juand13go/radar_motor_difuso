@@ -64,6 +64,21 @@ class LeadsPorAsesor(BaseModel):
     productos_interes: Optional[str]
     ciudad: Optional[str]
 
+class MensajeEntranteEntrada(BaseModel):
+    canal: str
+    canal_user_id: str
+    nombre: Optional[str] = None
+    texto: str
+
+class NotificacionAsesorSalida(BaseModel):
+    chat_id: str
+    nombre_asesor: str
+    texto: str
+
+class MensajeEntranteSalida(BaseModel):
+    respuesta_cliente: str
+    notificacion_asesor: Optional[NotificacionAsesorSalida]
+
 class EstadoCierreEnum(str, Enum):
     venta = "venta"
     no_venta = "no_venta"
