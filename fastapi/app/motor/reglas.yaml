@@ -1,0 +1,141 @@
+# Reglas del motor de prioridad de Tornalba Suministros Técnicos S.A.S. La prioridad va en una escala de 0 a 100
+variables:
+  monto_estimado:
+    minimo: 0
+    maximo: 20000000
+    conjuntos:
+      bajo:
+        tipo: trapezoidal
+        puntos: [0, 0, 200000, 1500000]
+      medio:
+        tipo: trapezoidal
+        puntos: [500000, 1500000, 4000000, 9000000]
+      alto:
+        tipo: trapezoidal
+        puntos: [4000000, 12000000, 20000000, 20000000]
+  relacion_cliente:
+    minimo: 0
+    maximo: 8
+    conjuntos:
+      nuevo:
+        tipo: triangular
+        puntos: [0, 0, 2]
+      recurrente:
+        tipo: triangular
+        puntos: [1, 3, 5]
+      confianza:
+        tipo: trapezoidal
+        puntos: [3, 5, 8, 8]
+  plazo_dias:
+    minimo: 0
+    maximo: 45
+    conjuntos:
+      urgente:
+        tipo: trapezoidal
+        puntos: [0, 0, 2, 5]
+      pronto:
+        tipo: triangular
+        puntos: [3, 7, 15]
+      holgado:
+        tipo: trapezoidal
+        puntos: [10, 20, 45, 45]
+  completitud:
+    minimo: 0
+    maximo: 1
+    conjuntos:
+      incompleta:
+        tipo: trapezoidal
+        puntos: [0, 0, 0.25, 0.6]
+      completa:
+        tipo: trapezoidal
+        puntos: [0.4, 0.75, 1, 1]
+salidas:
+  baja: 20
+  media: 45
+  alta: 70
+  critica: 90
+cortes:
+  media: 25
+  alta: 50
+  critica: 75
+umbral_escalacion: 50
+reglas:
+  - nombre: pedido_grande
+    si:
+      monto_estimado: alto
+    entonces: alta
+  - nombre: pedido_grande_urgente
+    si:
+      monto_estimado: alto
+      plazo_dias: urgente
+    entonces: critica
+  - nombre: pedido_grande_cliente_confianza
+    si:
+      monto_estimado: alto
+      relacion_cliente: confianza
+    entonces: critica
+  - nombre: pedido_grande_pronto
+    si:
+      monto_estimado: alto
+      plazo_dias: pronto
+    entonces: alta
+  - nombre: pedido_grande_cliente_nuevo
+    si:
+      monto_estimado: alto
+      relacion_cliente: nuevo
+    entonces: alta
+  - nombre: pedido_grande_incompleto
+    si:
+      monto_estimado: alto
+      completitud: incompleta
+    entonces: alta
+  - nombre: pedido_mediano
+    si:
+      monto_estimado: medio
+    entonces: media
+  - nombre: pedido_mediano_urgente
+    si:
+      monto_estimado: medio
+      plazo_dias: urgente
+    entonces: alta
+  - nombre: pedido_mediano_cliente_confianza
+    si:
+      monto_estimado: medio
+      relacion_cliente: confianza
+    entonces: alta
+  - nombre: pedido_mediano_completo
+    si:
+      monto_estimado: medio
+      completitud: completa
+    entonces: alta
+  - nombre: pedido_pequeno
+    si:
+      monto_estimado: bajo
+    entonces: baja
+  - nombre: pedido_pequeno_urgente
+    si:
+      monto_estimado: bajo
+      plazo_dias: urgente
+    entonces: media
+  - nombre: pedido_pequeno_sin_afan
+    si:
+      monto_estimado: bajo
+      plazo_dias: holgado
+    entonces: baja
+  - nombre: pedido_pequeno_incompleto
+    si:
+      monto_estimado: bajo
+      completitud: incompleta
+    entonces: baja
+  - nombre: cliente_confianza
+    si:
+      relacion_cliente: confianza
+    entonces: critica
+  - nombre: cliente_recurrente
+    si:
+      relacion_cliente: recurrente
+    entonces: media
+  - nombre: solicitud_urgente
+    si:
+      plazo_dias: urgente
+    entonces: media

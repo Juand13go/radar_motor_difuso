@@ -46,7 +46,7 @@ Si hay ítems y no hay lead abierto, se crea el lead. Si hay lead abierto, se ac
 
 Con el lead ya actualizado se calculan las cuatro variables (monto estimado, relación con el cliente, completitud y plazo), se evalúa el motor, se guarda la evaluación en evaluaciones_motor asociada al lead y al mensaje del cliente, y se actualizan monto_estimado, prioridad y nivel_prioridad del lead.
 
-Después se decide la escalación, solo si el lead todavía no está escalado. Se escala si la prioridad supera el umbral definido en reglas.yaml (motivo motor), o si el agente marcó solicita_asesor (motivo solicitud_cliente). Escalar asigna el asesor menos cargado, marca escalado en verdadero, guarda el motivo y escalado_en, arma el texto de notificación para el asesor, y agrega al final de respuesta_cliente una frase fija que le dice al cliente qué asesor lo va a contactar. Un lead ya escalado no vuelve a notificar aunque su prioridad suba; eso se ve en el panel.
+Después se decide la escalación, solo si el lead todavía no está escalado. Se escala si la prioridad alcanza o supera el umbral definido en reglas.yaml (motivo motor), o si el agente marcó solicita_asesor (motivo solicitud_cliente). Escalar asigna el asesor menos cargado, marca escalado en verdadero, guarda el motivo y escalado_en, arma el texto de notificación para el asesor, y agrega al final de respuesta_cliente una frase fija que le dice al cliente qué asesor lo va a contactar. Un lead ya escalado no vuelve a notificar aunque su prioridad suba; eso se ve en el panel.
 
 Por último se guarda la respuesta con rol assistant y se devuelve la salida.
 

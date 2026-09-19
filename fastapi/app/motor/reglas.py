@@ -31,12 +31,28 @@ def validar_variables(variables: dict):
         for nombre_conjunto, conjunto in variable.get("conjuntos", {}).items():
             validar_conjunto(nombre_conjunto, conjunto, nombre_variable, minimo, maximo)
 
+def esta_en_la_escala(valor: float):
+    # bool es subclase de int: sin este filtro un true del YAML pasaria como 1
+    return isinstance(valor, (int, float)) and not isinstance(valor, bool) and 0 <= valor <= 100
+
 def validar_cortes(cortes: dict):
     media = cortes.get("media")
     alta = cortes.get("alta")
     critica = cortes.get("critica")
     if media is None or alta is None or critica is None or not media < alta < critica:
         raise ConfiguracionMotorInvalida("Los cortes deben cumplir media menor que alta y alta menor que critica")
+    for nombre_corte, corte in cortes.items():
+        if not esta_en_la_escala(corte):
+            raise ConfiguracionMotorInvalida(f"El corte {nombre_corte} de la sección cortes debe ser un número entre 0 y 100")
+
+def validar_salidas(salidas: dict):
+    for nombre_salida, salida in salidas.items():
+        if not esta_en_la_escala(salida):
+            raise ConfiguracionMotorInvalida(f"La salida {nombre_salida} de la sección salidas debe ser un número entre 0 y 100")
+
+def validar_umbral_escalacion(umbral_escalacion: float):
+    if not esta_en_la_escala(umbral_escalacion):
+        raise ConfiguracionMotorInvalida("La sección umbral_escalacion debe ser un número entre 0 y 100")
 
 def validar_reglas(reglas: list, variables: dict, salidas: dict):
     for regla in reglas:
@@ -62,6 +78,8 @@ def validar_configuracion(configuracion: dict):
     validar_secciones(configuracion)
     validar_variables(configuracion["variables"])
     validar_cortes(configuracion["cortes"])
+    validar_salidas(configuracion["salidas"])
+    validar_umbral_escalacion(configuracion["umbral_escalacion"])
     validar_reglas(configuracion["reglas"], configuracion["variables"], configuracion["salidas"])
     return configuracion
 

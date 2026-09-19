@@ -122,3 +122,21 @@ def test_cargar_configuracion_lee_el_yaml_de_prueba_con_tres_reglas():
 def test_validar_configuracion_con_none_lanza_configuracion_motor_invalida():
     with pytest.raises(ConfiguracionMotorInvalida, match="vacía"):
         validar_configuracion(None)
+
+def test_salida_fuera_de_la_escala():
+    configuracion = configuracion_valida()
+    configuracion["salidas"]["critica"] = 150
+    with pytest.raises(ConfiguracionMotorInvalida, match="salidas"):
+        validar_configuracion(configuracion)
+
+def test_corte_fuera_de_la_escala():
+    configuracion = configuracion_valida()
+    configuracion["cortes"]["critica"] = 150
+    with pytest.raises(ConfiguracionMotorInvalida, match="cortes"):
+        validar_configuracion(configuracion)
+
+def test_umbral_de_escalacion_fuera_de_la_escala():
+    configuracion = configuracion_valida()
+    configuracion["umbral_escalacion"] = 150
+    with pytest.raises(ConfiguracionMotorInvalida, match="umbral_escalacion"):
+        validar_configuracion(configuracion)
