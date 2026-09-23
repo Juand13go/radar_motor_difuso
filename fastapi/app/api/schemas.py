@@ -1,64 +1,13 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
 import uuid
 from enum import Enum
 
-class ConversacionCrear(BaseModel):
-    canal_user_id : str
-    canal: str
-    nombre: str
-
-class ConversacionRespuesta(BaseModel):
-    id_conversacion: uuid.UUID
-
 class MensajeRespuesta(BaseModel):
     rol : str
     contenido : str
     
-class GuardarMensajeEntrada(BaseModel):
-    id_conversacion : uuid.UUID
-    rol : str
-    contenido : str
-
-class EstadoEntrada(BaseModel):
-    estado : str
-    id_conversacion : uuid.UUID
-
-class EstadoSalida(BaseModel):
-    estado : str
-
-class LeadEntrada(BaseModel):
-    id_conversacion: uuid.UUID
-    productos_interes: str = Field(min_length=1)
-    ciudad: str = Field(min_length=1)
-
-class ProcesarEntrada(BaseModel):
-    id_conversacion : uuid.UUID
-
-class ProcesarSalida(BaseModel):
-    respuesta : str
-    escalar : bool
-    productos_interes : Optional[str]
-    ciudad : Optional[str]
-
-class LeadSalida(BaseModel):
-    id_lead : uuid.UUID
-
-class ConfirmacionRespuesta(BaseModel):
-    ok: bool
-
-class AsesorSalida(BaseModel):
-    asesor_encargado : uuid.UUID 
-
-class AsesorEntrada(BaseModel):
-    id_lead : uuid.UUID
-
-class ObtenerAsesorSalida(BaseModel):
-    id_asesor : uuid.UUID
-    nombre_asesor : str 
-    chat_id : str
-
 class ItemSolicitadoSalida(BaseModel):
     id_producto: Optional[int]
     descripcion: str

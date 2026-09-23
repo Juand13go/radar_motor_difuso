@@ -1,7 +1,7 @@
 from sqlmodel import Session
 from sqlalchemy.exc import IntegrityError
 from app.excepciones import LeadNoEncontrado, SinAsesoresDisponibles
-from app.persistencia.repositorio import crear_lead, asesor_menos_cargado, actualizar_asesor, obtener_asesor_por_id, obtener_lead_por_id
+from app.persistencia.repositorio import asesor_menos_cargado, actualizar_asesor, obtener_asesor_por_id, obtener_lead_por_id
 from app.persistencia.repositorio import obtener_leads_por_asesor, actualizar_estado_cierre, lista_asesores_para_front
 from app.persistencia.repositorio import obtener_lead_abierto, crear_solicitud, actualizar_datos_solicitud, obtener_productos_por_ids, reemplazar_items_de_lead
 from app.persistencia.repositorio import obtener_items_de_lead, guardar_evaluacion, obtener_mensaje_por_id, obtener_leads_cerrados, actualizar_prioridad_lead, marcar_lead_escalado
@@ -22,9 +22,6 @@ logger = logging.getLogger(__name__)
 @lru_cache(maxsize=1)
 def obtener_configuracion():
     return cargar_configuracion(ruta=str(Path(__file__).resolve().parents[1] / "motor" / "reglas.yaml"))
-
-def creacion_lead(id_conversacion: uuid.UUID, productos_interes: str, ciudad: str, session: Session):
-    return crear_lead(id_conversacion, productos_interes, ciudad, session)
 
 def menos_cargado(session: Session):
     return asesor_menos_cargado(session=session)
