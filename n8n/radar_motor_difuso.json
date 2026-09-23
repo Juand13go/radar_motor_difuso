@@ -1,0 +1,178 @@
+{
+  "name": "Radar - Triaje de leads comerciales",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        0
+      ],
+      "id": "a1000000-0000-4000-8000-000000000001",
+      "name": "Telegram Trigger",
+      "webhookId": "radar-telegram-webhook",
+      "credentials": {
+        "telegramApi": {
+          "id": "4lGRXhpjHhX90ldS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fastapi:8000/mensaje_entrante",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ canal: 'telegram', canal_user_id: $json.message.chat.id.toString(), nombre: [$json.message.chat.first_name, $json.message.chat.last_name].filter(Boolean).join(' '), texto: $json.message.text }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -420,
+        0
+      ],
+      "id": "a1000000-0000-4000-8000-000000000002",
+      "name": "Radar (FastAPI)"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $('Radar (FastAPI)').item.json.respuesta_cliente }}",
+        "additionalFields": {
+          "appendAttribution": "={{ false }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -200,
+        0
+      ],
+      "id": "a1000000-0000-4000-8000-000000000003",
+      "name": "Respuesta al cliente",
+      "webhookId": "radar-respuesta-cliente",
+      "credentials": {
+        "telegramApi": {
+          "id": "4lGRXhpjHhX90ldS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b2000000-0000-4000-8000-000000000001",
+              "leftValue": "={{ $('Radar (FastAPI)').item.json.notificacion_asesor ? 'si' : 'no' }}",
+              "rightValue": "si",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        20,
+        0
+      ],
+      "id": "a1000000-0000-4000-8000-000000000004",
+      "name": "Hubo escalacion"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Radar (FastAPI)').item.json.notificacion_asesor.chat_id }}",
+        "text": "={{ $('Radar (FastAPI)').item.json.notificacion_asesor.texto }}",
+        "additionalFields": {
+          "appendAttribution": "={{ false }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        260,
+        -100
+      ],
+      "id": "a1000000-0000-4000-8000-000000000005",
+      "name": "Alerta al asesor",
+      "webhookId": "radar-alerta-asesor",
+      "credentials": {
+        "telegramApi": {
+          "id": "4lGRXhpjHhX90ldS",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Radar (FastAPI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Radar (FastAPI)": {
+      "main": [
+        [
+          {
+            "node": "Respuesta al cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respuesta al cliente": {
+      "main": [
+        [
+          {
+            "node": "Hubo escalacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hubo escalacion": {
+      "main": [
+        [
+          {
+            "node": "Alerta al asesor",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

@@ -218,14 +218,15 @@ def frase_confirmacion_cliente(nombre_asesor: str):
 
 def evaluar_y_escalar(lead, extraccion: dict, id_mensaje: uuid.UUID, session: Session):
     fallo_tecnico = extraccion.get("fallo_tecnico") is True
+    solicita_asesor = extraccion.get("solicita_asesor") is True
 
-    if not lead and not fallo_tecnico:
+    if not lead and not fallo_tecnico and not solicita_asesor:
         return {"escalado": False, "motivo": None, "notificacion": None, "evaluacion": None}
 
     if not lead:
         # El lead llega nulo, asi que la conversacion se toma del mensaje que se esta procesando
         mensaje = obtener_mensaje_por_id(id_mensaje=id_mensaje, session=session)
-        lead = abrir_solicitud(id_conversacion=mensaje.id_conversacion, ciudad=None, fecha_requerida=None, session=session)
+        lead = abrir_solicitud(id_conversacion=mensaje.id_conversacion, ciudad=extraccion.get("ciudad"), fecha_requerida=extraccion.get("fecha_requerida"), session=session)
 
     configuracion = obtener_configuracion()
     items = [item.model_dump() for item in obtener_items_de_lead(id_lead=lead.id_lead, session=session)]
@@ -249,7 +250,7 @@ def evaluar_y_escalar(lead, extraccion: dict, id_mensaje: uuid.UUID, session: Se
             logger.info(f"Motor evaluado con prioridad {evaluacion['prioridad']:.2f} y nivel {evaluacion['nivel']} [Conversación ID: {lead.id_conversacion}]")
 
     prioridad = evaluacion["prioridad"] if evaluacion else None
-    motivo = decidir_escalacion(prioridad=prioridad, umbral=configuracion["umbral_escalacion"], solicita_asesor=extraccion.get("solicita_asesor") is True, fallo_tecnico=fallo_tecnico, ya_escalado=lead.escalado)
+    motivo = decidir_escalacion(prioridad=prioridad, umbral=configuracion["umbral_escalacion"], solicita_asesor=solicita_asesor, fallo_tecnico=fallo_tecnico, ya_escalado=lead.escalado)
     if not motivo:
         return {"escalado": False, "motivo": None, "notificacion": None, "evaluacion": evaluacion}
 

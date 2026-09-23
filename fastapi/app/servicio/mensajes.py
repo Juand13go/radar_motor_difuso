@@ -8,7 +8,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-TEXTO_RESPUESTA_REPETIDA = "Disculpe la insistencia. Su solicitud ya quedó registrada y un asesor la va a revisar. ¿Puedo ayudarle con algo más?"
+TEXTO_RESPUESTA_REPETIDA = "Disculpe, creo que me repetí. ¿En qué puedo ayudarle?"
 
 def estado_de_la_solicitud(id_conversacion: uuid.UUID, session: Session):
     lead = obtener_lead_abierto(id_conversacion=id_conversacion, session=session)
