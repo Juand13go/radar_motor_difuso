@@ -8,6 +8,13 @@ const inputSimuladorTexto = document.getElementById("inputSimuladorTexto");
 const btnEnviarSimulador = document.getElementById("btnEnviarSimulador");
 const contenedorSimulador = document.getElementById("contenedorSimulador");
 const aviso = document.getElementById("aviso");
+const btnDemanda30 = document.getElementById("btnDemanda30");
+const btnDemanda7 = document.getElementById("btnDemanda7");
+const textoPeriodoDemanda = document.getElementById("textoPeriodoDemanda");
+const contenedorResumenDemanda = document.getElementById("contenedorResumenDemanda");
+const contenedorNoCubierta = document.getElementById("contenedorNoCubierta");
+const contenedorFueraCatalogo = document.getElementById("contenedorFueraCatalogo");
+const contenedorSobrestock = document.getElementById("contenedorSobrestock");
 
 let temporizadorAviso = null;
 
@@ -492,3 +499,144 @@ inputSimuladorTexto.addEventListener("keydown", (evento) => {
 inputSimuladorCliente.addEventListener("change", () => {
     contenedorSimulador.replaceChildren();
 });
+
+async function cargarDemanda(dias) {
+    try {
+        const response = await fetch(`/demanda?dias=${dias}`);
+
+        if (!response.ok) {
+            throw new Error(`Error en la petición: ${response.status}`);
+        }
+
+        const demanda = await response.json();
+        console.log("Reporte de demanda obtenido: ", demanda);
+        return demanda;
+    } catch (error) {
+        console.error("Hubo un error al cargar el reporte de demanda. ", error);
+        mostrarAviso("No se pudo cargar el reporte de demanda.", "error");
+    }
+}
+
+function formatearNumero(valor) {
+    return Math.round(valor).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function renderizarCifraResumen(valor, etiqueta) {
+    const cifra = document.createElement("div");
+    cifra.className = "franja-demanda__cifra";
+
+    const numero = document.createElement("span");
+    numero.className = "franja-demanda__numero";
+    numero.textContent = valor;
+
+    const texto = document.createElement("span");
+    texto.className = "franja-demanda__etiqueta";
+    texto.textContent = etiqueta;
+
+    cifra.append(numero, texto);
+    return cifra;
+}
+
+function renderizarResumenDemanda(resumen) {
+    contenedorResumenDemanda.replaceChildren(
+        renderizarCifraResumen(formatearNumero(resumen.solicitudes), "solicitudes recibidas"),
+        renderizarCifraResumen(formatearNumero(resumen.escaladas), "escaladas a un asesor"),
+        renderizarCifraResumen(formatearNumero(resumen.ventas), "cerradas en venta"),
+        renderizarCifraResumen(formatearNumero(resumen.no_ventas), "cerradas en no venta"),
+        renderizarCifraResumen(formatearPesos(resumen.monto_total), "monto total pedido")
+    );
+}
+
+// columnas es una lista de [encabezado, funcion que saca el texto de la fila, si es la cifra destacada]
+function renderizarTablaDemanda(filas, columnas, contenedor, textoVacio) {
+    if (filas.length === 0) {
+        const vacio = document.createElement("p");
+        vacio.className = "bandeja__vacia";
+        vacio.textContent = textoVacio;
+        contenedor.replaceChildren(vacio);
+        return;
+    }
+
+    const tabla = document.createElement("table");
+    tabla.className = "tabla-demanda";
+
+    const encabezado = document.createElement("tr");
+    for (const [titulo, , destacada] of columnas) {
+        const celda = document.createElement("th");
+        celda.textContent = titulo;
+        if (destacada) celda.className = "tabla-demanda__destacada";
+        encabezado.appendChild(celda);
+    }
+    const thead = document.createElement("thead");
+    thead.appendChild(encabezado);
+
+    const tbody = document.createElement("tbody");
+    for (const fila of filas) {
+        const tr = document.createElement("tr");
+        for (const [, obtenerTexto, destacada] of columnas) {
+            const celda = document.createElement("td");
+            celda.textContent = obtenerTexto(fila);
+            if (destacada) celda.className = "tabla-demanda__destacada";
+            tr.appendChild(celda);
+        }
+        tbody.appendChild(tr);
+    }
+
+    tabla.append(thead, tbody);
+    contenedor.replaceChildren(tabla);
+}
+
+// Las fechas llegan como AAAA-MM-DD; se leen en UTC para que la zona del navegador no corra el dia
+function formatearFechaLarga(textoFecha, conAnio) {
+    const opciones = { timeZone: "UTC", day: "numeric", month: "long" };
+    if (conAnio) opciones.year = "numeric";
+    return new Date(`${textoFecha}T00:00:00Z`).toLocaleDateString("es-CO", opciones);
+}
+
+function renderizarPeriodoDemanda(inicio, fin) {
+    const mismoAnio = inicio.slice(0, 4) === fin.slice(0, 4);
+    textoPeriodoDemanda.textContent = `del ${formatearFechaLarga(inicio, !mismoAnio)} al ${formatearFechaLarga(fin, true)}`;
+}
+
+function renderizarDemanda(demanda) {
+    renderizarPeriodoDemanda(demanda.inicio, demanda.fin);
+    renderizarResumenDemanda(demanda.resumen);
+
+    renderizarTablaDemanda(demanda.no_cubierta, [
+        ["Referencia", (fila) => fila.referencia, false],
+        ["Producto", (fila) => fila.nombre_producto, false],
+        ["Veces", (fila) => formatearNumero(fila.veces), false],
+        ["Unidades pedidas", (fila) => formatearNumero(fila.unidades_pedidas), false],
+        ["Unidades que faltaron", (fila) => formatearNumero(fila.unidades_faltantes), false],
+        ["Monto que faltó", (fila) => formatearPesos(fila.monto_faltante), true]
+    ], contenedorNoCubierta, "En este periodo no se pidió nada que faltara en existencias.");
+
+    renderizarTablaDemanda(demanda.fuera_de_catalogo, [
+        ["Descripción", (fila) => fila.descripcion, false],
+        ["Veces", (fila) => formatearNumero(fila.veces), true],
+        ["Unidades", (fila) => formatearNumero(fila.unidades), false]
+    ], contenedorFueraCatalogo, "En este periodo no se pidieron productos fuera del catálogo.");
+
+    renderizarTablaDemanda(demanda.sobrestock, [
+        ["Referencia", (fila) => fila.referencia, false],
+        ["Producto", (fila) => fila.nombre_producto, false],
+        ["Existencias", (fila) => formatearNumero(fila.existencias), false],
+        ["Precio unitario", (fila) => formatearPesos(fila.precio_unitario), false],
+        ["Capital inmovilizado", (fila) => formatearPesos(fila.capital_inmovilizado), true]
+    ], contenedorSobrestock, "En este periodo todos los productos con existencias tuvieron al menos una solicitud.");
+}
+
+async function mostrarDemanda(dias, botonActivo) {
+    btnDemanda30.classList.remove("boton--periodo-activo");
+    btnDemanda7.classList.remove("boton--periodo-activo");
+    botonActivo.classList.add("boton--periodo-activo");
+
+    const demanda = await cargarDemanda(dias);
+    if (demanda) renderizarDemanda(demanda);
+}
+
+btnDemanda30.addEventListener("click", () => mostrarDemanda(30, btnDemanda30));
+
+btnDemanda7.addEventListener("click", () => mostrarDemanda(7, btnDemanda7));
+
+mostrarDemanda(30, btnDemanda30);

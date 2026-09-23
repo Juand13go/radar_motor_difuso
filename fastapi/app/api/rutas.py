@@ -4,9 +4,10 @@ from app.servicio.conversacion import obtener_historial_conversacion
 from app.servicio.leads import funcion_listado_asesores
 from app.servicio.leads import listar_leads_por_asesor, cambiar_estado_lead_para_cierre, listar_leads_sin_asignar, listar_evaluaciones_lead
 from app.servicio.mensajes import procesar_mensaje_entrante
+from app.servicio.analitica import reporte_demanda
 import uuid
 from app.api.schemas import MensajeRespuesta, LeadsPorAsesor, CerrarLeadSalida, CerrarLeadEntrada
-from app.api.schemas import MensajeEntranteEntrada, MensajeEntranteSalida, EvaluacionLeadSalida
+from app.api.schemas import MensajeEntranteEntrada, MensajeEntranteSalida, EvaluacionLeadSalida, DemandaSalida
 
 router = APIRouter()
 
@@ -37,3 +38,7 @@ def listar_asesores_para_front(session=Depends(get_session)):
 @router.post('/mensaje_entrante', response_model=MensajeEntranteSalida)
 def mensaje_entrante(datos: MensajeEntranteEntrada, session=Depends(get_session)):
     return procesar_mensaje_entrante(canal=datos.canal, canal_user_id=datos.canal_user_id, nombre=datos.nombre, texto=datos.texto, session=session)
+
+@router.get('/demanda', response_model=DemandaSalida)
+def demanda(dias: int = 30, session=Depends(get_session)):
+    return reporte_demanda(dias=dias, session=session)

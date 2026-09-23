@@ -119,6 +119,44 @@
             <ul id="contenedorSinAsignar" class="bandeja"></ul>
         </section>
 
+        <!-- Bloque 4: reporte de demanda del periodo, lo llena renderizarDemanda en script.js -->
+        <section class="bloque">
+            <div class="bloque__encabezado">
+                <h3 class="bloque__titulo">Demanda del periodo</h3>
+                <p id="textoPeriodoDemanda" class="demanda__periodo"></p>
+                <p class="bloque__ayuda">Habla de las solicitudes recibidas por mensajería en el periodo. El sistema no ve las ventas de mostrador ni las compras a proveedores.</p>
+            </div>
+
+            <div class="controles">
+                <div class="controles__fila">
+                    <button id="btnDemanda30" class="boton boton--periodo boton--periodo-activo">Últimos 30 días</button>
+                    <button id="btnDemanda7" class="boton boton--periodo">Últimos 7 días</button>
+                </div>
+            </div>
+
+            <div id="contenedorResumenDemanda" class="franja-demanda"></div>
+
+            <div class="demanda">
+                <div class="demanda__bloque">
+                    <h4 class="demanda__titulo">Pidieron y no había</h4>
+                    <p class="demanda__ayuda">Productos del catálogo que se pidieron cuando no había existencias suficientes. El monto es lo que faltó, al precio del momento.</p>
+                    <div id="contenedorNoCubierta"></div>
+                </div>
+
+                <div class="demanda__bloque">
+                    <h4 class="demanda__titulo">Piden y no maneja</h4>
+                    <p class="demanda__ayuda">Productos que los clientes pidieron y que no están en el catálogo. No tienen monto porque no hay precio.</p>
+                    <div id="contenedorFueraCatalogo"></div>
+                </div>
+
+                <div class="demanda__bloque">
+                    <h4 class="demanda__titulo">Mercancía parada</h4>
+                    <p class="demanda__ayuda">Productos con existencias que nadie pidió en el periodo, con el capital que tienen inmovilizado.</p>
+                    <div id="contenedorSobrestock"></div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="pie">

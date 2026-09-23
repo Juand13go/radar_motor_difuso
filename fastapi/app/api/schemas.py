@@ -57,6 +57,41 @@ class MensajeEntranteSalida(BaseModel):
     respuesta_cliente: str
     notificacion_asesor: Optional[NotificacionAsesorSalida]
 
+class ResumenDemandaSalida(BaseModel):
+    solicitudes: int
+    escaladas: int
+    ventas: int
+    no_ventas: int
+    monto_total: float
+
+class NoCubiertaSalida(BaseModel):
+    referencia: str
+    nombre_producto: str
+    veces: int
+    unidades_pedidas: int
+    unidades_faltantes: int
+    monto_faltante: float
+
+class FueraDeCatalogoSalida(BaseModel):
+    descripcion: str
+    veces: int
+    unidades: int
+
+class SobrestockSalida(BaseModel):
+    referencia: str
+    nombre_producto: str
+    existencias: int
+    precio_unitario: float
+    capital_inmovilizado: float
+
+class DemandaSalida(BaseModel):
+    inicio: date
+    fin: date
+    resumen: ResumenDemandaSalida
+    no_cubierta: list[NoCubiertaSalida]
+    fuera_de_catalogo: list[FueraDeCatalogoSalida]
+    sobrestock: list[SobrestockSalida]
+
 class EstadoCierreEnum(str, Enum):
     venta = "venta"
     no_venta = "no_venta"
