@@ -119,8 +119,8 @@
             <ul id="contenedorSinAsignar" class="bandeja"></ul>
         </section>
 
-        <!-- Bloque 4: reporte de demanda del periodo, lo llena renderizarDemanda en script.js -->
-        <section class="bloque">
+        <!-- Bloque 4: reporte de demanda del periodo, lo llena renderizarDemanda en script.js. Es lo unico que sale al imprimir -->
+        <section class="bloque bloque--demanda">
             <div class="bloque__encabezado">
                 <h3 class="bloque__titulo">Demanda del periodo</h3>
                 <p id="textoPeriodoDemanda" class="demanda__periodo"></p>
@@ -131,6 +131,7 @@
                 <div class="controles__fila">
                     <button id="btnDemanda30" class="boton boton--periodo boton--periodo-activo">Últimos 30 días</button>
                     <button id="btnDemanda7" class="boton boton--periodo">Últimos 7 días</button>
+                    <button id="btnImprimirDemanda" class="boton boton--primario">Imprimir reporte</button>
                 </div>
             </div>
 
@@ -140,18 +141,21 @@
                 <div class="demanda__bloque">
                     <h4 class="demanda__titulo">Pidieron y no había</h4>
                     <p class="demanda__ayuda">Productos del catálogo que se pidieron cuando no había existencias suficientes. El monto es lo que faltó, al precio del momento.</p>
+                    <div id="graficoNoCubierta" class="grafico-demanda"></div>
                     <div id="contenedorNoCubierta"></div>
                 </div>
 
                 <div class="demanda__bloque">
                     <h4 class="demanda__titulo">Piden y no maneja</h4>
                     <p class="demanda__ayuda">Productos que los clientes pidieron y que no están en el catálogo. No tienen monto porque no hay precio.</p>
+                    <div id="graficoFueraCatalogo" class="grafico-demanda"></div>
                     <div id="contenedorFueraCatalogo"></div>
                 </div>
 
                 <div class="demanda__bloque">
                     <h4 class="demanda__titulo">Mercancía parada</h4>
                     <p class="demanda__ayuda">Productos con existencias que nadie pidió en el periodo, con el capital que tienen inmovilizado.</p>
+                    <div id="graficoSobrestock" class="grafico-demanda"></div>
                     <div id="contenedorSobrestock"></div>
                 </div>
             </div>
@@ -172,6 +176,9 @@
 
         <small>Radar, un producto de Halua.Studio</small>
     </footer> 
+
+    <!-- Pie que solo aparece en la impresion; la fecha la pone script.js justo antes de imprimir -->
+    <p id="pieImpresion" class="pie-impresion"></p>
 
 </body>
 </html>

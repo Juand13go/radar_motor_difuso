@@ -15,6 +15,11 @@ const contenedorResumenDemanda = document.getElementById("contenedorResumenDeman
 const contenedorNoCubierta = document.getElementById("contenedorNoCubierta");
 const contenedorFueraCatalogo = document.getElementById("contenedorFueraCatalogo");
 const contenedorSobrestock = document.getElementById("contenedorSobrestock");
+const graficoNoCubierta = document.getElementById("graficoNoCubierta");
+const graficoFueraCatalogo = document.getElementById("graficoFueraCatalogo");
+const graficoSobrestock = document.getElementById("graficoSobrestock");
+const btnImprimirDemanda = document.getElementById("btnImprimirDemanda");
+const pieImpresion = document.getElementById("pieImpresion");
 
 let temporizadorAviso = null;
 
@@ -586,6 +591,58 @@ function renderizarTablaDemanda(filas, columnas, contenedor, textoVacio) {
     contenedor.replaceChildren(tabla);
 }
 
+const SVG_NS = "http://www.w3.org/2000/svg";
+const ALTO_FILA_GRAFICO = 30;
+const ALTO_BARRA_GRAFICO = 16;
+const LARGO_MAXIMO_ETIQUETA = 32;
+
+function crearNodoSvg(etiqueta, atributos) {
+    const nodo = document.createElementNS(SVG_NS, etiqueta);
+    for (const [nombre, valor] of Object.entries(atributos)) {
+        nodo.setAttribute(nombre, valor);
+    }
+    return nodo;
+}
+
+function recortarEtiqueta(texto) {
+    return texto.length > LARGO_MAXIMO_ETIQUETA ? `${texto.slice(0, LARGO_MAXIMO_ETIQUETA - 1)}…` : texto;
+}
+
+// Las posiciones van en porcentaje para que el grafico ocupe el ancho del bloque sin recalcular al cambiar la ventana:
+// la etiqueta vive en el primer 32%, la barra entre el 33% y el 82%, y el valor queda alineado al borde derecho
+function renderizarGraficoDemanda(filas, obtenerEtiqueta, obtenerValor, formatearValor, variante, contenedor) {
+    if (filas.length === 0) {
+        contenedor.replaceChildren();
+        return;
+    }
+
+    const maximo = Math.max(...filas.map(obtenerValor));
+    const svg = crearNodoSvg("svg", { width: "100%", height: filas.length * ALTO_FILA_GRAFICO, role: "img" });
+    svg.classList.add("grafico-demanda__svg", `grafico-demanda__svg--${variante}`);
+
+    filas.forEach((fila, indice) => {
+        const centro = indice * ALTO_FILA_GRAFICO + ALTO_FILA_GRAFICO / 2;
+        const etiqueta = obtenerEtiqueta(fila);
+        const valor = obtenerValor(fila);
+        const ancho = maximo > 0 ? (valor / maximo) * 49 : 0;
+
+        const texto = crearNodoSvg("text", { x: "0", y: centro, "dominant-baseline": "middle", class: "grafico-demanda__etiqueta" });
+        texto.textContent = recortarEtiqueta(etiqueta);
+        const titulo = crearNodoSvg("title", {});
+        titulo.textContent = etiqueta;
+        texto.appendChild(titulo);
+
+        const barra = crearNodoSvg("rect", { x: "33%", y: centro - ALTO_BARRA_GRAFICO / 2, width: `${ancho}%`, height: ALTO_BARRA_GRAFICO, class: "grafico-demanda__barra" });
+
+        const cifra = crearNodoSvg("text", { x: "100%", y: centro, "dominant-baseline": "middle", "text-anchor": "end", class: "grafico-demanda__valor" });
+        cifra.textContent = formatearValor(valor);
+
+        svg.append(texto, barra, cifra);
+    });
+
+    contenedor.replaceChildren(svg);
+}
+
 // Las fechas llegan como AAAA-MM-DD; se leen en UTC para que la zona del navegador no corra el dia
 function formatearFechaLarga(textoFecha, conAnio) {
     const opciones = { timeZone: "UTC", day: "numeric", month: "long" };
@@ -610,12 +667,14 @@ function renderizarDemanda(demanda) {
         ["Unidades que faltaron", (fila) => formatearNumero(fila.unidades_faltantes), false],
         ["Monto que faltó", (fila) => formatearPesos(fila.monto_faltante), true]
     ], contenedorNoCubierta, "En este periodo no se pidió nada que faltara en existencias.");
+    renderizarGraficoDemanda(demanda.no_cubierta, (fila) => fila.nombre_producto, (fila) => fila.monto_faltante, formatearPesos, "no-cubierta", graficoNoCubierta);
 
     renderizarTablaDemanda(demanda.fuera_de_catalogo, [
         ["Descripción", (fila) => fila.descripcion, false],
         ["Veces", (fila) => formatearNumero(fila.veces), true],
         ["Unidades", (fila) => formatearNumero(fila.unidades), false]
     ], contenedorFueraCatalogo, "En este periodo no se pidieron productos fuera del catálogo.");
+    renderizarGraficoDemanda(demanda.fuera_de_catalogo, (fila) => fila.descripcion, (fila) => fila.veces, formatearNumero, "fuera-catalogo", graficoFueraCatalogo);
 
     renderizarTablaDemanda(demanda.sobrestock, [
         ["Referencia", (fila) => fila.referencia, false],
@@ -624,6 +683,7 @@ function renderizarDemanda(demanda) {
         ["Precio unitario", (fila) => formatearPesos(fila.precio_unitario), false],
         ["Capital inmovilizado", (fila) => formatearPesos(fila.capital_inmovilizado), true]
     ], contenedorSobrestock, "En este periodo todos los productos con existencias tuvieron al menos una solicitud.");
+    renderizarGraficoDemanda(demanda.sobrestock, (fila) => fila.nombre_producto, (fila) => fila.capital_inmovilizado, formatearPesos, "sobrestock", graficoSobrestock);
 }
 
 async function mostrarDemanda(dias, botonActivo) {
@@ -638,5 +698,13 @@ async function mostrarDemanda(dias, botonActivo) {
 btnDemanda30.addEventListener("click", () => mostrarDemanda(30, btnDemanda30));
 
 btnDemanda7.addEventListener("click", () => mostrarDemanda(7, btnDemanda7));
+
+btnImprimirDemanda.addEventListener("click", () => window.print());
+
+// Se llena al imprimir y no al cargar, para que la fecha sea la de la impresion aunque la pagina lleve horas abierta
+window.addEventListener("beforeprint", () => {
+    const fecha = new Date().toLocaleDateString("es-CO", { timeZone: "America/Bogota", day: "numeric", month: "long", year: "numeric" });
+    pieImpresion.textContent = `Radar, de Halua Studio · Impreso el ${fecha}`;
+});
 
 mostrarDemanda(30, btnDemanda30);

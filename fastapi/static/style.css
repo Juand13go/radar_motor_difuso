@@ -739,6 +739,43 @@ body {
 }
 
 /* ============================================================
+   Graficos de demanda
+   Barras horizontales en SVG, una por fila de la tabla. Cada bloque
+   toma un color que ya existe: rojo para lo que faltó, violeta para
+   lo que no se maneja y naranja para la mercancía parada
+   ============================================================ */
+
+.grafico-demanda {
+    margin-bottom: 20px;
+}
+
+.grafico-demanda__svg {
+    display: block;
+}
+
+.grafico-demanda__etiqueta {
+    font-family: var(--fuente);
+    font-size: 13px;
+    fill: var(--color-texto);
+}
+
+.grafico-demanda__valor {
+    font-family: var(--fuente);
+    font-size: 13px;
+    font-weight: 800;
+    fill: var(--color-texto);
+}
+
+.grafico-demanda__svg--no-cubierta .grafico-demanda__barra    { fill: var(--prioridad-critica); }
+.grafico-demanda__svg--fuera-catalogo .grafico-demanda__barra { fill: var(--color-acento); }
+.grafico-demanda__svg--sobrestock .grafico-demanda__barra     { fill: var(--color-naranja); }
+
+/* En pantalla no se ve: solo existe para la hoja impresa */
+.pie-impresion {
+    display: none;
+}
+
+/* ============================================================
    Pantallas angostas
    ============================================================ */
 
@@ -786,5 +823,78 @@ body {
 
     .franja-demanda__numero {
         font-size: 28px;
+    }
+}
+
+/* ============================================================
+   Impresion
+   Al imprimir sale solo el reporte de demanda, con el encabezado
+   de las dos marcas y un pie con la fecha de impresion
+   ============================================================ */
+
+@media print {
+    :root {
+        --margen-lateral: 0;
+    }
+
+    @page {
+        margin: 15mm;
+    }
+
+    body {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+
+    * {
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    .aviso,
+    .bloque:not(.bloque--demanda),
+    .bloque--demanda .controles,
+    .pie {
+        display: none !important;
+    }
+
+    .bloque--demanda {
+        border-top: none;
+        padding: 24px 0 0;
+    }
+
+    .bloque__ayuda,
+    .demanda__ayuda,
+    .demanda__periodo,
+    .franja-demanda__etiqueta,
+    .tabla-demanda th,
+    .tabla-demanda th.tabla-demanda__destacada,
+    .tabla-demanda td.tabla-demanda__destacada {
+        color: #000000;
+    }
+
+    .grafico-demanda__etiqueta,
+    .grafico-demanda__valor {
+        fill: #000000;
+    }
+
+    /* Sin esto el navegador quita los rellenos al imprimir y las barras salen en blanco */
+    .grafico-demanda__barra {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .franja-demanda,
+    .demanda__bloque {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .pie-impresion {
+        display: block;
+        margin-top: 32px;
+        padding-top: 8px;
+        border-top: 1px solid #000000;
+        font-size: 12px;
     }
 }
