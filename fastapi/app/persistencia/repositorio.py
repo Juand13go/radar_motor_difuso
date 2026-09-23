@@ -199,3 +199,48 @@ def marcar_lead_escalado(id_lead: uuid.UUID, motivo_escalacion: str, escalado_en
     
     
 
+def consultar_demanda_no_cubierta(desde: datetime, hasta: datetime, session: Session):
+    faltante = items_solicitados.cantidad - items_solicitados.existencias_al_momento
+    monto_faltante = func.sum(faltante * items_solicitados.precio_al_momento)
+    consulta = (
+        select(productos.referencia, productos.nombre_producto, func.count(items_solicitados.id_item).label("veces"), func.sum(items_solicitados.cantidad).label("unidades_pedidas"), func.sum(faltante).label("unidades_faltantes"), monto_faltante.label("monto_faltante"))
+        .join(leads, leads.id_lead == items_solicitados.id_lead)
+        .join(productos, productos.id_producto == items_solicitados.id_producto)
+        .where(leads.lead_creado_en >= desde, leads.lead_creado_en < hasta, items_solicitados.cantidad > items_solicitados.existencias_al_momento)
+        .group_by(productos.referencia, productos.nombre_producto)
+        .order_by(monto_faltante.desc())
+    )
+    return session.exec(consulta).all()
+
+def consultar_demanda_fuera_de_catalogo(desde: datetime, hasta: datetime, session: Session):
+    descripcion_normalizada = func.lower(func.trim(func.regexp_replace(items_solicitados.descripcion, r"\s+", " ", "g")))
+    veces = func.count(items_solicitados.id_item)
+    consulta = (
+        select(descripcion_normalizada.label("descripcion"), veces.label("veces"), func.coalesce(func.sum(items_solicitados.cantidad), 0).label("unidades"))
+        .join(leads, leads.id_lead == items_solicitados.id_lead)
+        .where(leads.lead_creado_en >= desde, leads.lead_creado_en < hasta, items_solicitados.id_producto.is_(None))
+        .group_by(descripcion_normalizada)
+        .order_by(veces.desc(), descripcion_normalizada.asc())
+    )
+    return session.exec(consulta).all()
+
+def consultar_sobrestock(desde: datetime, hasta: datetime, session: Session):
+    pedidos_en_rango = (
+        select(items_solicitados.id_producto)
+        .join(leads, leads.id_lead == items_solicitados.id_lead)
+        .where(leads.lead_creado_en >= desde, leads.lead_creado_en < hasta, items_solicitados.id_producto.is_not(None))
+    )
+    capital = productos.existencias * productos.precio_unitario
+    consulta = (
+        select(productos.referencia, productos.nombre_producto, productos.existencias, productos.precio_unitario, capital.label("capital_inmovilizado"))
+        .where(productos.existencias > 0, productos.id_producto.not_in(pedidos_en_rango))
+        .order_by(capital.desc())
+    )
+    return session.exec(consulta).all()
+
+def consultar_resumen_periodo(desde: datetime, hasta: datetime, session: Session):
+    consulta = (
+        select(func.count(leads.id_lead).label("solicitudes"), func.count(leads.id_lead).filter(leads.escalado.is_(True)).label("escaladas"), func.count(leads.id_lead).filter(leads.estado_lead == "venta").label("ventas"), func.count(leads.id_lead).filter(leads.estado_lead == "no_venta").label("no_ventas"), func.coalesce(func.sum(leads.monto_estimado), 0).label("monto_total"))
+        .where(leads.lead_creado_en >= desde, leads.lead_creado_en < hasta)
+    )
+    return session.exec(consulta).one()
