@@ -7,11 +7,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
-    <script src="/static/script.js" defer></script>
+    <link rel="stylesheet" href="/static/comun.css">
+    <link rel="stylesheet" href="/static/chat.css">
+    <link rel="stylesheet" href="/static/panel.css">
+    <link rel="stylesheet" href="/static/reporte.css">
+    <script src="/static/comun.js" defer></script>
+    <script src="/static/chat.js" defer></script>
+    <script src="/static/panel.js" defer></script>
+    <script src="/static/reporte.js" defer></script>
 </head>
 <body>
-    <!-- Aviso de exito o error: arranca vacio y oculto, lo llena mostrarAviso en script.js -->
+    <!-- Aviso de exito o error: arranca vacio y oculto, lo llena mostrarAviso en comun.js -->
     <div id="aviso" class="aviso" role="status" aria-live="polite"></div>
 
     <!-- Barra superior: a la izquierda la empresa que usa el panel, a la derecha quien lo construyo -->
@@ -119,7 +125,7 @@
             <ul id="contenedorSinAsignar" class="bandeja"></ul>
         </section>
 
-        <!-- Bloque 4: reporte de demanda del periodo, lo llena renderizarDemanda en script.js. Es lo unico que sale al imprimir -->
+        <!-- Bloque 4: reporte de demanda del periodo, lo llena renderizarDemanda en reporte.js. Es lo unico que sale al imprimir -->
         <section class="bloque bloque--demanda">
             <div class="bloque__encabezado">
                 <h3 class="bloque__titulo">Demanda del periodo</h3>
@@ -177,7 +183,7 @@
         <small>Radar, un producto de Halua.Studio</small>
     </footer> 
 
-    <!-- Pie que solo aparece en la impresion; la fecha la pone script.js justo antes de imprimir -->
+    <!-- Pie que solo aparece en la impresion; la fecha la pone reporte.js justo antes de imprimir -->
     <p id="pieImpresion" class="pie-impresion"></p>
 
 </body>

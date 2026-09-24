@@ -1,0 +1,187 @@
+/* ============================================================
+   Bandeja de leads
+   Cada lead es una tarjeta con una linea a la izquierda que toma
+   el color del semaforo segun su nivel de prioridad
+   ============================================================ */
+
+.bandeja {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.tarjeta-lead {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 20px;
+    border-left: 3px solid var(--color-gris-claro);
+    border-bottom: 1px solid var(--color-linea);
+}
+
+.tarjeta-lead--sin-clasificar {
+    color: var(--color-gris-medio);
+}
+
+/* Arriba de todo, porque es lo primero que el asesor necesita para contactar */
+.tarjeta-lead__cliente {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+
+.tarjeta-lead__encabezado {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.tarjeta-lead__prioridad {
+    font-weight: 600;
+}
+
+.tarjeta-lead__monto {
+    margin-left: auto;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.tarjeta-lead__datos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+    font-size: 14px;
+}
+
+.tarjeta-lead__falta {
+    color: var(--color-gris-medio);
+    font-style: italic;
+}
+
+.tarjeta-lead__items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 14px;
+}
+
+.item-lead--faltante {
+    color: var(--prioridad-critica);
+}
+
+.etiqueta {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border: 1px solid currentColor;
+}
+
+.etiqueta--fuera-catalogo { color: var(--color-acento); }
+.etiqueta--faltante       { color: var(--prioridad-critica); }
+
+.tarjeta-lead__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.boton-tarjeta {
+    font-family: var(--fuente);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 18px;
+    border: 1px solid var(--color-gris-claro);
+    background-color: transparent;
+    color: var(--color-texto);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.boton-tarjeta:hover {
+    border-color: var(--color-acento);
+    color: var(--color-acento);
+}
+
+.boton-tarjeta--venta:hover {
+    background-color: var(--prioridad-baja);
+    border-color: var(--prioridad-baja);
+    color: #FFFFFF;
+}
+
+.boton-tarjeta--no-venta:hover {
+    background-color: var(--prioridad-critica);
+    border-color: var(--prioridad-critica);
+    color: #FFFFFF;
+}
+
+.boton-tarjeta:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+/* La explicacion arranca cerrada y la abre el boton de la tarjeta */
+.explicacion {
+    display: none;
+    padding: 4px 0 4px 16px;
+    border-left: 1px solid var(--color-linea);
+    font-size: 14px;
+}
+
+.explicacion--abierta {
+    display: block;
+}
+
+.explicacion__titulo {
+    margin: 12px 0 4px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--color-gris-medio);
+}
+
+.explicacion__titulo:first-child {
+    margin-top: 0;
+}
+
+.explicacion__lista {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* ============================================================
+   Semaforo de prioridad
+   Se aplica a las tarjetas de la bandeja segun el nivel que
+   calculo el motor, junto con la insignia del mismo color
+   ============================================================ */
+
+.prioridad-critica { border-left-color: var(--prioridad-critica) !important; }
+.prioridad-alta    { border-left-color: var(--prioridad-alta) !important; }
+.prioridad-media   { border-left-color: var(--prioridad-media) !important; }
+.prioridad-baja    { border-left-color: var(--prioridad-baja) !important; }
+
+.insignia {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 999px;
+    color: #FFFFFF;
+}
+
+.insignia--critica { background-color: var(--prioridad-critica); }
+.insignia--alta    { background-color: var(--prioridad-alta); }
+.insignia--media   { background-color: var(--prioridad-media); color: var(--color-texto); }
+.insignia--baja    { background-color: var(--prioridad-baja); }
+.insignia--sin-clasificar { background-color: var(--color-gris-claro); color: var(--color-texto); }
