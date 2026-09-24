@@ -213,77 +213,6 @@ body {
 }
 
 /* ============================================================
-   Portada
-   Titular gigante partido en dos lineas, con la segunda en violeta,
-   y una columna de texto a la derecha que va aclarando de gris
-   ============================================================ */
-
-.portada {
-    display: flex;
-    gap: 30px;
-    align-items: flex-start;
-    padding: 160px 0 120px;
-}
-
-.portada__titulo {
-    position: relative;
-    flex: 1 1 640px;
-    min-width: 0;
-}
-
-.titular {
-    font-size: 84px;
-    font-weight: 800;
-    line-height: 0.92;
-    letter-spacing: -3px;
-    color: var(--color-texto);
-}
-
-.titular--acento {
-    color: var(--color-acento);
-}
-
-/* La regla se sale del contenedor por la izquierda, como en la web */
-.regla-larga {
-    position: relative;
-    left: calc(var(--margen-lateral) * -1);
-    width: calc(100% + var(--margen-lateral));
-    height: 2px;
-    border: none;
-    background-color: var(--color-texto);
-    margin-top: 18px;
-}
-
-.subtitular {
-    font-size: 34px;
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -1px;
-    margin-top: 20px;
-}
-
-.portada__texto {
-    flex: 0 1 438px;
-    padding-top: 8px;
-}
-
-.parrafo {
-    font-size: 16px;
-    line-height: 1.4;
-    color: var(--color-texto);
-}
-
-.parrafo--medio {
-    margin-top: 20px;
-    color: var(--color-gris-medio);
-}
-
-.parrafo--claro {
-    margin-top: 20px;
-    color: var(--color-gris-claro);
-}
-
-/* ============================================================
    Bloques de trabajo
    Sin recuadros: solo una linea fina arriba y espacio en blanco
    ============================================================ */
@@ -430,20 +359,6 @@ body {
 
     .encabezado__proveedor {
         align-items: flex-start;
-    }
-
-    .portada {
-        flex-direction: column;
-        padding: 80px 0 60px;
-    }
-
-    .titular {
-        font-size: 48px;
-        letter-spacing: -2px;
-    }
-
-    .subtitular {
-        font-size: 24px;
     }
 
     .bloque__titulo {
