@@ -29,7 +29,7 @@ async function enviarMensajeSimulador(canalUserId, nombre, texto) {
         return resultado;
     } catch (error) {
         console.error("Error al enviar el mensaje del simulador", error);
-        mostrarAviso("El simulador no pudo obtener respuesta del sistema.", "error");
+        mostrarAviso("El chat no pudo obtener respuesta del sistema.", "error");
         return { error: error.message };
     }
 }
@@ -72,7 +72,7 @@ async function enviarDesdeSimulador() {
     }
 
     if (!canalUserId) {
-        mostrarAviso("Ingrese un identificador para el cliente antes de enviar.", "error");
+        mostrarAviso("Ingrese la identificación de la conversación antes de enviar.", "error");
         return;
     }
 
@@ -97,9 +97,6 @@ async function enviarDesdeSimulador() {
     if (resultado.notificacion_asesor) {
         renderizarNotificacionSimulador(resultado.notificacion_asesor);
     }
-
-    // Cada mensaje puede crear, reclasificar o escalar un lead: las bandejas se ponen al dia solas
-    refrescarLeads();
 }
 
 function iniciarSimulador() {

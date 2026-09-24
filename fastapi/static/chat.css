@@ -4,6 +4,13 @@
    pero con lineas finas en vez de burbujas para no salir de la marca
    ============================================================ */
 
+/* Aclara que la identificacion solo se escribe a mano en la demo */
+.controles__nota {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--color-gris-medio);
+}
+
 .conversacion {
     list-style: none;
     display: flex;

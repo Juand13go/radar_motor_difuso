@@ -27,7 +27,8 @@ async function llamarBackend(url, textoAviso, opciones) {
         return datos;
     } catch (error) {
         console.error(`Hubo un error en la petición a ${url}. `, error);
-        mostrarAviso(textoAviso, "error");
+        // Sin textoAviso el error queda solo en la consola, para las recargas que el usuario no pidio
+        if (textoAviso) mostrarAviso(textoAviso, "error");
     }
 }
 

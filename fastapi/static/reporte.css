@@ -176,7 +176,7 @@
     }
 
     .aviso,
-    .bloque:not(.bloque--demanda),
+    .navegacion,
     .bloque--demanda .controles,
     .pie {
         display: none !important;

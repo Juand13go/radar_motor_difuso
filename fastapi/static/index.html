@@ -3,24 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radar · Panel de asesores</title>
+    <title>Tornalba Suministros Técnicos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/comun.css">
     <link rel="stylesheet" href="/static/chat.css">
-    <link rel="stylesheet" href="/static/panel.css">
-    <link rel="stylesheet" href="/static/reporte.css">
     <script src="/static/comun.js" defer></script>
     <script src="/static/chat.js" defer></script>
-    <script src="/static/panel.js" defer></script>
-    <script src="/static/reporte.js" defer></script>
 </head>
 <body>
     <!-- Aviso de exito o error: arranca vacio y oculto, lo llena mostrarAviso en comun.js -->
     <div id="aviso" class="aviso" role="status" aria-live="polite"></div>
 
-    <!-- Barra superior: a la izquierda la empresa que usa el panel, a la derecha quien lo construyo -->
+    <!-- Barra superior: solo la distribuidora, porque esta pagina es la que ve el cliente -->
     <nav class="navbar">
         <div class="encabezado">
             <div class="encabezado__cliente">
@@ -29,10 +25,6 @@
                     <p class="encabezado__nombre">Tornalba Suministros Técnicos S.A.S.</p>
                     <p class="encabezado__bajada">Distribuidora de suministros industriales y ferretería técnica</p>
                 </div>
-            </div>
-            <div class="encabezado__proveedor">
-                <img src="/static/Halua.png" alt="Halua Studio" class="encabezado__logo-proveedor">
-                <span class="encabezado__firma">Radar, de Halua Studio</span>
             </div>
         </div>
         <div class="navbar__linea">
@@ -43,47 +35,29 @@
                 <span class="punto punto--oscuro"></span>
             </div>
         </div>
-        <!-- <p class="encabezado__descripcion">Este es el sistema que recibe las solicitudes de los clientes por mensajería, calcula su prioridad y las enruta a los asesores.</p> -->
+        <div class="navegacion">
+            <a href="/" class="navegacion__enlace navegacion__enlace--activo" aria-current="page">Chat</a>
+            <a href="/panel" class="navegacion__enlace">Panel de asesores</a>
+            <a href="/reporte" class="navegacion__enlace">Demanda del periodo</a>
+        </div>
+        <!-- <p class="encabezado__descripcion">Somos una distribuidora B2B de suministros industriales y ferretería técnica en el Valle de Aburrá. Atendemos comercios, contratistas e industria. Escríbenos aquí qué necesitas y te respondemos.</p> -->
     </nav>
 
     <main class="contenido">
 
-        <!-- Portada: titular grande partido en dos, igual que la web de Halua 
-        <section class="portada">
-            <div class="portada__titulo">
-                <h2 class="titular">PANEL DE</h2>
-                <h2 class="titular titular--acento">ASESORES.</h2>
-                <hr class="regla-larga">
-                <h1 class="subtitular">Radar, triaje de leads comerciales</h1>
-            </div>
-
-            <div class="portada__texto">
-                <p class="parrafo">
-                    Cada solicitud que entra por los canales de la empresa se interpreta, se clasifica y se enruta al asesor que corresponde.
-                </p>
-                <p class="parrafo parrafo--medio">
-                    El asesor no abre doscientos mensajes: abre los leads que ya vienen con la informacion organizada.
-                </p>
-                <p class="parrafo parrafo--claro">
-                    Y cuando cierra, deja registro de si fue venta o no. Cada decision del sistema queda ligada a un resultado real.
-                </p>
-            </div>
-        </section>
-        -->
-        
-
-        <!-- Bloque 1: simulador de conversacion, usa el mismo endpoint que Telegram -->
+        <!-- Chat con el cliente, usa el mismo endpoint que Telegram -->
         <section class="bloque">
             <div class="bloque__encabezado">
-                <h3 class="bloque__titulo">Simulador de conversación</h3>
-                <p class="bloque__ayuda">Escribe como si fueras un cliente: cada mensaje recorre el mismo camino que uno de Telegram. Cambia el identificador para empezar de cero como otro cliente.</p>
+                <h3 class="bloque__titulo">Escríbenos</h3>
+                <p class="bloque__ayuda">Cuéntanos qué necesitas, con cantidades y para cuándo, y te respondemos enseguida.</p>
             </div>
 
             <div class="controles">
                 <div class="controles__fila">
-                    <input type="text" id="inputSimuladorCliente" class="campo" placeholder="Identificador del cliente" autocomplete="off">
+                    <input type="text" id="inputSimuladorCliente" class="campo" placeholder="Identificación de la conversación" autocomplete="off">
                     <input type="text" id="inputSimuladorNombre" class="campo" placeholder="Nombre del cliente (opcional)" autocomplete="off">
                 </div>
+                <p class="controles__nota">En producción, la identificación de la conversación la asigna el canal.</p>
             </div>
 
             <ul id="contenedorSimulador" class="conversacion"></ul>
@@ -96,95 +70,13 @@
             </div>
         </section>
 
-        <!-- Bloque 2: leads asignados a un asesor -->
-        <section class="bloque">
-            <div class="bloque__encabezado">
-                <h3 class="bloque__titulo">Leads asignados</h3>
-                <p class="bloque__ayuda">Elige un asesor para ver su bandeja, ordenada de mayor a menor prioridad.</p>
-            </div>
-
-            <div class="controles">
-                <div class="controles__fila">
-                    <select id="selectAsesor" class="campo">
-                        <option value="">Elige un asesor</option>
-                    </select>
-                    <button id="btnActualizarLeads" class="boton boton--primario">Actualizar</button>
-                </div>
-            </div>
-
-            <ul id="contenedorLeads" class="bandeja"></ul>
-        </section>
-
-        <!-- Bloque 3: solicitudes que el motor atendio sin escalar -->
-        <section class="bloque">
-            <div class="bloque__encabezado">
-                <h3 class="bloque__titulo">Solicitudes sin asignar</h3>
-                <p class="bloque__ayuda">Solicitudes que el sistema atendió sin escalar a un asesor. Antes esta demanda no quedaba a la vista de nadie; aquí se puede revisar y cerrar igual que las demás.</p>
-            </div>
-
-            <ul id="contenedorSinAsignar" class="bandeja"></ul>
-        </section>
-
-        <!-- Bloque 4: reporte de demanda del periodo, lo llena renderizarDemanda en reporte.js. Es lo unico que sale al imprimir -->
-        <section class="bloque bloque--demanda">
-            <div class="bloque__encabezado">
-                <h3 class="bloque__titulo">Demanda del periodo</h3>
-                <p id="textoPeriodoDemanda" class="demanda__periodo"></p>
-                <p class="bloque__ayuda">Habla de las solicitudes recibidas por mensajería en el periodo. El sistema no ve las ventas de mostrador ni las compras a proveedores.</p>
-            </div>
-
-            <div class="controles">
-                <div class="controles__fila">
-                    <button id="btnDemanda30" class="boton boton--periodo boton--periodo-activo">Últimos 30 días</button>
-                    <button id="btnDemanda7" class="boton boton--periodo">Últimos 7 días</button>
-                    <button id="btnImprimirDemanda" class="boton boton--primario">Imprimir reporte</button>
-                </div>
-            </div>
-
-            <div id="contenedorResumenDemanda" class="franja-demanda"></div>
-
-            <div class="demanda">
-                <div class="demanda__bloque">
-                    <h4 class="demanda__titulo">Pidieron y no había</h4>
-                    <p class="demanda__ayuda">Productos del catálogo que se pidieron cuando no había existencias suficientes. El monto es lo que faltó, al precio del momento.</p>
-                    <div id="graficoNoCubierta" class="grafico-demanda"></div>
-                    <div id="contenedorNoCubierta"></div>
-                </div>
-
-                <div class="demanda__bloque">
-                    <h4 class="demanda__titulo">Piden y no maneja</h4>
-                    <p class="demanda__ayuda">Productos que los clientes pidieron y que no están en el catálogo. No tienen monto porque no hay precio.</p>
-                    <div id="graficoFueraCatalogo" class="grafico-demanda"></div>
-                    <div id="contenedorFueraCatalogo"></div>
-                </div>
-
-                <div class="demanda__bloque">
-                    <h4 class="demanda__titulo">Mercancía parada</h4>
-                    <p class="demanda__ayuda">Productos con existencias que nadie pidió en el periodo, con el capital que tienen inmovilizado.</p>
-                    <div id="graficoSobrestock" class="grafico-demanda"></div>
-                    <div id="contenedorSobrestock"></div>
-                </div>
-            </div>
-        </section>
-
     </main>
 
+    <!-- Sin la marca de Halua: el cliente le compra a Tornalba y no le interesa quien hizo el software -->
     <footer class="pie">
+        <small>Tornalba Suministros Técnicos S.A.S.</small>
         <small>Medellín, Colombia</small>
-
-        <div class="circulos">
-            <span class="circulo circulo--violeta"></span>
-            <span class="circulo circulo--naranja"></span>
-            <span class="circulo circulo--cian"></span>
-            <span></span>
-            <span class="circulo circulo--cuadrado"></span>
-        </div>
-
-        <small>Radar, un producto de Halua.Studio</small>
-    </footer> 
-
-    <!-- Pie que solo aparece en la impresion; la fecha la pone reporte.js justo antes de imprimir -->
-    <p id="pieImpresion" class="pie-impresion"></p>
+    </footer>
 
 </body>
 </html>

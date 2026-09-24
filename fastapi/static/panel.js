@@ -9,12 +9,14 @@ const MOTIVOS_ESCALACION = {
     fallo_tecnico: "fallo técnico del asistente"
 };
 
+const INTERVALO_REFRESCO_LEADS = 20000;
+
 async function listarInformacionAsesores() {
     return llamarBackend('/listar_asesores', "No se pudieron cargar los asesores.");
 }
 
-async function cargarLeadsPorAsesor(idAsesor) {
-    return llamarBackend(`/leads_por_asesor?id_asesor=${idAsesor}`, "No se pudieron cargar los leads del asesor.");
+async function cargarLeadsPorAsesor(idAsesor, avisarError) {
+    return llamarBackend(`/leads_por_asesor?id_asesor=${idAsesor}`, avisarError ? "No se pudieron cargar los leads del asesor." : null);
 }
 
 async function ejecutarCierreLead(idLead, estado) {
@@ -30,8 +32,8 @@ async function ejecutarCierreLead(idLead, estado) {
     });
 }
 
-async function cargarLeadsSinAsignar() {
-    return llamarBackend('/leads_sin_asignar', "No se pudieron cargar las solicitudes sin asignar.");
+async function cargarLeadsSinAsignar(avisarError) {
+    return llamarBackend('/leads_sin_asignar', avisarError ? "No se pudieron cargar las solicitudes sin asignar." : null);
 }
 
 async function cargarEvaluacionesLead(idLead) {
@@ -155,7 +157,7 @@ function renderizarBotonCierre(lead, estado, texto) {
         if (res) {
             const cliente = lead.nombre_cliente && lead.nombre_cliente.trim() ? lead.nombre_cliente : lead.canal_user_id;
             mostrarAviso(`El lead de ${cliente} se cerró como ${estado.replace("_", " ")}.`, "exito");
-            refrescarLeads();
+            refrescarLeads(true);
         }
     });
     return boton;
@@ -261,27 +263,44 @@ function renderizarOpcionesAsesores(listaAsesores) {
     });
 }
 
-async function refrescarLeads() {
+async function refrescarLeads(avisarError) {
     const idAsesor = selectAsesor.value;
     if (idAsesor) {
-        const leads = await cargarLeadsPorAsesor(idAsesor);
+        const leads = await cargarLeadsPorAsesor(idAsesor, avisarError);
         if (leads) renderizarLeads(leads, contenedorLeads, "Este asesor no tiene leads abiertos.");
     } else {
         contenedorLeads.replaceChildren();
     }
 
-    const sinAsignar = await cargarLeadsSinAsignar();
+    const sinAsignar = await cargarLeadsSinAsignar(avisarError);
     if (sinAsignar) renderizarLeads(sinAsignar, contenedorSinAsignar, "No hay solicitudes sin asignar.");
 }
 
-async function iniciarPanel() {
-    selectAsesor.addEventListener("change", refrescarLeads);
+function refrescarLeadsAutomaticamente() {
+    // Recargar vuelve a dibujar las tarjetas y cerraria la explicacion que el asesor esta leyendo
+    if (document.querySelector(".explicacion--abierta")) {
+        return;
+    }
+    refrescarLeads(false);
+}
 
-    btnActualizarLeads.addEventListener("click", refrescarLeads);
+async function iniciarPanel() {
+    selectAsesor.addEventListener("change", () => refrescarLeads(true));
+
+    btnActualizarLeads.addEventListener("click", () => refrescarLeads(true));
+
+    // Los clientes escriben desde otro lado, asi que la bandeja se busca sola lo que entro mientras tanto
+    setInterval(refrescarLeadsAutomaticamente, INTERVALO_REFRESCO_LEADS);
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+            refrescarLeadsAutomaticamente();
+        }
+    });
 
     const asesores = await listarInformacionAsesores();
     if (asesores) renderizarOpcionesAsesores(asesores);
-    refrescarLeads();
+    refrescarLeads(true);
 }
 
 // Solo arranca en la pagina que tiene las bandejas, asi este archivo no busca elementos que no existen

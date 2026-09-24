@@ -175,6 +175,34 @@ body {
 .punto--medio  { background-color: var(--color-gris-medio); }
 .punto--oscuro { background-color: var(--color-texto); }
 
+/* Enlaces entre el panel y el reporte. La pagina en la que se esta
+   queda subrayada en violeta, igual que el boton de periodo activo */
+.navegacion {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    margin: 0 var(--margen-lateral);
+    padding-top: 16px;
+}
+
+.navegacion__enlace {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-gris-medio);
+    text-decoration: none;
+    padding-bottom: 4px;
+    border-bottom: 2px solid transparent;
+}
+
+.navegacion__enlace:hover {
+    color: var(--color-acento);
+}
+
+.navegacion__enlace--activo {
+    color: var(--color-acento);
+    border-bottom-color: var(--color-acento);
+}
+
 /* ============================================================
    Contenido
    ============================================================ */

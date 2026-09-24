@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar · Demanda del periodo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/comun.css">
+    <link rel="stylesheet" href="/static/reporte.css">
+    <script src="/static/comun.js" defer></script>
+    <script src="/static/reporte.js" defer></script>
+</head>
+<body>
+    <!-- Aviso de exito o error: arranca vacio y oculto, lo llena mostrarAviso en comun.js -->
+    <div id="aviso" class="aviso" role="status" aria-live="polite"></div>
+
+    <!-- Barra superior: a la izquierda la empresa que usa el panel, a la derecha quien lo construyo -->
+    <nav class="navbar">
+        <div class="encabezado">
+            <div class="encabezado__cliente">
+                <img src="/static/tornalba.png" alt="Tornalba Suministros Técnicos S.A.S." class="encabezado__logo-cliente">
+                <div>
+                    <p class="encabezado__nombre">Tornalba Suministros Técnicos S.A.S.</p>
+                    <p class="encabezado__bajada">Distribuidora de suministros industriales y ferretería técnica</p>
+                </div>
+            </div>
+            <div class="encabezado__proveedor">
+                <img src="/static/Halua.png" alt="Halua Studio" class="encabezado__logo-proveedor">
+                <span class="encabezado__firma">Radar, de Halua Studio</span>
+            </div>
+        </div>
+        <div class="navbar__linea">
+            <hr>
+            <div class="puntos">
+                <span class="punto punto--claro"></span>
+                <span class="punto punto--medio"></span>
+                <span class="punto punto--oscuro"></span>
+            </div>
+        </div>
+        <div class="navegacion">
+            <a href="/" class="navegacion__enlace">Chat</a>
+            <a href="/panel" class="navegacion__enlace">Panel de asesores</a>
+            <a href="/reporte" class="navegacion__enlace navegacion__enlace--activo" aria-current="page">Demanda del periodo</a>
+        </div>
+    </nav>
+
+    <main class="contenido">
+
+        <!-- Reporte de demanda del periodo, lo llena renderizarDemanda en reporte.js -->
+        <section class="bloque bloque--demanda">
+            <div class="bloque__encabezado">
+                <h3 class="bloque__titulo">Demanda del periodo</h3>
+                <p id="textoPeriodoDemanda" class="demanda__periodo"></p>
+                <p class="bloque__ayuda">Habla de las solicitudes recibidas por mensajería en el periodo. El sistema no ve las ventas de mostrador ni las compras a proveedores.</p>
+            </div>
+
+            <div class="controles">
+                <div class="controles__fila">
+                    <button id="btnDemanda30" class="boton boton--periodo boton--periodo-activo">Últimos 30 días</button>
+                    <button id="btnDemanda7" class="boton boton--periodo">Últimos 7 días</button>
+                    <button id="btnImprimirDemanda" class="boton boton--primario">Imprimir reporte</button>
+                </div>
+            </div>
+
+            <div id="contenedorResumenDemanda" class="franja-demanda"></div>
+
+            <div class="demanda">
+                <div class="demanda__bloque">
+                    <h4 class="demanda__titulo">Pidieron y no había</h4>
+                    <p class="demanda__ayuda">Productos del catálogo que se pidieron cuando no había existencias suficientes. El monto es lo que faltó, al precio del momento.</p>
+                    <div id="graficoNoCubierta" class="grafico-demanda"></div>
+                    <div id="contenedorNoCubierta"></div>
+                </div>
+
+                <div class="demanda__bloque">
+                    <h4 class="demanda__titulo">Piden y no maneja</h4>
+                    <p class="demanda__ayuda">Productos que los clientes pidieron y que no están en el catálogo. No tienen monto porque no hay precio.</p>
+                    <div id="graficoFueraCatalogo" class="grafico-demanda"></div>
+                    <div id="contenedorFueraCatalogo"></div>
+                </div>
+
+                <div class="demanda__bloque">
+                    <h4 class="demanda__titulo">Mercancía parada</h4>
+                    <p class="demanda__ayuda">Productos con existencias que nadie pidió en el periodo, con el capital que tienen inmovilizado.</p>
+                    <div id="graficoSobrestock" class="grafico-demanda"></div>
+                    <div id="contenedorSobrestock"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="pie">
+        <small>Medellín, Colombia</small>
+
+        <div class="circulos">
+            <span class="circulo circulo--violeta"></span>
+            <span class="circulo circulo--naranja"></span>
+            <span class="circulo circulo--cian"></span>
+            <span></span>
+            <span class="circulo circulo--cuadrado"></span>
+        </div>
+
+        <small>Radar, un producto de Halua.Studio</small>
+    </footer>
+
+    <!-- Pie que solo aparece en la impresion; la fecha la pone reporte.js justo antes de imprimir -->
+    <p id="pieImpresion" class="pie-impresion"></p>
+
+</body>
+</html>

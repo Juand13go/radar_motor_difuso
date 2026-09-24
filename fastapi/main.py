@@ -18,6 +18,14 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 def index():
     return FileResponse("static/index.html")
 
+@app.get("/panel")
+def panel():
+    return FileResponse("static/panel.html")
+
+@app.get("/reporte")
+def reporte():
+    return FileResponse("static/reporte.html")
+
 @app.exception_handler(ConversacionNoEncontrada)
 def manejar_conversacion_no_encontrada(request: Request, exc: ConversacionNoEncontrada):
     return JSONResponse(status_code=404, content={"detail":"Conversación No Encontrada"})
