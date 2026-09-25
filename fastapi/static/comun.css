@@ -1,18 +1,20 @@
 /* ============================================================
-   Radar
-   Tipografia grande, mucho blanco y lineas finas. Sin cajas.
+   Radar - Panel de asesores
+   Identidad visual tomada de la web de Halua Studio:
+   tipografia grande, mucho blanco y lineas finas. Sin cajas.
    ============================================================ */
 
 :root {
-    --color-texto: #3D3D3D;         /* el gris del logo de Tornalba */
-    --color-acento: #1F5A96;        /* azul acero, de una familia que no esta en el semaforo */
-    --color-alerta: #FF9E10;        /* lo que pide atencion; coincide a proposito con la prioridad alta */
+    --color-texto: #4C4C4C;         /* gris oscuro, el color principal de la marca */
+    --color-acento: #4C3ACA;        /* violeta, el acento fuerte */
+    --color-naranja: #FF9E10;
+    --color-cian: #18CFED;
     --color-gris-medio: #999999;
     --color-gris-claro: #CCCCCC;
     --color-linea: #E5E5E5;
     --color-fondo: #FFFFFF;
 
-    /* Colores del semaforo de prioridad. No son decorativos: son
+    /* Colores del semaforo de prioridad. No son de la marca: son
        semanticos, y se leen igual que en un triaje medico */
     --prioridad-critica: #E5484D;
     --prioridad-alta: #FF9E10;
@@ -23,7 +25,7 @@
        cae en la tipografia del sistema sin romper el diseno */
     --fuente: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-    --margen-lateral: 60px;
+    --margen-lateral: 60px;         /* el mismo margen que usa la web de Halua */
 }
 
 * {
@@ -80,7 +82,7 @@ body {
 .aviso--exito { background-color: var(--prioridad-baja); }
 .aviso--error { background-color: var(--prioridad-critica); }
 
-/* Tornalba a la izquierda y Radar en el extremo derecho */
+/* Tornalba a la izquierda y Halua en el extremo derecho */
 .encabezado {
     display: flex;
     justify-content: space-between;
@@ -96,12 +98,20 @@ body {
     gap: 16px;
 }
 
-/* El logo se fija por altura y el ancho sale de su proporcion, asi no se deforma */
+/* Los logos se fijan por altura y el ancho sale de su proporcion, asi no se deforman.
+   Las alturas son distintas porque Tornalba es casi cuadrado y Halua es un logotipo ancho:
+   con estas dos quedan de un ancho parecido */
 .encabezado__logo-cliente {
     height: 72px;
     width: auto;
     display: block;
     flex-shrink: 0;
+}
+
+.encabezado__logo-proveedor {
+    height: 26px;
+    width: auto;
+    display: block;
 }
 
 .encabezado__nombre {
@@ -124,12 +134,18 @@ body {
     flex-shrink: 0;
 }
 
+.encabezado__firma {
+    font-size: 13px;
+    color: var(--color-gris-medio);
+}
+
 .encabezado__descripcion {
     max-width: 640px;
     margin: 16px var(--margen-lateral) 0;
     color: var(--color-gris-medio);
 }
 
+/* Linea divisoria con los tres puntos al final, igual que en la web */
 .navbar__linea {
     display: flex;
     align-items: center;
@@ -142,8 +158,25 @@ body {
     border-bottom: 2px solid var(--color-texto);
 }
 
-/* Enlaces entre las tres paginas. La pagina en la que se esta
-   queda subrayada en el acento, igual que el boton de periodo activo */
+.puntos {
+    display: flex;
+    gap: 8px;
+    margin-left: 16px;
+}
+
+.punto {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: block;
+}
+
+.punto--claro  { background-color: var(--color-gris-claro); }
+.punto--medio  { background-color: var(--color-gris-medio); }
+.punto--oscuro { background-color: var(--color-texto); }
+
+/* Enlaces entre el panel y el reporte. La pagina en la que se esta
+   queda subrayada en violeta, igual que el boton de periodo activo */
 .navegacion {
     display: flex;
     flex-wrap: wrap;
@@ -219,7 +252,7 @@ body {
     flex-wrap: wrap;
 }
 
-/* Campo sin caja: solo una linea abajo, con las mismas lineas finas del resto */
+/* Campo sin caja: solo una linea abajo, en la logica de la marca */
 .campo {
     flex: 1;
     min-width: 260px;
@@ -271,7 +304,7 @@ body {
 }
 
 /* ============================================================
-   Pie
+   Pie con la grilla de circulos de la marca
    ============================================================ */
 
 .pie {
@@ -285,6 +318,28 @@ body {
     border-top: 2px solid var(--color-texto);
     font-size: 15px;
     color: var(--color-texto);
+}
+
+.circulos {
+    display: grid;
+    grid-template-columns: repeat(3, 21px);
+    gap: 8px 6px;
+}
+
+.circulo {
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    display: block;
+}
+
+.circulo--violeta  { background-color: var(--color-acento); }
+.circulo--naranja  { background-color: var(--color-naranja); }
+.circulo--cian     { background-color: var(--color-cian); }
+
+.circulo--cuadrado {
+    border-radius: 0;
+    background-color: var(--color-texto);
 }
 
 /* ============================================================

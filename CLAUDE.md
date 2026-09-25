@@ -1,6 +1,6 @@
 # Instrucciones para trabajar en este repositorio
 
-Este repositorio es Radar, el sistema de triaje de leads comerciales. El código lo escribe Claude Code, pero las decisiones de arquitectura, los nombres de dominio y las reglas de negocio las toma Juan Diego. Cada cambio tiene que poder leerse como si lo hubiera escrito él: mismo orden, mismos nombres, mismo nivel de detalle. Si algo de este archivo choca con una instrucción puntual, gana la instrucción puntual; si choca con lo que ya está escrito en el código, pregunta antes de decidir.
+Este repositorio es Radar, el sistema de triaje de leads comerciales de Halua Studio. El código lo escribe Claude Code, pero las decisiones de arquitectura, los nombres de dominio y las reglas de negocio las toma Juan Diego. Cada cambio tiene que poder leerse como si lo hubiera escrito él: mismo orden, mismos nombres, mismo nivel de detalle. Si algo de este archivo choca con una instrucción puntual, gana la instrucción puntual; si choca con lo que ya está escrito en el código, pregunta antes de decidir.
 
 El orden del trabajo está en PLAN.md. Léelo al empezar cada sesión. Cada instrucción nombra una pieza de ese plan (por ejemplo 2.3) y solo se trabaja esa pieza.
 

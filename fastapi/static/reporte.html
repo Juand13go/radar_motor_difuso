@@ -16,7 +16,7 @@
     <!-- Aviso de exito o error: arranca vacio y oculto, lo llena mostrarAviso en comun.js -->
     <div id="aviso" class="aviso" role="status" aria-live="polite"></div>
 
-    <!-- Barra superior: a la izquierda la empresa que usa el panel, a la derecha el sistema -->
+    <!-- Barra superior: a la izquierda la empresa que usa el panel, a la derecha quien lo construyo -->
     <nav class="navbar">
         <div class="encabezado">
             <div class="encabezado__cliente">
@@ -27,12 +27,17 @@
                 </div>
             </div>
             <div class="encabezado__proveedor">
-                <p class="encabezado__nombre">Radar</p>
-                <p class="encabezado__bajada">Triaje de solicitudes comerciales</p>
+                <img src="/static/Halua.png" alt="Halua Studio" class="encabezado__logo-proveedor">
+                <span class="encabezado__firma">Radar, de Halua Studio</span>
             </div>
         </div>
         <div class="navbar__linea">
             <hr>
+            <div class="puntos">
+                <span class="punto punto--claro"></span>
+                <span class="punto punto--medio"></span>
+                <span class="punto punto--oscuro"></span>
+            </div>
         </div>
         <div class="navegacion">
             <a href="/" class="navegacion__enlace">Chat</a>
@@ -89,7 +94,16 @@
 
     <footer class="pie">
         <small>Medellín, Colombia</small>
-        <small>Radar</small>
+
+        <div class="circulos">
+            <span class="circulo circulo--violeta"></span>
+            <span class="circulo circulo--naranja"></span>
+            <span class="circulo circulo--cian"></span>
+            <span></span>
+            <span class="circulo circulo--cuadrado"></span>
+        </div>
+
+        <small>Radar, un producto de Halua.Studio</small>
     </footer>
 
     <!-- Pie que solo aparece en la impresion; la fecha la pone reporte.js justo antes de imprimir -->
