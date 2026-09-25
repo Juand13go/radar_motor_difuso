@@ -1,7 +1,7 @@
 /* ============================================================
    Demanda del periodo
    Una franja de cifras grandes y tres tablas sin cajas, con la
-   cifra que mas pesa de cada tabla en el violeta de la marca
+   cifra que mas pesa de cada tabla en el color de acento
    ============================================================ */
 
 .boton--periodo {
@@ -101,7 +101,7 @@
 /* ============================================================
    Graficos de demanda
    Barras horizontales en SVG, una por fila de la tabla. Cada bloque
-   toma un color que ya existe: rojo para lo que faltó, violeta para
+   toma un color que ya existe: rojo para lo que faltó, azul para
    lo que no se maneja y naranja para la mercancía parada
    ============================================================ */
 
@@ -128,7 +128,7 @@
 
 .grafico-demanda__svg--no-cubierta .grafico-demanda__barra    { fill: var(--prioridad-critica); }
 .grafico-demanda__svg--fuera-catalogo .grafico-demanda__barra { fill: var(--color-acento); }
-.grafico-demanda__svg--sobrestock .grafico-demanda__barra     { fill: var(--color-naranja); }
+.grafico-demanda__svg--sobrestock .grafico-demanda__barra     { fill: var(--color-alerta); }
 
 /* En pantalla no se ve: solo existe para la hoja impresa */
 .pie-impresion {
@@ -153,7 +153,7 @@
 /* ============================================================
    Impresion
    Al imprimir sale solo el reporte de demanda, con el encabezado
-   de las dos marcas y un pie con la fecha de impresion
+   de Tornalba y Radar y un pie con la fecha de impresion
    ============================================================ */
 
 @media print {

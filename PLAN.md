@@ -128,6 +128,8 @@ Problema: demostrar que el canal es intercambiable.
 Solución: un disparador de WhatsApp en n8n que llama al mismo endpoint con canal whatsapp, usando el número de prueba de Meta, que es gratis y no exige verificación del negocio pero solo habla con cinco destinatarios cargados de antemano. Por ese límite no reemplaza a Telegram en la feria.
 Solo se hace si la 4.5 cerró el 24 de septiembre. Si no, se descarta sin reemplazo.
 
+Se intentó y quedó a medias. El número de prueba de Meta funciona y el envío está configurado en n8n con su credencial. La recepción no: el nodo WhatsApp Trigger genera su propio token de verificación a partir de la credencial OAuth y no lo expone, así que la verificación del webhook en Meta no coincide. Además, mientras la aplicación no esté publicada, Meta no entrega mensajes reales al webhook, ni siquiera los del administr   ador. Para retomarlo hay que publicar la aplicación y usar un nodo Webhook común en lugar del trigger nativo, devolviendo el hub.challenge en la verificación.
+
 ## Fase 5. Panel (25 al 27 de septiembre)
 
 ### 5.1 Simulador de chat

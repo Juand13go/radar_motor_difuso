@@ -189,7 +189,7 @@ function iniciarReporte() {
     // Se llena al imprimir y no al cargar, para que la fecha sea la de la impresion aunque la pagina lleve horas abierta
     window.addEventListener("beforeprint", () => {
         const fecha = new Date().toLocaleDateString("es-CO", { timeZone: "America/Bogota", day: "numeric", month: "long", year: "numeric" });
-        pieImpresion.textContent = `Radar, de Halua Studio · Impreso el ${fecha}`;
+        pieImpresion.textContent = `Radar · Impreso el ${fecha}`;
     });
 
     mostrarDemanda(30, btnDemanda30);
