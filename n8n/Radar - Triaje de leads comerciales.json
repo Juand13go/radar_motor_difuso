@@ -11,15 +11,15 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        -640,
-        0
+        -896,
+        112
       ],
-      "id": "a1000000-0000-4000-8000-000000000001",
+      "id": "ed7acd94-4fcc-4ab2-9fb9-502e71faeea0",
       "name": "Telegram Trigger",
       "webhookId": "radar-telegram-webhook",
       "credentials": {
         "telegramApi": {
-          "id": "4lGRXhpjHhX90ldS",
+          "id": "Hd8GAwym0jecDUxS",
           "name": "Telegram account"
         }
       }
@@ -28,19 +28,27 @@
       "parameters": {
         "method": "POST",
         "url": "http://fastapi:8000/mensaje_entrante",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ canal: 'telegram', canal_user_id: $json.message.chat.id.toString(), nombre: [$json.message.chat.first_name, $json.message.chat.last_name].filter(Boolean).join(' '), texto: $json.message.text }) }}",
+        "jsonBody": "={{ JSON.stringify({ canal: 'telegram', canal_user_id: $json.message.chat.id.toString(), nombre: [$json.message.chat.first_name, $json.message.chat.last_name].filter(Boolean).join(' '), texto: $json.message.text, voz_file_id: ($json.message.voice || $json.message.audio || {}).file_id }) }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -420,
-        0
+        -688,
+        112
       ],
-      "id": "a1000000-0000-4000-8000-000000000002",
-      "name": "Radar (FastAPI)"
+      "id": "6547ffb1-b81c-4eee-8c6a-cb11e82e1a04",
+      "name": "Radar (FastAPI)",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "8S3Fu1o2sCT8tOaj",
+          "name": "Radar backoffice"
+        }
+      }
     },
     {
       "parameters": {
@@ -53,15 +61,15 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -200,
-        0
+        -464,
+        112
       ],
-      "id": "a1000000-0000-4000-8000-000000000003",
+      "id": "7835eb7a-ffc2-47b7-92ba-58eb4fb711f2",
       "name": "Respuesta al cliente",
       "webhookId": "radar-respuesta-cliente",
       "credentials": {
         "telegramApi": {
-          "id": "4lGRXhpjHhX90ldS",
+          "id": "Hd8GAwym0jecDUxS",
           "name": "Telegram account"
         }
       }
@@ -93,10 +101,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        20,
-        0
+        -240,
+        112
       ],
-      "id": "a1000000-0000-4000-8000-000000000004",
+      "id": "79b8c288-bbc7-4fea-898e-2fe6a8e58ee4",
       "name": "Hubo escalacion"
     },
     {
@@ -110,20 +118,21 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        260,
-        -100
+        0,
+        0
       ],
-      "id": "a1000000-0000-4000-8000-000000000005",
+      "id": "4df5646e-de9b-4b44-b602-c9cd9605cc43",
       "name": "Alerta al asesor",
       "webhookId": "radar-alerta-asesor",
       "credentials": {
         "telegramApi": {
-          "id": "4lGRXhpjHhX90ldS",
+          "id": "Hd8GAwym0jecDUxS",
           "name": "Telegram account"
         }
       }
     }
   ],
+  "pinData": {},
   "connections": {
     "Telegram Trigger": {
       "main": [
@@ -166,13 +175,20 @@
             "type": "main",
             "index": 0
           }
-        ],
-        []
+        ]
       ]
     }
   },
+  "active": false,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "pinData": {}
+  "versionId": "169427ae-cb22-48f8-90df-a6d81bc53eff",
+  "meta": {
+    "instanceId": "12b512e7d0516be0d23252aa8806b4440928a64ebd849c639058d8c8f4c06606"
+  },
+  "nodeGroups": [],
+  "id": "r9gZtb08NONekoIV",
+  "tags": []
 }
