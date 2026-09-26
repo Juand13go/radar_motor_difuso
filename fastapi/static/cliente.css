@@ -2,7 +2,7 @@
    Chat del cliente
    Pensado primero para el celular: una sola columna que ocupa
    el ancho disponible, y en pantallas grandes queda centrada.
-   Misma linea visual del simulador, pero sin depender de chat.css
+   Misma linea visual del simulador, pero sin depender de simulador.css
    ============================================================ */
 
 .chat-cliente {

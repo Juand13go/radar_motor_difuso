@@ -228,6 +228,18 @@ function iniciarCliente() {
         }
     });
 
+    inputClienteNombre.addEventListener("keydown", (evento) => {
+        if (evento.key === "Enter") {
+            (inputClienteTelefono.hidden ? inputClienteTexto : inputClienteTelefono).focus();
+        }
+    });
+
+    inputClienteTelefono.addEventListener("keydown", (evento) => {
+        if (evento.key === "Enter") {
+            inputClienteTexto.focus();
+        }
+    });
+
     // Independiente del historial: un navegador que chateo antes de pedir el telefono tiene que darlo ahora
     if (obtenerTelefonoGuardado()) {
         ocultarCampoTelefono();
