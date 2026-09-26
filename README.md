@@ -1,10 +1,11 @@
-# TRIAJE LEADS COMERCIALES/RADAR
+# RADAR
 Este sistema plantea la automatización de la atención y la clasificación de las solicitudes comerciales que le entran a una empresa por sus canales de mensajería.
-El flujo inicia con un mensaje del cliente por alguno de los canales de la empresa (actualmente Telegram), n8n lo recibe y llama a un único endpoint de FastAPI, que es
-donde vive toda la lógica. Ahí se guarda la conversación, el agente de IA lee el mensaje con el catálogo al frente y extrae lo que el cliente está pidiendo (los productos
+El flujo inicia con un mensaje del cliente por alguno de los canales de la empresa. Hoy son dos: Telegram (donde n8n recibe el mensaje, escrito o como nota de voz, y
+llama a un único endpoint de FastAPI) y el chat web de la empresa (que llama directo a FastAPI). En los dos casos toda la lógica vive en FastAPI. Ahí se guarda la conversación, el agente de IA lee el mensaje con el catálogo al frente y extrae lo que el cliente está pidiendo (los productos
 con su cantidad, la ciudad y para cuándo lo necesita), y con esos datos el sistema arma la solicitud, la valora contra el catálogo y la pasa por un motor de lógica difusa
 que calcula su prioridad. Si esa prioridad alcanza el umbral, si el cliente pidió hablar con una persona o si el modelo falló, la solicitud se escala: se le asigna el
-asesor menos cargado y se le avisa por Telegram. Al cliente se le responde por el mismo canal por el que escribió. Cuando el asesor termina de atender el lead lo cierra
+asesor menos cargado y se le avisa por Telegram (si el cliente escribió por la web, la alerta trae su celular con un enlace de WhatsApp para contactarlo). Al cliente se
+le responde por el mismo canal por el que escribió. Cuando el asesor termina de atender el lead lo cierra
 desde el panel como venta o no venta, y ese resultado también queda guardado, de manera que cada decisión que tomó el sistema queda ligada a lo que pasó realmente con ese
 cliente.
 La diferencia con la versión anterior es dónde se decide. Antes el modelo decía si el lead debía escalarse; ahora el modelo solo extrae información y la decisión la toma
@@ -17,7 +18,7 @@ La relación con el cliente sale de cuántas solicitudes anteriores de esa misma
 La completitud mide cuántos datos llegaron (si hay productos del catálogo, si tienen cantidad y si se conoce la ciudad).
 El plazo en días se calcula en Python restando la fecha que pidió el cliente contra la fecha de hoy en Colombia. Al modelo no se le pide que califique la urgencia, se le
 pide que extraiga una fecha, porque una fecha se puede verificar y una etiqueta no.
-Las funciones de pertenencia, los conjuntos de cada variable, las salidas, los cortes entre niveles, el umbral de escalación y las diecisiete reglas viven en
+Las funciones de pertenencia, los conjuntos de cada variable, las salidas, los cortes entre niveles, el umbral de escalación y las quince reglas viven en
 app/motor/reglas.yaml, fuera del código. Cambiar qué es un monto alto para otra empresa no exige tocar Python ni reconstruir la imagen.
 La inferencia es Sugeno de orden cero: cada regla activa aporta su salida ponderada por su grado de activación, y la prioridad es el promedio ponderado de todas. Antes de
 calcular las pertenencias, cada entrada se recorta a su universo, de modo que un plazo vencido cuenta como cero días y un monto por encima del máximo cuenta como el máximo.
@@ -34,8 +35,10 @@ Migraciones con Alembic
 Schemas de Pydantic (Validación de los datos que entran y salen)
 SQLModel (ORM - Definición de las tablas y comunicación con PostgreSQL)
 Cloudfared (Proxy inverso para exponer n8n por HTTPS y recibir el webhook de Telegram)
-Frontend (HTML, CSS y JS sin frameworks) con tres páginas: el chat del cliente, el panel de los asesores y el reporte de demanda
-pytest (Pruebas automatizadas del motor y de la lógica de servicio)
+Whisper en Groq (Transcripción de las notas de voz de Telegram; el modelo se define en la variable GROQ_MODELO_VOZ)
+Frontend (HTML, CSS y JS sin frameworks) separado en dos partes: la página del cliente, que solo tiene el chat, y el backoffice (panel de los asesores, reporte de demanda y
+simulador de conversaciones), protegido con usuario y clave
+pytest (Pruebas automatizadas del motor, de la lógica de servicio y de la sesión del administrador)
 
 ## Requisitos
 El sistema corre en Docker, esta tecnología se encarga de que el sistema funcione sin tener que instalar nada; las dependencias del proyecto están en el
@@ -45,15 +48,19 @@ Necesitas: Docker y Docker Compose, un bot de Telegram (creado con @BotFather) y
 ## Configuración
 En la raíz del proyecto está el archivo .env.example con todas las variables que necesita el sistema, sin valores. Se copia como .env y se completa:
 POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD (PostgreSQL)
-N8N_DB, N8N_USER, N8N_PASSWORD (Base de datos y credenciales de n8n)
+N8N_DB (Base de datos de n8n, separada de las tablas del negocio)
 WEBHOOK_URL (URL HTTPS que entrega cloudfare)
 GROQ_API_KEY (Agente IA)
 GROQ_MODEL (Modelo que usa el agente; está por fuera del código para poder cambiarlo sin tocar nada ni reconstruir la imagen)
-TELEGRAM_BOT_TOKEN (Token del bot)
+GROQ_MODELO_VOZ (Modelo que transcribe las notas de voz, por ejemplo whisper-large-v3-turbo)
+TELEGRAM_BOT_TOKEN (Token del bot; lo usa FastAPI para la alerta del canal web y para descargar las notas de voz)
+ADMIN_USUARIO, ADMIN_CLAVE (Usuario y clave del backoffice; la clave también firma la sesión, así que cambiarla cierra todas las sesiones abiertas)
 COMPOSE_PROJECT_NAME (Nombre del proyecto en Docker; fija los nombres de los volúmenes para que renombrar o mover la carpeta no rompa la persistencia de la BD)
 
 El .env nunca se sube al repositorio, por eso existe el .env.example: documenta qué hace falta sin exponer los valores.
-El token del bot de Telegram se configura como credencial dentro de n8n.
+El token del bot de Telegram se configura además como credencial dentro de n8n, y el usuario y la clave del backoffice como una credencial de autenticación básica
+en el nodo que llama a FastAPI.
+Después de cambiar cualquier variable del .env hay que recrear los contenedores con "docker compose up -d" (un restart no vuelve a leer el .env).
 
 ## Cómo levantar el entorno
 Clonar el repositorio
@@ -61,9 +68,9 @@ Crear el .env a partir del .env.example (ver sección de configuración)
 Para el proxy inverso con cloudfare: "cloudflared tunnel --url http://localhost:5678" (Recibirás una URL HTTPS como esta: "https://vitamin-barrier-odds-performing.trycloudflare.com", colócala en la variable WEBHOOK_URL del .env)
 docker compose up (al arrancar se ejecutan automáticamente las migraciones con Alembic y el seed.py que puebla el catálogo de productos y los asesores)
 Abrir n8n en la URL de cloudfare (HTTPS) e importar el archivo con el flujo (carpeta n8n/)
-Configurar la credencial de Telegram en n8n y activar el flujo
-El chat del cliente queda en http://localhost:8000/, el panel de los asesores en http://localhost:8000/panel, el reporte de demanda en http://localhost:8000/reporte y la
-documentación interactiva de la API en http://localhost:8000/docs
+Configurar en n8n la credencial de Telegram y la de autenticación básica (con ADMIN_USUARIO y ADMIN_CLAVE) en el nodo que llama a FastAPI, y activar el flujo
+El chat del cliente queda en http://localhost:8000/. El backoffice se abre entrando por http://localhost:8000/entrar con el usuario y la clave del .env, y desde ahí
+quedan el panel de los asesores (/panel), el reporte de demanda (/reporte), el simulador de conversaciones (/simulador) y la documentación interactiva de la API (/docs)
 Si quieres ver el reporte con datos, el script fastapi/semilla_historia.py carga unas semanas de solicitudes cerradas de ejemplo; se ejecuta con
 "docker exec -w /app radar_fastapi python semilla_historia.py" y se borra con el mismo comando agregando "borrar"
 
@@ -71,18 +78,22 @@ Si quieres ver el reporte con datos, el script fastapi/semilla_historia.py carga
 El Dockerfile construye el servicio de FastAPI.
 La estructura de este proyecto está guiada por 3 capas (Servicio, Persistencia y API), y las tres viven dentro de fastapi/app/. En la capa de servicio encuentras toda la
 lógica de la aplicación (en Python nativo): mensajes.py orquesta un mensaje entrante de principio a fin, agente.py tiene la comunicación con el modelo y su herramienta,
-leads.py arma las variables del motor y decide la escalación, analitica.py tiene las consultas de demanda y conversacion.py lo que queda del manejo de conversaciones y
-mensajes. En la capa de persistencia encuentras todos los queries y la comunicación de la aplicación con la base de datos (repositorio.py); y finalmente tenemos la capa de
-API con todos los endpoints de FastAPI (rutas.py) y los schemas de Pydantic (schemas.py). Aparte de las tres capas está app/motor/, que es el motor de lógica difusa
+leads.py arma las variables del motor y decide la escalación, analitica.py tiene las consultas de demanda, conversacion.py el manejo de conversaciones y mensajes,
+notificaciones.py la alerta por Telegram del canal web y voz.py la descarga y transcripción de las notas de voz. En la capa de persistencia encuentras todos los queries y la comunicación de la aplicación con la base de datos (repositorio.py); y finalmente tenemos la capa de
+API con todos los endpoints de FastAPI (rutas.py), los schemas de Pydantic (schemas.py) y la autenticación del backoffice (seguridad.py). Aparte de las tres capas está app/motor/, que es el motor de lógica difusa
 (pertenencia.py, inferencia.py, reglas.py y reglas.yaml) y no depende de nada de la aplicación. En esa misma carpeta app/ está excepciones.py, donde se definen las
 excepciones propias del dominio.
-Los endpoints expuestos son: /mensaje_entrante (recibe un mensaje de cualquier canal y ejecuta todo el flujo), /historial (mensajes de una conversación), /listar_asesores,
-/leads_por_asesor (los leads asignados a un asesor, ordenados por prioridad), /leads_sin_asignar (las solicitudes que el sistema atendió sin escalar), /evaluaciones_lead
-(el historial de cómo fue cambiando la prioridad de un lead), /cerrar_lead (registra el cierre como venta o no venta) y /demanda (el reporte del periodo).
+Los endpoints públicos son /chat (un mensaje del chat web, con el canal fijo en el servidor), /chat/historial (la conversación de ese cliente, identificado por el
+uuid que guarda su navegador), /entrar y /salir (abren y cierran la sesión del administrador).
+Los endpoints protegidos son /mensaje_entrante (recibe un mensaje de Telegram o del simulador y ejecuta todo el flujo), /listar_asesores, /leads_por_asesor (los leads
+asignados a un asesor, ordenados por prioridad), /leads_sin_asignar (las solicitudes que el sistema atendió sin escalar), /evaluaciones_lead (el historial de cómo fue
+cambiando la prioridad de un lead), /cerrar_lead (registra el cierre como venta o no venta), /demanda (el reporte del periodo), /conversaciones_simulador y
+/mensajes_simulador (la lista y el historial del simulador). Aceptan la cookie de sesión del administrador o, para n8n, autenticación básica.
 En la raíz de fastapi/ están models.py (definición de las tablas con SQLModel), database.py (conexión a la BD), seed.py (inyección del catálogo desde productos.json y de
 los asesores desde asesores.json), semilla_historia.py (historia de ejemplo para el reporte), main.py (punto de entrada de la aplicación), la carpeta prompts/ con el
-prompt del agente por fuera del código, la carpeta alembic/ con las migraciones, la carpeta tests/ con las pruebas y la carpeta static/ con el frontend (index.html para el
-chat, panel.html, reporte.html y sus CSS y JS separados por página).
+prompt del agente por fuera del código, la carpeta alembic/ con las migraciones, la carpeta tests/ con las pruebas y la carpeta static/ con el frontend (index.html y cliente.js para el
+chat del cliente, entrar.html para la entrada al backoffice, panel.html, reporte.html y simulador.html, cada uno con su CSS y su JS, y comun.css y comun.js con lo que
+comparten).
 docker-compose.yml: Configuración del Docker y comandos de arranque y montaje de la BD (creación del esquema, inyección de datos a la BD (seed.py), arranque de la aplicación).
 Los volúmenes y la red están declarados con nombre explícito para que no dependan del nombre de la carpeta.
 init.sql: Crea la base de datos exclusiva de n8n al levantar PostgreSQL por primera vez.
@@ -98,8 +109,9 @@ lean con escala. El reporte habla solo de lo que entra por mensajería: el siste
 
 ## Pruebas
 Las pruebas se corren dentro del contenedor de FastAPI, que es donde están fijadas las versiones, con "docker exec -w /app radar_fastapi python -m pytest".
-Cubren el motor completo (funciones de pertenencia, operadores, activación de reglas, agregación, carga y validación del YAML y la evaluación con su explicación) y las
-funciones puras de la capa de servicio (las cuatro variables, la validación de lo que devuelve el modelo y la decisión de escalación).
+Son 213. Cubren el motor completo (funciones de pertenencia, operadores, activación de reglas, agregación, carga y validación del YAML, la evaluación con su explicación y
+el comportamiento de las quince reglas reales de Tornalba), las funciones puras de la capa de servicio (las cuatro variables, la validación de lo que devuelve el modelo, la
+decisión de escalación, el texto de la alerta con el enlace de WhatsApp y la respuesta al cliente) y la firma de la sesión del administrador.
 Las pruebas del motor se escribieron antes que las funciones, con los valores calculados a mano.
 
 ## Estado del proyecto
@@ -118,6 +130,10 @@ la solicitud se registra desde el primer producto que menciona el cliente (se es
 lo que pidió queda guardado de forma estructurada con el precio y las existencias del
 momento, y el panel muestra la bandeja ordenada por prioridad con la explicación de cada
 decisión.
+
+En la última etapa el sistema se preparó para salir del computador de desarrollo: la página del cliente quedó separada del
+backoffice, el chat web pide el celular para que el asesor lo contacte por WhatsApp, el backoffice quedó detrás de una sesión de administrador, el bot entiende notas de
+voz y se corrigieron dos reglas del motor que diluían la prioridad. El detalle de cada pieza está en PLAN.md (fases 8 y 9).
 
 Este desarrollo es el entregable del diplomado en Inteligencia Artificial Avanzada y
 Aplicada de la Universidad EIA para la Cámara de Comercio Aburrá Sur.

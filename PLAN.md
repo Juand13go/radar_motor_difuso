@@ -146,6 +146,14 @@ Solución: leads_por_asesor devuelve los leads ordenados por prioridad con nivel
 Problema: el asesor no sabe por qué un lead está arriba.
 Solución: al abrir un lead se ven las reglas activadas con su grado y cómo fue cambiando la prioridad en cada mensaje.
 
+### 5.5 Rutas del historial del simulador
+Problema: el simulador generaba un identificador al azar en cada carga, así que al recargar la página se perdía la conversación, y /historial solo devolvía los últimos diez mensajes porque es la misma función que arma el contexto del agente.
+Solución: /conversaciones_simulador lista las conversaciones del canal simulador con su último mensaje (una sola consulta con una subconsulta LATERAL) y /mensajes_simulador devuelve el historial completo de una de ellas. El canal queda fijo en el servicio, para que las conversaciones de Telegram no salgan por estas rutas.
+
+### 5.6 Simulador con lista de conversaciones
+Problema: sin una lista no se puede volver a una conversación anterior.
+Solución: el simulador pasa a dos columnas, la lista de conversaciones a la izquierda y el chat a la derecha, con un botón de conversación nueva. Mientras se espera una respuesta o se cargan mensajes, la lista queda bloqueada para que una respuesta no termine pintada en otra conversación.
+
 ## Fase 6. Demanda invisible (28 de septiembre)
 
 ### 6.1 Semilla de historia
@@ -174,6 +182,68 @@ Actualizar el README al dominio de Tornalba, al flujo nuevo y al motor.
 Juan Diego escribe las entradas nuevas: la solicitud nace con el primer ítem, prioridad y escalación son decisiones separadas, la urgencia se mide en días a partir de una fecha, n8n queda como canal y Python orquesta, las fechas se guardan en UTC y se interpretan en la zona de Colombia, y la sección de trabajo futuro.
 También se reescribe la sección de deuda técnica conocida, que hoy describe un estado que ya cambió: n8n ya no está en latest, el prompt ya no vive en conversacion.py, ya hay pruebas automatizadas y productos_interes ya no es el único registro de lo que pidió el cliente.
 
+## Fase 8. Separación del cliente y el backoffice (25 y 26 de septiembre)
+
+El sistema se va a desplegar en un servidor y los clientes van a entrar desde el celular. Hasta aquí todo vivía en páginas abiertas: cualquiera con la URL veía el panel, el reporte y las conversaciones de los demás. Esta fase separa lo que ve el cliente (solo su chat) de lo que ve el administrador (el backoffice).
+
+### 8.1 Canal web
+Problema: la única entrada era /mensaje_entrante, que recibe el canal desde afuera y permitiría escribir en conversaciones ajenas.
+Solución: rutas públicas propias, POST /chat y POST /chat/historial, con el canal web fijo en el servidor. El identificador del cliente es un uuid que genera su navegador y llega en el cuerpo, nunca en la URL, para que no quede escrito en los logs. La ruta pública nunca devuelve la notificación del asesor, porque trae datos internos.
+
+### 8.2 Simulador en el backoffice
+Problema: el simulador con lista de conversaciones es una herramienta del administrador, no la página del cliente.
+Solución: se muda a /simulador con la identidad de Radar. index.html se deja igual hasta la 8.3 para que la raíz nunca quede rota entre commits.
+
+### 8.3 Página del cliente
+Problema: el cliente necesita un chat simple, pensado para el celular, que le muestre solo su conversación.
+Solución: index.html queda con la identidad de Tornalba, sin navegación al backoffice y con una sola columna. El identificador se guarda en localStorage (con respaldo en memoria si el navegador no lo permite) y se genera con crypto.randomUUID o, por http, con crypto.getRandomValues.
+
+### 8.4 Celular del cliente web
+Problema: un cliente web no tenía cómo ser contactado. El asesor solo veía un uuid, pero al escalar el cliente recibía "lo va a contactar en breve".
+Solución: columna telefono en conversaciones (8.4a) y teléfono opcional en /chat conectado hasta la conversación (8.4b). Solo celulares colombianos de diez dígitos que empiezan por 3. Se escribe al crear la conversación y no se reemplaza después.
+
+### 8.5 Campo de celular y autorización
+Problema: el teléfono tenía que pedirse en la página y volverse obligatorio sin romper a los clientes que ya habían chateado.
+Solución: el campo aparece mientras el navegador no tenga un teléfono guardado, haya historial o no. El navegador lo limpia (espacios, guiones, paréntesis, el más y el 57) antes de enviarlo. Junto al campo va el texto de autorización de contacto por WhatsApp. En el mismo commit el teléfono pasa a ser obligatorio en /chat.
+
+### 8.6 WhatsApp en el panel y en la alerta
+Problema: el asesor no veía el canal ni el teléfono.
+Solución: enlace_whatsapp arma https://wa.me/57 más el número. El panel muestra el canal, el teléfono en lugar del uuid y el botón Escribir por WhatsApp, y la alerta al asesor abre con el celular y trae el enlace.
+
+### 8.7 Alerta por Telegram para el canal web
+Problema: el chat web no pasa por n8n, así que cuando una conversación web escalaba nadie se enteraba por Telegram.
+Solución: FastAPI le escribe directo a Telegram con sendMessage y el token del bot en TELEGRAM_BOT_TOKEN, usando urllib de la librería estándar. El token nunca aparece en los logs y un fallo de Telegram nunca tumba la respuesta al cliente.
+
+### 8.8 Backoffice protegido
+Problema: cualquiera podía abrir el panel, el reporte, la documentación y todas las rutas internas.
+Solución: autenticación básica con usuario y clave en ADMIN_USUARIO y ADMIN_CLAVE, comparados con secrets.compare_digest. Las rutas se separan en router_publico (/chat, /chat/historial) y router_admin (todo lo demás), así que una ruta nueva queda protegida por estar en el router y no por acordarse de ponerle la dependencia. n8n llama a /mensaje_entrante con una credencial Basic.
+
+### 8.9 Despliegue
+Problema: el sistema solo corre mientras el computador de Juan Diego está encendido, y la URL del túnel cambia en cada reinicio.
+Solución: servidor en Hetzner, dominio en Cloudflare y un túnel con nombre fijo. docker-compose de producción sin recarga automática, sin montar el código y sin exponer el puerto 8000.
+Pendiente del pago del servidor y del dominio.
+
+### 8.10 Sesión del administrador
+Problema: la ventana de usuario y clave que dibuja el navegador con la autenticación básica no se puede estilizar y da impresión de producto sin terminar.
+Solución: una sesión con cookie firmada con HMAC-SHA256 (usando ADMIN_CLAVE como llave) que dura doce horas, es HttpOnly, SameSite=Strict y Secure (8.10a); la página /entrar con la identidad de Radar (8.10b); y el botón Salir, más la vuelta a /entrar cuando la sesión vence con una página abierta (8.10c). La API dejó de mandar WWW-Authenticate para que el navegador no vuelva a mostrar su ventana. n8n sigue entrando con Basic.
+
+## Fase 9. Ajustes antes de la feria (26 de septiembre)
+
+### 9.1 Reglas que diluían la prioridad
+Problema: la agregación Sugeno es un promedio, y las reglas de una sola condición solicitud_urgente y cliente_recurrente (las dos con salida media) metían un 45 justo donde la prioridad tenía que subir. Un pedido grande y urgente de un cliente nuevo sacaba 68,75, menos que uno grande sin fecha (70), y un cliente nuevo nunca llegaba a crítica.
+Solución: se eliminaron esas dos reglas y quedaron quince. Grande, urgente y de cliente nuevo pasa a 76,67 (crítica). Se agregaron pruebas con el reglas.yaml real, que antes no tenía ninguna.
+
+### 9.2 Mensajes sin texto y frase duplicada
+Problema: un audio, un sticker o una foto por Telegram llegaba sin texto, /mensaje_entrante respondía 422 y el cliente se quedaba sin respuesta. Además, cuando fallaba el modelo el cliente leía dos veces que un asesor lo iba a contactar.
+Solución: el texto pasa a ser opcional en /mensaje_entrante y un mensaje sin texto recibe una respuesta fija sin llamar al agente. Con fallo técnico la respuesta es solo el texto de fallo.
+
+### 9.3 Limpieza
+Retiro de código sin uso (crear_lead, actualizar_estado_conversacion y la ruta /historial), argumentos por nombre y anotaciones de tipo que habían quedado desactualizadas (9.3a). En el frontend, chat.js y chat.css pasan a llamarse simulador.js y simulador.css, y Enter avanza entre los campos del chat del cliente (9.3b).
+
+### 9.4 Notas de voz por Telegram
+Problema: en Colombia la gente escribe mucho por nota de voz, y el sistema solo entendía texto.
+Solución: n8n manda el file_id de la nota de voz. FastAPI la descarga desde Telegram (máximo 5 MB), la transcribe con Whisper en Groq (modelo en GROQ_MODELO_VOZ) y sigue el flujo como si el cliente la hubiera escrito. Si no se puede transcribir, el cliente recibe un texto fijo que le pide escribirla.
+
 ## Trabajo futuro
 
 No se construye antes de la feria. Los datos que necesita ya quedan guardados.
@@ -192,10 +262,26 @@ Una herramienta de exploración de datos conectada a la base, para que el client
 
 Entorno de desarrollo local con las dependencias instaladas fuera de Docker, para correr las pruebas sin levantar los contenedores.
 
-Búsqueda semántica sobre el catálogo, calibración del motor con los cierres reales, otros canales como WhatsApp, autenticación del panel y despliegue en servidor.
+Búsqueda semántica sobre el catálogo, calibración del motor con los cierres reales y otros canales como WhatsApp.
+
+Reintento de las alertas al asesor que fallan: hoy el lead queda escalado aunque Telegram no haya recibido la alerta.
+
+Identificar al cliente por su NIT o su teléfono y no por el canal, para que la misma persona por Telegram y por la web sea un solo cliente y su historial de compras cuente para la relación.
+
+Descontar las existencias cuando un lead cierra en venta.
+
+Notas de voz en el chat web y un filtro para las frases que Whisper inventa con audio en silencio.
 
 ## Limitaciones conocidas
 
 Cada función del repositorio hace su propio commit, así que un fallo a mitad del flujo puede dejar datos parciales.
+
+Una alerta al asesor que falla (Telegram caído, token mal cargado) no se reintenta. El lead queda escalado y solo se ve en el panel.
+
+Con audio en silencio o puro ruido, Whisper puede devolver frases que nadie dijo, y esas frases llegan al agente como si el cliente las hubiera escrito.
+
+La relación con el cliente se cuenta por conversación, así que en la web cada navegador es un cliente nuevo.
+
+Los archivos HTML del backoffice también se sirven desde /static sin clave. Salen vacíos, porque todos los datos vienen de la API y la API pide sesión.
 
 Las pruebas solo corren dentro del contenedor de FastAPI. El Python del sistema es 3.14 y no trae pip ni ensurepip, y las versiones del proyecto están fijadas contra la 3.11 de la imagen.
