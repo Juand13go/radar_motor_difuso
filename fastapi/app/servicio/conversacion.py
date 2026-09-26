@@ -1,18 +1,20 @@
 from sqlmodel import Session
 from app.persistencia.repositorio import creacion_conversacion, verificacion_existencia_conversacion, historial_conversacion, guardar_mensaje_por_rol
-from app.persistencia.repositorio import obtener_conversacion_por_id, conversaciones_por_canal, mensajes_de_conversacion
+from app.persistencia.repositorio import obtener_conversacion_por_id, conversaciones_por_canal, mensajes_de_conversacion, completar_telefono_conversacion
 from app.excepciones import ConversacionNoEncontrada
 import uuid
 
 CANAL_SIMULADOR = "simulador"
 CANAL_WEB = "web"
 
-def obtener_o_crear_conversacion(canal_user_id: str, canal: str, nombre: str, session):
+def obtener_o_crear_conversacion(canal_user_id: str, canal: str, nombre: str, session, telefono: str = None):
     conversacion = verificacion_existencia_conversacion(canal=canal, canal_user_id=canal_user_id, session=session)
     if conversacion:
+        if telefono and not conversacion.telefono:
+            return completar_telefono_conversacion(id_conversacion=conversacion.id_conversacion, telefono=telefono, session=session)
         return conversacion
     else:
-        return creacion_conversacion(canal_user_id, canal, nombre, session)
+        return creacion_conversacion(canal_user_id=canal_user_id, canal=canal, nombre=nombre, session=session, telefono=telefono)
 
 def obtener_historial_conversacion(id_conversacion: uuid.UUID, session: Session):
     return historial_conversacion(id_conversacion, session)

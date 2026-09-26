@@ -68,6 +68,8 @@ class ChatEntrada(BaseModel):
     canal_user_id: uuid.UUID
     nombre: Optional[str] = Field(default=None, max_length=80)
     texto: str = Field(min_length=1, max_length=1000)
+    # Opcional hasta la 8.5, que lo vuelve obligatorio en el mismo commit en que el navegador empieza a mandarlo
+    telefono: Optional[str] = Field(default=None, pattern=r"^3\d{9}$")
 
 class ChatSalida(BaseModel):
     respuesta_cliente: str

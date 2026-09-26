@@ -23,8 +23,8 @@ def ultimo_mensaje_asistente(id_conversacion: uuid.UUID, session: Session):
     respuestas = [mensaje.contenido for mensaje in historial if mensaje.rol == "assistant"]
     return respuestas[-1] if respuestas else None
 
-def procesar_mensaje_entrante(canal: str, canal_user_id: str, nombre: str, texto: str, session: Session):
-    conversacion = obtener_o_crear_conversacion(canal_user_id=canal_user_id, canal=canal, nombre=nombre, session=session)
+def procesar_mensaje_entrante(canal: str, canal_user_id: str, nombre: str, texto: str, session: Session, telefono: str = None):
+    conversacion = obtener_o_crear_conversacion(canal_user_id=canal_user_id, canal=canal, nombre=nombre, session=session, telefono=telefono)
     mensaje_cliente = guardado_mensajes(id_conversacion=conversacion.id_conversacion, rol="user", contenido=texto, session=session)
 
     estado_solicitud = estado_de_la_solicitud(id_conversacion=conversacion.id_conversacion, session=session)
@@ -47,7 +47,7 @@ def procesar_mensaje_entrante(canal: str, canal_user_id: str, nombre: str, texto
     guardado_mensajes(id_conversacion=conversacion.id_conversacion, rol="assistant", contenido=respuesta_cliente, session=session)
     return {"respuesta_cliente": respuesta_cliente, "notificacion_asesor": resultado["notificacion"]}
 
-def procesar_mensaje_web(canal_user_id: uuid.UUID, nombre: str, texto: str, session: Session):
-    resultado = procesar_mensaje_entrante(canal=CANAL_WEB, canal_user_id=str(canal_user_id), nombre=nombre, texto=texto, session=session)
+def procesar_mensaje_web(canal_user_id: uuid.UUID, nombre: str, texto: str, telefono: str, session: Session):
+    resultado = procesar_mensaje_entrante(canal=CANAL_WEB, canal_user_id=str(canal_user_id), nombre=nombre, texto=texto, session=session, telefono=telefono)
     # La notificacion trae prioridad, monto y el chat del asesor, que no le corresponden al cliente
     return {"respuesta_cliente": resultado["respuesta_cliente"]}

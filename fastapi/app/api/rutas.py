@@ -50,7 +50,7 @@ def mensaje_entrante(datos: MensajeEntranteEntrada, session=Depends(get_session)
 
 @router.post('/chat', response_model=ChatSalida)
 def chat(datos: ChatEntrada, session=Depends(get_session)):
-    return procesar_mensaje_web(canal_user_id=datos.canal_user_id, nombre=datos.nombre, texto=datos.texto, session=session)
+    return procesar_mensaje_web(canal_user_id=datos.canal_user_id, nombre=datos.nombre, texto=datos.texto, telefono=datos.telefono, session=session)
 
 @router.post('/chat/historial', response_model=list[MensajeRespuesta])
 def chat_historial(datos: ChatHistorialEntrada, session=Depends(get_session)):
