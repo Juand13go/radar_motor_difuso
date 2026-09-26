@@ -18,3 +18,6 @@ class ConfiguracionMotorInvalida(Exception):
 
 class EntradaMotorInvalida(Exception):
     pass
+
+class SesionRequerida(Exception):
+    pass

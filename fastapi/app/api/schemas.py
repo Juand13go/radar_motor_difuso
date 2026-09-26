@@ -127,3 +127,10 @@ class CerrarLeadSalida(BaseModel):
     estado_lead : str
     ok : bool = True
 
+class EntrarEntrada(BaseModel):
+    usuario : str
+    clave : str
+
+class SesionSalida(BaseModel):
+    ok : bool
+

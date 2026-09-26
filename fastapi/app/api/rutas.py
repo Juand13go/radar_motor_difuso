@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from database import get_session
 from app.servicio.conversacion import obtener_historial_conversacion, listar_conversaciones_simulador, obtener_mensajes_simulador, obtener_mensajes_web
 from app.servicio.leads import funcion_listado_asesores
@@ -8,8 +8,8 @@ from app.servicio.analitica import reporte_demanda
 import uuid
 from app.api.schemas import MensajeRespuesta, LeadsPorAsesor, CerrarLeadSalida, CerrarLeadEntrada
 from app.api.schemas import MensajeEntranteEntrada, MensajeEntranteSalida, EvaluacionLeadSalida, DemandaSalida, ConversacionResumenSalida
-from app.api.schemas import ChatEntrada, ChatSalida, ChatHistorialEntrada
-from app.api.seguridad import verificar_admin
+from app.api.schemas import ChatEntrada, ChatSalida, ChatHistorialEntrada, EntrarEntrada, SesionSalida
+from app.api.seguridad import verificar_admin, abrir_sesion, cerrar_sesion
 
 router_publico = APIRouter()
 router_admin = APIRouter(dependencies=[Depends(verificar_admin)])
@@ -61,3 +61,11 @@ def chat_historial(datos: ChatHistorialEntrada, session=Depends(get_session)):
 @router_admin.get('/demanda', response_model=DemandaSalida)
 def demanda(dias: int = 30, session=Depends(get_session)):
     return reporte_demanda(dias=dias, session=session)
+
+@router_publico.post('/entrar', response_model=SesionSalida)
+def entrar(datos: EntrarEntrada, response: Response):
+    return abrir_sesion(usuario=datos.usuario, clave=datos.clave, response=response)
+
+@router_publico.post('/salir', response_model=SesionSalida)
+def salir(response: Response):
+    return cerrar_sesion(response=response)

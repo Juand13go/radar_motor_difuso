@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Request, Depends
 from app.api.rutas import router_publico, router_admin
-from app.api.seguridad import verificar_admin
-from fastapi.responses import JSONResponse
+from app.api.seguridad import verificar_admin, verificar_pagina_admin
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.openapi.docs import get_swagger_ui_html
-from app.excepciones import ConversacionNoEncontrada, LeadNoEncontrado, AsesorNoEncontrado, SinAsesoresDisponibles
+from app.excepciones import ConversacionNoEncontrada, LeadNoEncontrado, AsesorNoEncontrado, SinAsesoresDisponibles, SesionRequerida
 import logging
 from fastapi.responses import FileResponse
 
@@ -22,15 +22,15 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 def index():
     return FileResponse("static/index.html")
 
-@app.get("/panel", dependencies=[Depends(verificar_admin)])
+@app.get("/panel", dependencies=[Depends(verificar_pagina_admin)])
 def panel():
     return FileResponse("static/panel.html")
 
-@app.get("/reporte", dependencies=[Depends(verificar_admin)])
+@app.get("/reporte", dependencies=[Depends(verificar_pagina_admin)])
 def reporte():
     return FileResponse("static/reporte.html")
 
-@app.get("/simulador", dependencies=[Depends(verificar_admin)])
+@app.get("/simulador", dependencies=[Depends(verificar_pagina_admin)])
 def simulador():
     return FileResponse("static/simulador.html")
 
@@ -57,3 +57,7 @@ def manejar_asesor_no_encontrado(request: Request, exc: AsesorNoEncontrado):
 @app.exception_handler(SinAsesoresDisponibles)
 def manejar_sin_asesores_disponibles(request: Request, exc: SinAsesoresDisponibles):
     return JSONResponse(status_code=503, content={"detail":"No hay asesores disponibles"})
+
+@app.exception_handler(SesionRequerida)
+def manejar_sesion_requerida(request: Request, exc: SesionRequerida):
+    return RedirectResponse("/entrar", status_code=303)
