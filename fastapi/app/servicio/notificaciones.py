@@ -10,14 +10,21 @@ logger = logging.getLogger(__name__)
 
 TIMEOUT_TELEGRAM = 5
 
-def enviar_alerta_telegram(chat_id: str, texto: str, id_conversacion: uuid.UUID):
+def leer_token_bot():
     token = (os.getenv("TELEGRAM_BOT_TOKEN") or "").strip()
     if not token:
-        logger.error(f"Falta TELEGRAM_BOT_TOKEN y la alerta al asesor no se envió [Conversación ID: {id_conversacion}]")
-        return False
+        logger.error("Falta TELEGRAM_BOT_TOKEN")
+        return None
     # El token va dentro de la URL, y con caracteres raros urllib la copia en el mensaje de la excepcion
     if not re.fullmatch(r"\d+:[A-Za-z0-9_-]+", token):
-        logger.error(f"TELEGRAM_BOT_TOKEN no tiene el formato de un token de bot y la alerta al asesor no se envió [Conversación ID: {id_conversacion}]")
+        logger.error("TELEGRAM_BOT_TOKEN no tiene el formato de un token de bot")
+        return None
+    return token
+
+def enviar_alerta_telegram(chat_id: str, texto: str, id_conversacion: uuid.UUID):
+    token = leer_token_bot()
+    if not token:
+        logger.error(f"La alerta al asesor no se envió porque no hay un token de bot válido [Conversación ID: {id_conversacion}]")
         return False
 
     # Sin parse_mode, para que ningun caracter que escribio el cliente se lea como formato

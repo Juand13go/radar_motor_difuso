@@ -57,6 +57,7 @@ class MensajeEntranteEntrada(BaseModel):
     canal_user_id: str
     nombre: Optional[str] = None
     texto: Optional[str] = None
+    voz_file_id: Optional[str] = None
 
 class NotificacionAsesorSalida(BaseModel):
     chat_id: str

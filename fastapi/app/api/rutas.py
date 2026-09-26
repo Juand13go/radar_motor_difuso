@@ -48,7 +48,7 @@ def listar_asesores_para_front(session=Depends(get_session)):
 
 @router_admin.post('/mensaje_entrante', response_model=MensajeEntranteSalida)
 def mensaje_entrante(datos: MensajeEntranteEntrada, session=Depends(get_session)):
-    return procesar_mensaje_entrante(canal=datos.canal, canal_user_id=datos.canal_user_id, nombre=datos.nombre, texto=datos.texto, session=session)
+    return procesar_mensaje_entrante(canal=datos.canal, canal_user_id=datos.canal_user_id, nombre=datos.nombre, texto=datos.texto, session=session, voz_file_id=datos.voz_file_id)
 
 @router_publico.post('/chat', response_model=ChatSalida)
 def chat(datos: ChatEntrada, session=Depends(get_session)):

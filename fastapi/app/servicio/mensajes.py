@@ -4,6 +4,7 @@ from app.servicio.conversacion import obtener_o_crear_conversacion, guardado_men
 from app.servicio.agente import comunicacion_agente, TEXTO_FALLO_TECNICO
 from app.servicio.leads import texto_estado_solicitud, registrar_solicitud, evaluar_y_escalar, frase_confirmacion_cliente
 from app.servicio.notificaciones import enviar_alerta_telegram
+from app.servicio.voz import transcribir_voz
 import uuid
 import logging
 
@@ -11,9 +12,23 @@ logger = logging.getLogger(__name__)
 
 TEXTO_RESPUESTA_REPETIDA = "Disculpe, creo que me repetí. ¿En qué puedo ayudarle?"
 TEXTO_SOLO_TEXTO = "Por ahora solo puedo leer mensajes de texto. ¿Me escribe lo que necesita?"
+TEXTO_VOZ_NO_ENTENDIDA = "No pude escuchar bien su nota de voz. ¿Me la escribe, por favor?"
 
 def es_mensaje_sin_texto(texto: str):
     return texto is None or not texto.strip()
+
+def elegir_texto_entrante(texto: str, transcripcion: str):
+    if not es_mensaje_sin_texto(texto=texto):
+        return texto
+    if es_mensaje_sin_texto(texto=transcripcion):
+        return None
+    # Whisper suele dejar un espacio al inicio de la transcripcion
+    return transcripcion.strip()
+
+def respuesta_sin_contenido(hubo_voz: bool):
+    if hubo_voz:
+        return TEXTO_VOZ_NO_ENTENDIDA
+    return TEXTO_SOLO_TEXTO
 
 def armar_respuesta_cliente(respuesta: str, escalado: bool, fallo_tecnico: bool, nombre_asesor: str):
     if fallo_tecnico:
@@ -36,13 +51,17 @@ def ultimo_mensaje_asistente(id_conversacion: uuid.UUID, session: Session):
     respuestas = [mensaje.contenido for mensaje in historial if mensaje.rol == "assistant"]
     return respuestas[-1] if respuestas else None
 
-def procesar_mensaje_entrante(canal: str, canal_user_id: str, nombre: str, texto: str, session: Session, telefono: str = None):
-    if es_mensaje_sin_texto(texto=texto):
-        logger.info(f"Mensaje sin texto por el canal {canal}, se respondió el texto fijo")
-        return {"respuesta_cliente": TEXTO_SOLO_TEXTO, "notificacion_asesor": None, "id_conversacion": None}
+def procesar_mensaje_entrante(canal: str, canal_user_id: str, nombre: str, texto: str, session: Session, telefono: str = None, voz_file_id: str = None):
+    transcripcion = None
+    if es_mensaje_sin_texto(texto=texto) and voz_file_id:
+        transcripcion = transcribir_voz(file_id=voz_file_id, canal=canal)
+    texto_cliente = elegir_texto_entrante(texto=texto, transcripcion=transcripcion)
+    if texto_cliente is None:
+        logger.info(f"Mensaje sin texto legible por el canal {canal}, se respondió el texto fijo")
+        return {"respuesta_cliente": respuesta_sin_contenido(hubo_voz=bool(voz_file_id)), "notificacion_asesor": None, "id_conversacion": None}
 
     conversacion = obtener_o_crear_conversacion(canal_user_id=canal_user_id, canal=canal, nombre=nombre, session=session, telefono=telefono)
-    mensaje_cliente = guardado_mensajes(id_conversacion=conversacion.id_conversacion, rol="user", contenido=texto, session=session)
+    mensaje_cliente = guardado_mensajes(id_conversacion=conversacion.id_conversacion, rol="user", contenido=texto_cliente, session=session)
 
     estado_solicitud = estado_de_la_solicitud(id_conversacion=conversacion.id_conversacion, session=session)
     extraccion = comunicacion_agente(id_conversacion=conversacion.id_conversacion, session=session, estado_solicitud=estado_solicitud)
