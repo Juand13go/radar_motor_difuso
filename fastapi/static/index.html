@@ -8,15 +8,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/comun.css">
-    <link rel="stylesheet" href="/static/chat.css">
+    <link rel="stylesheet" href="/static/cliente.css">
     <script src="/static/comun.js" defer></script>
-    <script src="/static/chat.js" defer></script>
+    <script src="/static/cliente.js" defer></script>
 </head>
 <body>
     <!-- Aviso de exito o error: arranca vacio y oculto, lo llena mostrarAviso en comun.js -->
     <div id="aviso" class="aviso" role="status" aria-live="polite"></div>
 
-    <!-- Barra superior: solo la distribuidora, porque esta pagina es la que ve el cliente -->
+    <!-- Barra superior: solo la distribuidora y sin navegacion, porque esta pagina es la que ve el cliente -->
     <nav class="navbar">
         <div class="encabezado">
             <div class="encabezado__cliente">
@@ -35,38 +35,19 @@
                 <span class="punto punto--oscuro"></span>
             </div>
         </div>
-        <div class="navegacion">
-            <a href="/" class="navegacion__enlace navegacion__enlace--activo" aria-current="page">Chat</a>
-            <a href="/panel" class="navegacion__enlace">Panel de asesores</a>
-            <a href="/reporte" class="navegacion__enlace">Demanda del periodo</a>
-        </div>
     </nav>
 
     <main class="contenido">
 
-        <!-- Chat con el cliente, usa el mismo endpoint que Telegram -->
-        <section class="bloque">
-            <div class="bloque__encabezado">
-                <h3 class="bloque__titulo">Escríbenos</h3>
-                <p class="bloque__ayuda">Cuéntanos qué necesitas, con cantidades y para cuándo, y te respondemos enseguida.</p>
-            </div>
+        <!-- Chat del cliente, solo con su propia conversacion -->
+        <section class="chat-cliente">
+            <ul id="conversacionCliente" class="chat-cliente__conversacion"></ul>
 
-            <div class="simulador">
-                <aside class="simulador__lateral">
-                    <input type="text" id="inputSimuladorNombre" class="campo" placeholder="Nombre del cliente (opcional)" autocomplete="off">
-                    <button id="btnNuevaConversacion" class="boton simulador__nueva">Nueva conversación</button>
-                    <ul id="listaConversaciones" class="simulador__lista"></ul>
-                </aside>
-
-                <div class="simulador__chat">
-                    <ul id="contenedorSimulador" class="conversacion"></ul>
-
-                    <div class="controles">
-                        <div class="controles__fila">
-                            <input type="text" id="inputSimuladorTexto" class="campo" placeholder="Escribe el mensaje del cliente" autocomplete="off">
-                            <button id="btnEnviarSimulador" class="boton boton--primario">Enviar</button>
-                        </div>
-                    </div>
+            <div class="chat-cliente__controles">
+                <input type="text" id="inputClienteNombre" class="campo chat-cliente__campo" placeholder="Su nombre o el de su empresa (opcional)" maxlength="80" autocomplete="off">
+                <div class="chat-cliente__fila">
+                    <input type="text" id="inputClienteTexto" class="campo chat-cliente__campo" placeholder="Escriba su mensaje" maxlength="1000" autocomplete="off" enterkeyhint="send">
+                    <button id="btnEnviarCliente" class="boton boton--primario">Enviar</button>
                 </div>
             </div>
         </section>

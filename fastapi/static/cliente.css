@@ -1,0 +1,90 @@
+/* ============================================================
+   Chat del cliente
+   Pensado primero para el celular: una sola columna que ocupa
+   el ancho disponible, y en pantallas grandes queda centrada.
+   Misma linea visual del simulador, pero sin depender de chat.css
+   ============================================================ */
+
+.chat-cliente {
+    max-width: 720px;
+    margin: 0 auto;
+    padding-top: 32px;
+}
+
+.chat-cliente__conversacion {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 24px;
+}
+
+.chat-cliente__mensaje {
+    max-width: 80%;
+    padding: 10px 16px;
+    font-size: 16px;
+    line-height: 1.45;
+    white-space: pre-line;          /* respeta el salto entre la frase del asesor y la respuesta */
+    word-break: break-word;
+}
+
+.chat-cliente__mensaje--cliente {
+    align-self: flex-end;
+    text-align: right;
+    border-right: 3px solid var(--color-acento);
+}
+
+.chat-cliente__mensaje--sistema {
+    align-self: flex-start;
+    border-left: 3px solid var(--color-gris-claro);
+}
+
+.chat-cliente__mensaje--pendiente {
+    align-self: flex-start;
+    color: var(--color-gris-medio);
+    font-style: italic;
+}
+
+.chat-cliente__mensaje--error {
+    align-self: flex-start;
+    border-left: 3px solid var(--prioridad-critica);
+    color: var(--prioridad-critica);
+}
+
+/* Pegados abajo mientras se lee una conversacion larga; el fondo tapa los mensajes que pasan por debajo */
+.chat-cliente__controles {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 0 16px;
+    background-color: var(--color-fondo);
+    border-top: 1px solid var(--color-linea);
+}
+
+.chat-cliente__fila {
+    display: flex;
+    gap: 10px;
+}
+
+/* 16px evita que el celular haga zoom al tocar el campo, y sin el ancho minimo de comun.css no se desborda */
+.chat-cliente__campo {
+    flex: 1;
+    min-width: 0;
+    font-size: 16px;
+}
+
+/* ============================================================
+   Pantallas angostas
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .chat-cliente {
+        padding-top: 24px;
+    }
+
+    .chat-cliente__mensaje {
+        max-width: 90%;
+    }
+}
