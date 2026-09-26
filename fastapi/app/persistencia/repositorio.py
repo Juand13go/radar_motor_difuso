@@ -1,6 +1,7 @@
 from models import conversaciones, mensajes, leads, productos, asesores, items_solicitados, evaluaciones_motor, ahora_utc
 from sqlmodel import select, Session, func
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import true
 from datetime import date, datetime
 from decimal import Decimal
 import uuid
@@ -244,3 +245,23 @@ def consultar_resumen_periodo(desde: datetime, hasta: datetime, session: Session
         .where(leads.lead_creado_en >= desde, leads.lead_creado_en < hasta)
     )
     return session.exec(consulta).one()
+
+def conversaciones_por_canal(canal: str, session: Session):
+    ultimo = (
+        select(mensajes.contenido, mensajes.creado_en)
+        .where(mensajes.id_conversacion == conversaciones.id_conversacion)
+        .order_by(mensajes.creado_en.desc())
+        .limit(1)
+        .lateral()
+    )
+    # El join interno con la lateral deja por fuera las conversaciones que todavia no tienen mensajes
+    consulta = (
+        select(conversaciones.id_conversacion, conversaciones.canal_user_id, conversaciones.nombre, ultimo.c.contenido.label("ultimo_mensaje"), ultimo.c.creado_en.label("actualizado_en"))
+        .join(ultimo, true())
+        .where(conversaciones.canal == canal)
+        .order_by(ultimo.c.creado_en.desc())
+    )
+    return session.exec(consulta).all()
+
+def mensajes_de_conversacion(id_conversacion: uuid.UUID, session: Session):
+    return session.exec(select(mensajes).where(mensajes.id_conversacion == id_conversacion).order_by(mensajes.creado_en.asc())).all()

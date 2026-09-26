@@ -1,19 +1,27 @@
 from fastapi import APIRouter, Depends
 from database import get_session
-from app.servicio.conversacion import obtener_historial_conversacion
+from app.servicio.conversacion import obtener_historial_conversacion, listar_conversaciones_simulador, obtener_mensajes_simulador
 from app.servicio.leads import funcion_listado_asesores
 from app.servicio.leads import listar_leads_por_asesor, cambiar_estado_lead_para_cierre, listar_leads_sin_asignar, listar_evaluaciones_lead
 from app.servicio.mensajes import procesar_mensaje_entrante
 from app.servicio.analitica import reporte_demanda
 import uuid
 from app.api.schemas import MensajeRespuesta, LeadsPorAsesor, CerrarLeadSalida, CerrarLeadEntrada
-from app.api.schemas import MensajeEntranteEntrada, MensajeEntranteSalida, EvaluacionLeadSalida, DemandaSalida
+from app.api.schemas import MensajeEntranteEntrada, MensajeEntranteSalida, EvaluacionLeadSalida, DemandaSalida, ConversacionResumenSalida
 
 router = APIRouter()
 
 @router.get('/historial', response_model=list[MensajeRespuesta])
 def cargar_historial(id_conversacion: uuid.UUID, session = Depends(get_session)):
     return obtener_historial_conversacion(id_conversacion, session)
+
+@router.get('/conversaciones_simulador', response_model=list[ConversacionResumenSalida])
+def conversaciones_simulador(session=Depends(get_session)):
+    return listar_conversaciones_simulador(session=session)
+
+@router.get('/mensajes_simulador', response_model=list[MensajeRespuesta])
+def mensajes_simulador(id_conversacion: uuid.UUID, session=Depends(get_session)):
+    return obtener_mensajes_simulador(id_conversacion=id_conversacion, session=session)
 
 @router.get('/leads_por_asesor', response_model=list[LeadsPorAsesor])
 def leads_por_asesor(id_asesor: uuid.UUID, session = Depends(get_session)):

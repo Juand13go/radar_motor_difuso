@@ -8,6 +8,13 @@ class MensajeRespuesta(BaseModel):
     rol : str
     contenido : str
     
+class ConversacionResumenSalida(BaseModel):
+    id_conversacion: uuid.UUID
+    canal_user_id: str
+    nombre: Optional[str]
+    ultimo_mensaje: str
+    actualizado_en: datetime
+
 class ItemSolicitadoSalida(BaseModel):
     id_producto: Optional[int]
     descripcion: str
