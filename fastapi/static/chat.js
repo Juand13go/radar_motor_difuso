@@ -24,6 +24,11 @@ async function enviarMensajeSimulador(canalUserId, nombre, texto) {
             })
         });
 
+        if (response.status === 401) {
+            window.location.replace("/entrar");
+            return null;
+        }
+
         if (!response.ok) {
             throw new Error(`El sistema no pudo responder. Status: ${response.status}`);
         }
@@ -187,6 +192,9 @@ async function enviarDesdeSimulador() {
     const pendiente = renderizarMensajeSimulador("El sistema está respondiendo...", "pendiente");
 
     const resultado = await enviarMensajeSimulador(conversacionActiva.canal_user_id, conversacionActiva.nombre, texto);
+
+    // Sin resultado la pagina ya va camino a /entrar, asi que se deja como esta
+    if (!resultado) return;
 
     pendiente.remove();
     bloquearSimulador(false);
