@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Response
 from database import get_session
-from app.servicio.conversacion import obtener_historial_conversacion, listar_conversaciones_simulador, obtener_mensajes_simulador, obtener_mensajes_web
+from app.servicio.conversacion import listar_conversaciones_simulador, obtener_mensajes_simulador, obtener_mensajes_web
 from app.servicio.leads import funcion_listado_asesores
 from app.servicio.leads import listar_leads_por_asesor, cambiar_estado_lead_para_cierre, listar_leads_sin_asignar, listar_evaluaciones_lead
 from app.servicio.mensajes import procesar_mensaje_entrante, procesar_mensaje_web
@@ -13,10 +13,6 @@ from app.api.seguridad import verificar_admin, abrir_sesion, cerrar_sesion
 
 router_publico = APIRouter()
 router_admin = APIRouter(dependencies=[Depends(verificar_admin)])
-
-@router_admin.get('/historial', response_model=list[MensajeRespuesta])
-def cargar_historial(id_conversacion: uuid.UUID, session = Depends(get_session)):
-    return obtener_historial_conversacion(id_conversacion, session)
 
 @router_admin.get('/conversaciones_simulador', response_model=list[ConversacionResumenSalida])
 def conversaciones_simulador(session=Depends(get_session)):

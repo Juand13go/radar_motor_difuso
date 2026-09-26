@@ -46,26 +46,6 @@ def guardar_mensaje_por_rol(id_conversacion: uuid.UUID, rol:str, contenido:str, 
     session.refresh(nuevo_mensaje)
     return nuevo_mensaje
 
-def actualizar_estado_conversacion(estado: str, id_conversacion: uuid.UUID, session: Session):
-    conversacion = session.get(conversaciones, id_conversacion)
-    if conversacion is None:
-        raise ConversacionNoEncontrada
-    conversacion.estado = estado
-    session.add(conversacion)
-    session.commit()
-    session.refresh(conversacion)
-    return conversacion
-
-def crear_lead(id_conversacion: uuid.UUID, productos_interes: str, ciudad: str, session: Session): 
-    existe = session.get(conversaciones, id_conversacion)
-    if existe is None: 
-        raise ConversacionNoEncontrada
-    lead = leads(id_conversacion=id_conversacion, productos_interes = productos_interes, ciudad = ciudad)
-    session.add(lead)
-    session.commit()
-    session.refresh(lead)
-    return lead
-
 def obtener_productos(session: Session):
     return session.exec(select(productos)).all()  
 

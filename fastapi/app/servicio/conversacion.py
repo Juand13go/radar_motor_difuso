@@ -7,7 +7,7 @@ import uuid
 CANAL_SIMULADOR = "simulador"
 CANAL_WEB = "web"
 
-def obtener_o_crear_conversacion(canal_user_id: str, canal: str, nombre: str, session, telefono: str = None):
+def obtener_o_crear_conversacion(canal_user_id: str, canal: str, nombre: str, session: Session, telefono: str = None):
     conversacion = verificacion_existencia_conversacion(canal=canal, canal_user_id=canal_user_id, session=session)
     if conversacion:
         if telefono and not conversacion.telefono:
@@ -17,10 +17,10 @@ def obtener_o_crear_conversacion(canal_user_id: str, canal: str, nombre: str, se
         return creacion_conversacion(canal_user_id=canal_user_id, canal=canal, nombre=nombre, session=session, telefono=telefono)
 
 def obtener_historial_conversacion(id_conversacion: uuid.UUID, session: Session):
-    return historial_conversacion(id_conversacion, session)
+    return historial_conversacion(id_conversacion=id_conversacion, session=session)
 
 def guardado_mensajes(id_conversacion: uuid.UUID, rol:str, contenido:str, session: Session):
-    return guardar_mensaje_por_rol(id_conversacion, rol, contenido, session)
+    return guardar_mensaje_por_rol(id_conversacion=id_conversacion, rol=rol, contenido=contenido, session=session)
 
 def listar_conversaciones_simulador(session: Session):
     return [dict(fila._mapping) for fila in conversaciones_por_canal(canal=CANAL_SIMULADOR, session=session)]

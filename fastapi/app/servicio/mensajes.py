@@ -5,6 +5,7 @@ from app.servicio.agente import comunicacion_agente, TEXTO_FALLO_TECNICO
 from app.servicio.leads import texto_estado_solicitud, registrar_solicitud, evaluar_y_escalar, frase_confirmacion_cliente
 from app.servicio.notificaciones import enviar_alerta_telegram
 from app.servicio.voz import transcribir_voz
+from typing import Optional
 import uuid
 import logging
 
@@ -51,7 +52,7 @@ def ultimo_mensaje_asistente(id_conversacion: uuid.UUID, session: Session):
     respuestas = [mensaje.contenido for mensaje in historial if mensaje.rol == "assistant"]
     return respuestas[-1] if respuestas else None
 
-def procesar_mensaje_entrante(canal: str, canal_user_id: str, nombre: str, texto: str, session: Session, telefono: str = None, voz_file_id: str = None):
+def procesar_mensaje_entrante(canal: str, canal_user_id: str, nombre: Optional[str], texto: Optional[str], session: Session, telefono: Optional[str] = None, voz_file_id: Optional[str] = None):
     transcripcion = None
     if es_mensaje_sin_texto(texto=texto) and voz_file_id:
         transcripcion = transcribir_voz(file_id=voz_file_id, canal=canal)

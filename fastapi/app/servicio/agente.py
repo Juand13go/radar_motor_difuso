@@ -158,8 +158,7 @@ def llamar_al_modelo(mensajes: list, id_conversacion: uuid.UUID):
         logger.info(f"El modelo devolvió argumentos inválidos para la herramienta, se reintenta una vez [Conversación ID: {id_conversacion}]")
         return obtener_cliente_modelo().chat.completions.create(**parametros)
 
-# estado_solicitud va al final y con valor por defecto para que /procesar, que se retira en la 4.5, siga llamandola igual
-def comunicacion_agente(id_conversacion: uuid.UUID, session: Session, estado_solicitud: str = "Sin solicitud abierta"):
+def comunicacion_agente(id_conversacion: uuid.UUID, session: Session, estado_solicitud: str):
     historial = obtener_historial_conversacion(id_conversacion=id_conversacion, session=session)
     catalogo_productos_variable = catalogo_a_texto(session)
     ids_validos = [producto.id_producto for producto in obtener_productos(session)]
