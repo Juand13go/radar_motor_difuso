@@ -3,6 +3,7 @@ from app.persistencia.repositorio import obtener_lead_abierto, obtener_items_de_
 from app.servicio.conversacion import obtener_o_crear_conversacion, guardado_mensajes, obtener_historial_conversacion, CANAL_WEB
 from app.servicio.agente import comunicacion_agente
 from app.servicio.leads import texto_estado_solicitud, registrar_solicitud, evaluar_y_escalar, frase_confirmacion_cliente
+from app.servicio.notificaciones import enviar_alerta_telegram
 import uuid
 import logging
 
@@ -45,9 +46,14 @@ def procesar_mensaje_entrante(canal: str, canal_user_id: str, nombre: str, texto
         respuesta_cliente = f"{frase_confirmacion_cliente(nombre_asesor=resultado['notificacion']['nombre_asesor'])}\n{respuesta_cliente}"
 
     guardado_mensajes(id_conversacion=conversacion.id_conversacion, rol="assistant", contenido=respuesta_cliente, session=session)
-    return {"respuesta_cliente": respuesta_cliente, "notificacion_asesor": resultado["notificacion"]}
+    # response_model de /mensaje_entrante descarta id_conversacion, asi que n8n recibe lo mismo de siempre
+    return {"respuesta_cliente": respuesta_cliente, "notificacion_asesor": resultado["notificacion"], "id_conversacion": conversacion.id_conversacion}
 
 def procesar_mensaje_web(canal_user_id: uuid.UUID, nombre: str, texto: str, telefono: str, session: Session):
     resultado = procesar_mensaje_entrante(canal=CANAL_WEB, canal_user_id=str(canal_user_id), nombre=nombre, texto=texto, session=session, telefono=telefono)
+    notificacion = resultado["notificacion_asesor"]
+    # El chat web no pasa por n8n, asi que la alerta al asesor sale desde aqui
+    if notificacion:
+        enviar_alerta_telegram(chat_id=notificacion["chat_id"], texto=notificacion["texto"], id_conversacion=resultado["id_conversacion"])
     # La notificacion trae prioridad, monto y el chat del asesor, que no le corresponden al cliente
     return {"respuesta_cliente": resultado["respuesta_cliente"]}
