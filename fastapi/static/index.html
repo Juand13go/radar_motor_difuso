@@ -40,7 +40,6 @@
             <a href="/panel" class="navegacion__enlace">Panel de asesores</a>
             <a href="/reporte" class="navegacion__enlace">Demanda del periodo</a>
         </div>
-        <!-- <p class="encabezado__descripcion">Somos una distribuidora B2B de suministros industriales y ferretería técnica en el Valle de Aburrá. Atendemos comercios, contratistas e industria. Escríbenos aquí qué necesitas y te respondemos.</p> -->
     </nav>
 
     <main class="contenido">
@@ -52,20 +51,22 @@
                 <p class="bloque__ayuda">Cuéntanos qué necesitas, con cantidades y para cuándo, y te respondemos enseguida.</p>
             </div>
 
-            <div class="controles">
-                <div class="controles__fila">
-                    <input type="text" id="inputSimuladorCliente" class="campo" placeholder="Identificación de la conversación" autocomplete="off">
+            <div class="simulador">
+                <aside class="simulador__lateral">
                     <input type="text" id="inputSimuladorNombre" class="campo" placeholder="Nombre del cliente (opcional)" autocomplete="off">
-                </div>
-                <p class="controles__nota">En producción, la identificación de la conversación la asigna el canal.</p>
-            </div>
+                    <button id="btnNuevaConversacion" class="boton simulador__nueva">Nueva conversación</button>
+                    <ul id="listaConversaciones" class="simulador__lista"></ul>
+                </aside>
 
-            <ul id="contenedorSimulador" class="conversacion"></ul>
+                <div class="simulador__chat">
+                    <ul id="contenedorSimulador" class="conversacion"></ul>
 
-            <div class="controles">
-                <div class="controles__fila">
-                    <input type="text" id="inputSimuladorTexto" class="campo" placeholder="Escribe el mensaje del cliente" autocomplete="off">
-                    <button id="btnEnviarSimulador" class="boton boton--primario">Enviar</button>
+                    <div class="controles">
+                        <div class="controles__fila">
+                            <input type="text" id="inputSimuladorTexto" class="campo" placeholder="Escribe el mensaje del cliente" autocomplete="off">
+                            <button id="btnEnviarSimulador" class="boton boton--primario">Enviar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

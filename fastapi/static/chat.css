@@ -4,11 +4,88 @@
    pero con lineas finas en vez de burbujas para no salir de la marca
    ============================================================ */
 
-/* Aclara que la identificacion solo se escribe a mano en la demo */
-.controles__nota {
-    margin-top: 6px;
+.simulador {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+}
+
+.simulador__lateral {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-right: 24px;
+    border-right: 1px solid var(--color-linea);
+}
+
+/* En la columna angosta el campo no cabe con el ancho minimo que trae de comun.css */
+.simulador__lateral .campo {
+    flex: none;
+    min-width: 0;
+    width: 100%;
+}
+
+.simulador__nueva {
+    width: 100%;
+    color: var(--color-acento);
+    background-color: transparent;
+    border: 2px solid var(--color-acento);
+}
+
+.simulador__lista {
+    list-style: none;
+    max-height: 480px;
+    overflow-y: auto;
+}
+
+.simulador__item {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    text-align: left;
+    font-family: var(--fuente);
+    color: var(--color-texto);
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid var(--color-linea);
+    border-left: 3px solid transparent;
+    cursor: pointer;
+}
+
+.simulador__item:hover {
+    border-left-color: var(--color-gris-claro);
+}
+
+.simulador__item--activo,
+.simulador__item--activo:hover {
+    border-left-color: var(--color-acento);
+}
+
+.simulador__item:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+.simulador__nombre {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.simulador__item--activo .simulador__nombre {
+    color: var(--color-acento);
+}
+
+.simulador__ultimo {
+    display: block;
+    margin-top: 2px;
     font-size: 13px;
     color: var(--color-gris-medio);
+}
+
+/* min-width: 0 deja que la columna del chat se encoja en vez de desbordar la grid con mensajes largos */
+.simulador__chat {
+    min-width: 0;
 }
 
 .conversacion {
@@ -76,6 +153,23 @@
    ============================================================ */
 
 @media (max-width: 900px) {
+    /* La lista pasa arriba del chat y se limita para que el chat siga a la vista */
+    .simulador {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .simulador__lateral {
+        padding-right: 0;
+        padding-bottom: 16px;
+        border-right: none;
+        border-bottom: 1px solid var(--color-linea);
+    }
+
+    .simulador__lista {
+        max-height: 220px;
+    }
+
     .mensaje {
         max-width: 90%;
     }
