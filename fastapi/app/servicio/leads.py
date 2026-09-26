@@ -49,7 +49,7 @@ def obtener_nombre_asesor(id_asesor: uuid.UUID, session: Session):
 def lead_para_bandeja(lead, session: Session):
     items = [item.model_dump() for item in obtener_items_de_lead(id_lead=lead.id_lead, session=session)]
     conversacion = obtener_conversacion_por_id(id_conversacion=lead.id_conversacion, session=session)
-    return {**lead.model_dump(), "creado_en": lead.lead_creado_en, "items": items, "nombre_cliente": conversacion.nombre, "canal_user_id": conversacion.canal_user_id}
+    return {**lead.model_dump(), "creado_en": lead.lead_creado_en, "items": items, "nombre_cliente": conversacion.nombre, "canal_user_id": conversacion.canal_user_id, "canal": conversacion.canal, "telefono": conversacion.telefono, "enlace_whatsapp": enlace_whatsapp(telefono=conversacion.telefono)}
 
 def listar_leads_por_asesor(id_asesor: uuid.UUID, session: Session):
     return [lead_para_bandeja(lead=lead, session=session) for lead in obtener_leads_por_asesor(id_asesor, session)]
@@ -186,11 +186,24 @@ def decidir_escalacion(prioridad: float, umbral: float, solicita_asesor: bool, f
         return "motor"
     return None
 
-def texto_notificacion_asesor(nombre_cliente: str, canal_user_id: str, nivel_prioridad: str, monto_estimado: Decimal, items: list, fallo_tecnico: bool):
-    if isinstance(nombre_cliente, str) and nombre_cliente.strip():
+def enlace_whatsapp(telefono: str):
+    if not telefono:
+        return None
+    return f"https://wa.me/57{telefono}"
+
+def texto_notificacion_asesor(nombre_cliente: str, canal_user_id: str, nivel_prioridad: str, monto_estimado: Decimal, items: list, fallo_tecnico: bool, telefono: str = None):
+    enlace = enlace_whatsapp(telefono=telefono)
+    tiene_nombre = isinstance(nombre_cliente, str) and nombre_cliente.strip()
+    if enlace and tiene_nombre:
+        lineas = [f"Nueva solicitud de {nombre_cliente} (celular: {telefono})."]
+    elif enlace:
+        lineas = [f"Nueva solicitud del cliente con celular {telefono}."]
+    elif tiene_nombre:
         lineas = [f"Nueva solicitud de {nombre_cliente} (ID en el canal: {canal_user_id})."]
     else:
         lineas = [f"Nueva solicitud del cliente con ID en el canal {canal_user_id}."]
+    if enlace:
+        lineas.append(f"WhatsApp: {enlace}")
     if fallo_tecnico:
         lineas.append("Hubo un fallo técnico con el asistente y la solicitud no se pudo leer completa: hay que revisar la conversación con el cliente.")
     lineas.append(f"Prioridad: {nivel_prioridad or 'sin calcular'}")
@@ -255,7 +268,7 @@ def evaluar_y_escalar(lead, extraccion: dict, id_mensaje: uuid.UUID, session: Se
     lead = marcar_lead_escalado(id_lead=lead.id_lead, motivo_escalacion=motivo, escalado_en=ahora_utc(), session=session)
     asesor = obtener_nombre_asesor(id_asesor=lead.asesor_encargado, session=session)
     conversacion = obtener_conversacion_por_id(id_conversacion=lead.id_conversacion, session=session)
-    texto = texto_notificacion_asesor(nombre_cliente=conversacion.nombre, canal_user_id=conversacion.canal_user_id, nivel_prioridad=lead.nivel_prioridad, monto_estimado=lead.monto_estimado, items=items, fallo_tecnico=fallo_tecnico)
+    texto = texto_notificacion_asesor(nombre_cliente=conversacion.nombre, canal_user_id=conversacion.canal_user_id, nivel_prioridad=lead.nivel_prioridad, monto_estimado=lead.monto_estimado, items=items, fallo_tecnico=fallo_tecnico, telefono=conversacion.telefono)
     logger.info(f"Lead {lead.id_lead} escalado con motivo {motivo} y prioridad {prioridad} [Conversación ID: {lead.id_conversacion}]")
     return {
         "escalado": True,

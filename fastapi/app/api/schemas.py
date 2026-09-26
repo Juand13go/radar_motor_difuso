@@ -28,6 +28,9 @@ class LeadsPorAsesor(BaseModel):
     id_conversacion: uuid.UUID
     nombre_cliente: Optional[str]
     canal_user_id: str
+    canal: str
+    telefono: Optional[str]
+    enlace_whatsapp: Optional[str]
     productos_interes: Optional[str]
     ciudad: Optional[str]
     prioridad: Optional[float]

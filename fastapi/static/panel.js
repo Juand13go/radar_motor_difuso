@@ -155,7 +155,7 @@ function renderizarBotonCierre(lead, estado, texto) {
     boton.addEventListener("click", async () => {
         const res = await ejecutarCierreLead(lead.id_lead, estado);
         if (res) {
-            const cliente = lead.nombre_cliente && lead.nombre_cliente.trim() ? lead.nombre_cliente : lead.canal_user_id;
+            const cliente = lead.nombre_cliente && lead.nombre_cliente.trim() ? lead.nombre_cliente : (lead.telefono || lead.canal_user_id);
             mostrarAviso(`El lead de ${cliente} se cerró como ${estado.replace("_", " ")}.`, "exito");
             refrescarLeads(true);
         }
@@ -170,7 +170,9 @@ function renderizarTarjetaLead(lead) {
     const cliente = document.createElement("div");
     cliente.className = "tarjeta-lead__cliente";
     const tieneNombre = lead.nombre_cliente && lead.nombre_cliente.trim();
-    cliente.textContent = tieneNombre ? `${lead.nombre_cliente} · ${lead.canal_user_id}` : lead.canal_user_id;
+    const identificador = lead.enlace_whatsapp ? lead.telefono : lead.canal_user_id;
+    cliente.textContent = tieneNombre ? `${lead.nombre_cliente} · ${identificador}` : identificador;
+    cliente.appendChild(renderizarEtiqueta(lead.canal, "etiqueta--canal"));
 
     const encabezado = document.createElement("div");
     encabezado.className = "tarjeta-lead__encabezado";
@@ -235,6 +237,17 @@ function renderizarTarjetaLead(lead) {
     const acciones = document.createElement("div");
     acciones.className = "tarjeta-lead__acciones";
     acciones.append(btnExplicacion, renderizarBotonCierre(lead, "venta", "Venta"), renderizarBotonCierre(lead, "no_venta", "No venta"));
+
+    // El href viene del servidor y se asigna tal cual, asi que solo se acepta un enlace de WhatsApp
+    if (lead.enlace_whatsapp && lead.enlace_whatsapp.startsWith("https://wa.me/")) {
+        const enlaceWhatsapp = document.createElement("a");
+        enlaceWhatsapp.className = "boton";
+        enlaceWhatsapp.href = lead.enlace_whatsapp;
+        enlaceWhatsapp.target = "_blank";
+        enlaceWhatsapp.rel = "noopener";
+        enlaceWhatsapp.textContent = "Escribir por WhatsApp";
+        acciones.appendChild(enlaceWhatsapp);
+    }
 
     li.append(cliente, encabezado, datos, items, acciones, explicacion);
     return li;

@@ -4,7 +4,7 @@ from datetime import date
 from decimal import Decimal
 from models import productos, leads
 from app.servicio.leads import construir_items_para_guardar, texto_estado_solicitud, calcular_monto_estimado, calcular_relacion_cliente
-from app.servicio.leads import calcular_completitud, armar_entradas_del_motor
+from app.servicio.leads import calcular_completitud, armar_entradas_del_motor, enlace_whatsapp
 from app.servicio.leads import decidir_escalacion, texto_notificacion_asesor, frase_confirmacion_cliente
 
 def productos_por_id():
@@ -176,6 +176,29 @@ def test_notificacion_con_nombre_identifica_al_cliente_por_su_canal():
 
 def test_notificacion_sin_nombre_identifica_al_cliente_por_su_canal():
     assert "6560871955" in texto_notificacion_asesor(nombre_cliente=None, canal_user_id="6560871955", nivel_prioridad="alta", monto_estimado=Decimal("14800000"), items=[], fallo_tecnico=False)
+
+def test_enlace_whatsapp_con_telefono_antepone_el_indicativo_de_colombia():
+    assert enlace_whatsapp(telefono="3001234567") == "https://wa.me/573001234567"
+
+def test_enlace_whatsapp_sin_telefono_es_nulo():
+    assert enlace_whatsapp(telefono=None) is None
+
+def test_notificacion_con_telefono_incluye_la_linea_de_whatsapp():
+    assert "WhatsApp: https://wa.me/573001234567" in texto_notificacion_asesor(nombre_cliente="Juan Diego Ramírez", canal_user_id="7c1e2b90-web", nivel_prioridad="alta", monto_estimado=Decimal("14800000"), items=[], fallo_tecnico=False, telefono="3001234567")
+
+def test_notificacion_sin_telefono_no_incluye_enlace_de_whatsapp():
+    assert "wa.me" not in texto_notificacion_asesor(nombre_cliente="Juan Diego Ramírez", canal_user_id="6560871955", nivel_prioridad="alta", monto_estimado=Decimal("14800000"), items=[], fallo_tecnico=False, telefono=None)
+
+def test_notificacion_con_telefono_no_muestra_el_id_del_canal():
+    assert "7c1e2b90-web" not in texto_notificacion_asesor(nombre_cliente=None, canal_user_id="7c1e2b90-web", nivel_prioridad="alta", monto_estimado=Decimal("14800000"), items=[], fallo_tecnico=False, telefono="3001234567")
+
+def test_notificacion_sin_nombre_con_telefono_abre_con_el_celular():
+    texto = texto_notificacion_asesor(nombre_cliente=None, canal_user_id="7c1e2b90-web", nivel_prioridad="alta", monto_estimado=Decimal("14800000"), items=[], fallo_tecnico=False, telefono="3001234567")
+    assert texto.splitlines()[0] == "Nueva solicitud del cliente con celular 3001234567."
+
+def test_notificacion_con_nombre_y_telefono_abre_con_el_nombre_y_el_celular():
+    texto = texto_notificacion_asesor(nombre_cliente="Juan Diego Ramírez", canal_user_id="7c1e2b90-web", nivel_prioridad="alta", monto_estimado=Decimal("14800000"), items=[], fallo_tecnico=False, telefono="3001234567")
+    assert texto.splitlines()[0] == "Nueva solicitud de Juan Diego Ramírez (celular: 3001234567)."
 
 def test_frase_para_el_cliente_nombra_al_asesor_y_lo_trata_de_usted():
     assert frase_confirmacion_cliente(nombre_asesor="Natalia Ramírez Rendón") == "Su solicitud ya quedó en manos de Natalia Ramírez Rendón, que lo va a contactar en breve."
