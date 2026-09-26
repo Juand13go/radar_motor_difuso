@@ -11,12 +11,25 @@ def verificacion_existencia_conversacion(canal:str, canal_user_id:str, session: 
     conversacion = session.exec(select(conversaciones).where(conversaciones.canal == canal, conversaciones.canal_user_id == canal_user_id)).first()
     return conversacion
 
-def creacion_conversacion(canal_user_id:str, canal:str, nombre:str, session: Session):
-    nueva_conversacion = conversaciones(canal_user_id = canal_user_id, canal = canal, nombre = nombre) 
-    session.add(nueva_conversacion) 
+def creacion_conversacion(canal_user_id:str, canal:str, nombre:str, session: Session, telefono: str = None):
+    nueva_conversacion = conversaciones(canal_user_id = canal_user_id, canal = canal, nombre = nombre, telefono = telefono)
+    session.add(nueva_conversacion)
     session.commit()
     session.refresh(nueva_conversacion)
     return nueva_conversacion
+
+def completar_telefono_conversacion(id_conversacion: uuid.UUID, telefono: str, session: Session):
+    conversacion = session.get(conversaciones, id_conversacion)
+    if not conversacion:
+        raise ConversacionNoEncontrada
+    # El primer telefono que llega es el que queda; uno distinto en un mensaje posterior no lo reemplaza
+    if conversacion.telefono:
+        return conversacion
+    conversacion.telefono = telefono
+    session.add(conversacion)
+    session.commit()
+    session.refresh(conversacion)
+    return conversacion
 
 def historial_conversacion(id_conversacion: uuid.UUID, session: Session):
     ultimos = session.exec(select(mensajes).where(mensajes.id_conversacion == id_conversacion).order_by(mensajes.creado_en.desc()).limit(10)).all()

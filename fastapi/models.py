@@ -23,6 +23,7 @@ class conversaciones(SQLModel, table=True):
     canal: str
     canal_user_id: str
     nombre: Optional[str] = None
+    telefono: Optional[str] = None
     estado: str = Field(default="activo")
     conv_actualizado_en: datetime = Field(default_factory=ahora_utc, sa_column=columna_fecha())
 
