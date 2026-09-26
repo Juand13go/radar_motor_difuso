@@ -131,11 +131,3 @@ reglas:
     si:
       relacion_cliente: confianza
     entonces: critica
-  - nombre: cliente_recurrente
-    si:
-      relacion_cliente: recurrente
-    entonces: media
-  - nombre: solicitud_urgente
-    si:
-      plazo_dias: urgente
-    entonces: media
