@@ -45,6 +45,8 @@
 
             <div class="chat-cliente__controles">
                 <input type="text" id="inputClienteNombre" class="campo chat-cliente__campo" placeholder="Su nombre o el de su empresa (opcional)" maxlength="80" autocomplete="off">
+                <input type="tel" id="inputClienteTelefono" class="campo chat-cliente__campo" placeholder="Su celular (WhatsApp)" maxlength="20" inputmode="numeric" autocomplete="tel">
+                <p id="textoAutorizacionCliente" class="chat-cliente__autorizacion">Al enviar su mensaje autoriza a Tornalba Suministros Técnicos a contactarlo por WhatsApp sobre esta solicitud.</p>
                 <div class="chat-cliente__fila">
                     <input type="text" id="inputClienteTexto" class="campo chat-cliente__campo" placeholder="Escriba su mensaje" maxlength="1000" autocomplete="off" enterkeyhint="send">
                     <button id="btnEnviarCliente" class="boton boton--primario">Enviar</button>
