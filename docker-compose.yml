@@ -37,6 +37,8 @@ services:
       GROQ_API_KEY: ${GROQ_API_KEY}
       GROQ_MODEL: ${GROQ_MODEL}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      ADMIN_USUARIO: ${ADMIN_USUARIO}
+      ADMIN_CLAVE: ${ADMIN_CLAVE}
     networks:
       - radar_net
     depends_on:
