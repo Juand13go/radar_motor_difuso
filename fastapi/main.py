@@ -26,6 +26,10 @@ def panel():
 def reporte():
     return FileResponse("static/reporte.html")
 
+@app.get("/simulador")
+def simulador():
+    return FileResponse("static/simulador.html")
+
 @app.exception_handler(ConversacionNoEncontrada)
 def manejar_conversacion_no_encontrada(request: Request, exc: ConversacionNoEncontrada):
     return JSONResponse(status_code=404, content={"detail":"Conversación No Encontrada"})

@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radar · Panel de asesores</title>
+    <title>Radar · Simulador</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/comun.css">
-    <link rel="stylesheet" href="/static/panel.css">
+    <link rel="stylesheet" href="/static/chat.css">
     <script src="/static/comun.js" defer></script>
-    <script src="/static/panel.js" defer></script>
+    <script src="/static/chat.js" defer></script>
 </head>
 <body>
     <!-- Aviso de exito o error: arranca vacio y oculto, lo llena mostrarAviso en comun.js -->
@@ -40,41 +40,39 @@
             </div>
         </div>
         <div class="navegacion">
-            <a href="/simulador" class="navegacion__enlace">Simulador</a>
-            <a href="/panel" class="navegacion__enlace navegacion__enlace--activo" aria-current="page">Panel de asesores</a>
+            <a href="/simulador" class="navegacion__enlace navegacion__enlace--activo" aria-current="page">Simulador</a>
+            <a href="/panel" class="navegacion__enlace">Panel de asesores</a>
             <a href="/reporte" class="navegacion__enlace">Demanda del periodo</a>
         </div>
     </nav>
 
     <main class="contenido">
 
-        <!-- Bloque 1: leads asignados a un asesor -->
+        <!-- Simulador del cliente, usa el mismo endpoint que Telegram -->
         <section class="bloque">
             <div class="bloque__encabezado">
-                <h3 class="bloque__titulo">Leads asignados</h3>
-                <p class="bloque__ayuda">Elige un asesor para ver su bandeja, ordenada de mayor a menor prioridad.</p>
+                <h3 class="bloque__titulo">Simulador de conversaciones</h3>
+                <p class="bloque__ayuda">Escribe como si fueras un cliente. El mensaje recorre el mismo flujo que Telegram: el agente extrae la solicitud, el motor calcula la prioridad y, si corresponde, se escala a un asesor.</p>
             </div>
 
-            <div class="controles">
-                <div class="controles__fila">
-                    <select id="selectAsesor" class="campo">
-                        <option value="">Elige un asesor</option>
-                    </select>
-                    <button id="btnActualizarLeads" class="boton boton--primario">Actualizar</button>
+            <div class="simulador">
+                <aside class="simulador__lateral">
+                    <input type="text" id="inputSimuladorNombre" class="campo" placeholder="Nombre del cliente (opcional)" autocomplete="off">
+                    <button id="btnNuevaConversacion" class="boton simulador__nueva">Nueva conversación</button>
+                    <ul id="listaConversaciones" class="simulador__lista"></ul>
+                </aside>
+
+                <div class="simulador__chat">
+                    <ul id="contenedorSimulador" class="conversacion"></ul>
+
+                    <div class="controles">
+                        <div class="controles__fila">
+                            <input type="text" id="inputSimuladorTexto" class="campo" placeholder="Escribe el mensaje del cliente" autocomplete="off">
+                            <button id="btnEnviarSimulador" class="boton boton--primario">Enviar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <ul id="contenedorLeads" class="bandeja"></ul>
-        </section>
-
-        <!-- Bloque 2: solicitudes que el motor atendio sin escalar -->
-        <section class="bloque">
-            <div class="bloque__encabezado">
-                <h3 class="bloque__titulo">Solicitudes sin asignar</h3>
-                <p class="bloque__ayuda">Solicitudes que el sistema atendió sin escalar a un asesor. Antes esta demanda no quedaba a la vista de nadie; aquí se puede revisar y cerrar igual que las demás.</p>
-            </div>
-
-            <ul id="contenedorSinAsignar" class="bandeja"></ul>
         </section>
 
     </main>
