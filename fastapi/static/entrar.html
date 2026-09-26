@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar · Entrar al backoffice</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/comun.css">
+    <link rel="stylesheet" href="/static/entrar.css">
+    <script src="/static/entrar.js" defer></script>
+</head>
+<body>
+
+    <!-- Misma barra de marca del backoffice, sin la navegacion porque todavia no hay sesion -->
+    <nav class="navbar">
+        <div class="encabezado">
+            <div class="encabezado__cliente">
+                <img src="/static/tornalba.png" alt="Tornalba Suministros Técnicos S.A.S." class="encabezado__logo-cliente">
+                <div>
+                    <p class="encabezado__nombre">Tornalba Suministros Técnicos S.A.S.</p>
+                    <p class="encabezado__bajada">Distribuidora de suministros industriales y ferretería técnica</p>
+                </div>
+            </div>
+            <div class="encabezado__proveedor">
+                <img src="/static/Halua.png" alt="Halua Studio" class="encabezado__logo-proveedor">
+                <span class="encabezado__firma">Radar, de Halua Studio</span>
+            </div>
+        </div>
+        <div class="navbar__linea">
+            <hr>
+            <div class="puntos">
+                <span class="punto punto--claro"></span>
+                <span class="punto punto--medio"></span>
+                <span class="punto punto--oscuro"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="contenido">
+
+        <section class="tarjeta-entrar">
+            <h1 class="tarjeta-entrar__titulo">Entrar al backoffice</h1>
+
+            <form id="formEntrar" class="tarjeta-entrar__formulario">
+                <div class="tarjeta-entrar__grupo">
+                    <label for="usuarioEntrar" class="tarjeta-entrar__etiqueta">Usuario</label>
+                    <input id="usuarioEntrar" class="campo" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+                </div>
+                <div class="tarjeta-entrar__grupo">
+                    <label for="claveEntrar" class="tarjeta-entrar__etiqueta">Clave</label>
+                    <input id="claveEntrar" class="campo" type="password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" id="btnEntrar" class="boton boton--primario">Entrar</button>
+            </form>
+
+            <p id="mensajeError" class="tarjeta-entrar__error" role="alert"></p>
+        </section>
+
+    </main>
+
+    <footer class="pie">
+        <small>Medellín, Colombia</small>
+
+        <div class="circulos">
+            <span class="circulo circulo--violeta"></span>
+            <span class="circulo circulo--naranja"></span>
+            <span class="circulo circulo--cian"></span>
+            <span></span>
+            <span class="circulo circulo--cuadrado"></span>
+        </div>
+
+        <small>Radar, un producto de Halua.Studio</small>
+    </footer>
+
+</body>
+</html>

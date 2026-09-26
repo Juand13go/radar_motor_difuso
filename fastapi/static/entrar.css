@@ -1,0 +1,85 @@
+/* ============================================================
+   Entrada al backoffice
+   A diferencia del resto del backoffice aqui si hay una caja,
+   pero con lineas finas y el violeta arriba, sin sombras ni
+   esquinas, para no salirse de la marca
+   ============================================================ */
+
+.tarjeta-entrar {
+    width: 100%;
+    max-width: 420px;
+    margin: 72px auto;
+    padding: 40px;
+    border: 1px solid var(--color-linea);
+    border-top: 3px solid var(--color-acento);
+}
+
+.tarjeta-entrar__titulo {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.2;
+    margin-bottom: 28px;
+}
+
+.tarjeta-entrar__formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tarjeta-entrar__grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tarjeta-entrar__etiqueta {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-gris-medio);
+}
+
+/* 16px para que el celular no haga zoom al enfocar, y sin el ancho minimo
+   de comun.css, que en una pantalla de 320px desborda la tarjeta */
+.tarjeta-entrar .campo {
+    min-width: 0;
+    font-size: 16px;
+}
+
+.tarjeta-entrar .boton {
+    width: 100%;
+    margin-top: 8px;
+}
+
+/* ============================================================
+   Mensaje de error
+   No se oculta con display: none porque algunos lectores de
+   pantalla no anuncian un role="alert" que estaba oculto
+   ============================================================ */
+
+.tarjeta-entrar__error {
+    margin-top: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--prioridad-critica);
+}
+
+.tarjeta-entrar__error:empty {
+    margin-top: 0;
+}
+
+/* ============================================================
+   Pantallas angostas
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .tarjeta-entrar {
+        margin: 40px auto;
+        padding: 28px 20px;
+    }
+
+    .tarjeta-entrar__titulo {
+        font-size: 22px;
+    }
+}

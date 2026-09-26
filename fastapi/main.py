@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI, Request, Depends, Cookie
 from app.api.rutas import router_publico, router_admin
-from app.api.seguridad import verificar_admin, verificar_pagina_admin
+from app.api.seguridad import verificar_admin, verificar_pagina_admin, sesion_actual_valida
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.openapi.docs import get_swagger_ui_html
 from app.excepciones import ConversacionNoEncontrada, LeadNoEncontrado, AsesorNoEncontrado, SinAsesoresDisponibles, SesionRequerida
+from typing import Optional
 import logging
 from fastapi.responses import FileResponse
 
@@ -33,6 +34,12 @@ def reporte():
 @app.get("/simulador", dependencies=[Depends(verificar_pagina_admin)])
 def simulador():
     return FileResponse("static/simulador.html")
+
+@app.get("/entrar")
+def pagina_entrar(radar_sesion: Optional[str] = Cookie(default=None)):
+    if sesion_actual_valida(radar_sesion=radar_sesion):
+        return RedirectResponse("/panel", status_code=303)
+    return FileResponse("static/entrar.html")
 
 @app.get("/openapi.json", include_in_schema=False, dependencies=[Depends(verificar_admin)])
 def openapi():
