@@ -1,6 +1,6 @@
 from sqlmodel import Session
 from app.persistencia.repositorio import obtener_lead_abierto, obtener_items_de_lead
-from app.servicio.conversacion import obtener_o_crear_conversacion, guardado_mensajes, obtener_historial_conversacion
+from app.servicio.conversacion import obtener_o_crear_conversacion, guardado_mensajes, obtener_historial_conversacion, CANAL_WEB
 from app.servicio.agente import comunicacion_agente
 from app.servicio.leads import texto_estado_solicitud, registrar_solicitud, evaluar_y_escalar, frase_confirmacion_cliente
 import uuid
@@ -46,3 +46,8 @@ def procesar_mensaje_entrante(canal: str, canal_user_id: str, nombre: str, texto
 
     guardado_mensajes(id_conversacion=conversacion.id_conversacion, rol="assistant", contenido=respuesta_cliente, session=session)
     return {"respuesta_cliente": respuesta_cliente, "notificacion_asesor": resultado["notificacion"]}
+
+def procesar_mensaje_web(canal_user_id: uuid.UUID, nombre: str, texto: str, session: Session):
+    resultado = procesar_mensaje_entrante(canal=CANAL_WEB, canal_user_id=str(canal_user_id), nombre=nombre, texto=texto, session=session)
+    # La notificacion trae prioridad, monto y el chat del asesor, que no le corresponden al cliente
+    return {"respuesta_cliente": resultado["respuesta_cliente"]}

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import date, datetime
 import uuid
@@ -63,6 +63,17 @@ class NotificacionAsesorSalida(BaseModel):
 class MensajeEntranteSalida(BaseModel):
     respuesta_cliente: str
     notificacion_asesor: Optional[NotificacionAsesorSalida]
+
+class ChatEntrada(BaseModel):
+    canal_user_id: uuid.UUID
+    nombre: Optional[str] = Field(default=None, max_length=80)
+    texto: str = Field(min_length=1, max_length=1000)
+
+class ChatSalida(BaseModel):
+    respuesta_cliente: str
+
+class ChatHistorialEntrada(BaseModel):
+    canal_user_id: uuid.UUID
 
 class ResumenDemandaSalida(BaseModel):
     solicitudes: int

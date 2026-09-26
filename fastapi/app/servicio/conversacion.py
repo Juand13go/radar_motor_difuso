@@ -5,6 +5,7 @@ from app.excepciones import ConversacionNoEncontrada
 import uuid
 
 CANAL_SIMULADOR = "simulador"
+CANAL_WEB = "web"
 
 def obtener_o_crear_conversacion(canal_user_id: str, canal: str, nombre: str, session):
     conversacion = verificacion_existencia_conversacion(canal=canal, canal_user_id=canal_user_id, session=session)
@@ -28,3 +29,10 @@ def obtener_mensajes_simulador(id_conversacion: uuid.UUID, session: Session):
     if conversacion.canal != CANAL_SIMULADOR:
         raise ConversacionNoEncontrada
     return mensajes_de_conversacion(id_conversacion=id_conversacion, session=session)
+
+def obtener_mensajes_web(canal_user_id: uuid.UUID, session: Session):
+    conversacion = verificacion_existencia_conversacion(canal=CANAL_WEB, canal_user_id=str(canal_user_id), session=session)
+    # Un cliente que abre el chat por primera vez todavia no tiene conversacion, y eso no es un error
+    if not conversacion:
+        return []
+    return mensajes_de_conversacion(id_conversacion=conversacion.id_conversacion, session=session)

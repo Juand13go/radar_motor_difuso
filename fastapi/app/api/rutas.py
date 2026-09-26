@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends
 from database import get_session
-from app.servicio.conversacion import obtener_historial_conversacion, listar_conversaciones_simulador, obtener_mensajes_simulador
+from app.servicio.conversacion import obtener_historial_conversacion, listar_conversaciones_simulador, obtener_mensajes_simulador, obtener_mensajes_web
 from app.servicio.leads import funcion_listado_asesores
 from app.servicio.leads import listar_leads_por_asesor, cambiar_estado_lead_para_cierre, listar_leads_sin_asignar, listar_evaluaciones_lead
-from app.servicio.mensajes import procesar_mensaje_entrante
+from app.servicio.mensajes import procesar_mensaje_entrante, procesar_mensaje_web
 from app.servicio.analitica import reporte_demanda
 import uuid
 from app.api.schemas import MensajeRespuesta, LeadsPorAsesor, CerrarLeadSalida, CerrarLeadEntrada
 from app.api.schemas import MensajeEntranteEntrada, MensajeEntranteSalida, EvaluacionLeadSalida, DemandaSalida, ConversacionResumenSalida
+from app.api.schemas import ChatEntrada, ChatSalida, ChatHistorialEntrada
 
 router = APIRouter()
 
@@ -46,6 +47,14 @@ def listar_asesores_para_front(session=Depends(get_session)):
 @router.post('/mensaje_entrante', response_model=MensajeEntranteSalida)
 def mensaje_entrante(datos: MensajeEntranteEntrada, session=Depends(get_session)):
     return procesar_mensaje_entrante(canal=datos.canal, canal_user_id=datos.canal_user_id, nombre=datos.nombre, texto=datos.texto, session=session)
+
+@router.post('/chat', response_model=ChatSalida)
+def chat(datos: ChatEntrada, session=Depends(get_session)):
+    return procesar_mensaje_web(canal_user_id=datos.canal_user_id, nombre=datos.nombre, texto=datos.texto, session=session)
+
+@router.post('/chat/historial', response_model=list[MensajeRespuesta])
+def chat_historial(datos: ChatHistorialEntrada, session=Depends(get_session)):
+    return obtener_mensajes_web(canal_user_id=datos.canal_user_id, session=session)
 
 @router.get('/demanda', response_model=DemandaSalida)
 def demanda(dias: int = 30, session=Depends(get_session)):
