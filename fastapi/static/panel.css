@@ -1,58 +1,117 @@
 /* ============================================================
    Bandeja de leads
-   Cada lead es una tarjeta con una linea a la izquierda que toma
-   el color del semaforo segun su nivel de prioridad
+   Cada bloque es una tarjeta y cada lead una fila separada por
+   una linea fina, con una franja a la izquierda que toma el
+   color del semaforo segun su nivel de prioridad
    ============================================================ */
 
+.bloque {
+    margin-bottom: 24px;
+    padding: 24px;
+    background-color: var(--color-tarjeta);
+    border: 1px solid var(--color-linea);
+    border-radius: var(--radio-tarjeta);
+    box-shadow: var(--sombra-tarjeta);
+}
+
+.bloque__encabezado {
+    margin-bottom: 18px;
+}
+
+.bloque__titulo {
+    font-size: 15px;
+    font-weight: 650;
+    letter-spacing: -0.2px;
+    color: var(--color-tinta);
+}
+
+.bloque__ayuda {
+    margin-top: 4px;
+    font-size: 13px;
+}
+
+/* Los margenes negativos llevan las filas hasta el borde de la tarjeta, asi el hover y la franja la cruzan completa */
 .bandeja {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    margin: 0 -24px -24px;
+}
+
+.bandeja .bandeja__vacia {
+    padding: 16px 24px 24px;
+    border-top: 1px solid var(--color-linea);
 }
 
 .tarjeta-lead {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 16px 20px;
-    border-left: 3px solid var(--color-gris-claro);
-    border-bottom: 1px solid var(--color-linea);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px 16px;
+    padding: 16px 24px 16px 21px;
+    border-top: 1px solid var(--color-linea);
+    border-left: 3px solid transparent;
+    transition: background-color 0.15s ease;
+}
+
+.tarjeta-lead:last-child {
+    border-bottom-left-radius: var(--radio-tarjeta);
+    border-bottom-right-radius: var(--radio-tarjeta);
+}
+
+.tarjeta-lead:hover {
+    background-color: #FBF9FF;
 }
 
 .tarjeta-lead--sin-clasificar {
     color: var(--color-gris-medio);
+    border-left-color: var(--color-gris-claro);
 }
 
-/* Arriba de todo, porque es lo primero que el asesor necesita para contactar */
+/* Datos, items, acciones y explicacion van debajo, a todo el ancho de la fila */
+.tarjeta-lead__datos,
+.tarjeta-lead__items,
+.tarjeta-lead__acciones,
+.explicacion {
+    grid-column: 1 / -1;
+}
+
 .tarjeta-lead__cliente {
-    font-size: 16px;
-    font-weight: 800;
-    letter-spacing: -0.3px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    color: var(--color-tinta);
+    overflow-wrap: anywhere;
 }
 
 .tarjeta-lead__encabezado {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 12px;
+    justify-content: flex-end;
+    gap: 8px 12px;
 }
 
 .tarjeta-lead__prioridad {
-    font-weight: 600;
+    font-size: 12px;
+    color: var(--color-gris-medio);
 }
 
+/* El ancho minimo alinea los montos de una fila a otra */
 .tarjeta-lead__monto {
-    margin-left: auto;
-    font-size: 18px;
-    font-weight: 800;
+    min-width: 120px;
+    text-align: right;
+    font-size: 16px;
+    font-weight: 650;
+    color: var(--color-tinta);
+    font-variant-numeric: tabular-nums;
 }
 
 .tarjeta-lead__datos {
     display: flex;
     flex-wrap: wrap;
     gap: 6px 24px;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .tarjeta-lead__falta {
@@ -63,62 +122,74 @@
 .tarjeta-lead__items {
     list-style: none;
     display: flex;
-    flex-direction: column;
-    gap: 4px;
-    font-size: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 13px;
 }
 
-.item-lead--faltante {
-    color: var(--prioridad-critica);
+.item-lead {
+    padding: 6px 10px;
+    background-color: #FAF8FC;
+    border: 1px solid #EEE7F3;
+    border-radius: var(--radio-control);
 }
 
 .etiqueta {
     display: inline-block;
     margin-left: 8px;
-    padding: 1px 8px;
-    font-size: 11px;
+    padding: 1px 6px;
+    font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.5px;
     text-transform: uppercase;
     border: 1px solid currentColor;
+    border-radius: 4px;
 }
 
+.etiqueta--canal          { color: var(--color-gris-medio); }
 .etiqueta--fuera-catalogo { color: var(--color-acento); }
-.etiqueta--faltante       { color: var(--prioridad-critica); }
+.etiqueta--faltante       { color: #A08552; }
 
 .tarjeta-lead__acciones {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
 }
 
+/* Los botones de la fila son secundarios salvo Venta, que es el cierre esperado */
 .boton-tarjeta {
     font-family: var(--fuente);
     font-size: 13px;
     font-weight: 600;
-    padding: 7px 18px;
-    border: 1px solid var(--color-gris-claro);
-    background-color: transparent;
-    color: var(--color-texto);
+    padding: 7px 14px;
+    color: var(--color-tinta);
+    background-color: var(--color-tarjeta);
+    border: 1px solid var(--color-borde-boton);
+    border-radius: var(--radio-control);
     cursor: pointer;
     transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .boton-tarjeta:hover {
-    border-color: var(--color-acento);
     color: var(--color-acento);
+    border-color: var(--color-acento);
+}
+
+.boton-tarjeta:focus-visible {
+    outline: 3px solid var(--color-foco);
+    outline-offset: 2px;
+}
+
+.boton-tarjeta--venta {
+    color: #FFFFFF;
+    background-color: var(--color-acento);
+    border-color: var(--color-acento);
 }
 
 .boton-tarjeta--venta:hover {
-    background-color: var(--prioridad-baja);
-    border-color: var(--prioridad-baja);
     color: #FFFFFF;
-}
-
-.boton-tarjeta--no-venta:hover {
-    background-color: var(--prioridad-critica);
-    border-color: var(--prioridad-critica);
-    color: #FFFFFF;
+    background-color: var(--color-acento-hover);
+    border-color: var(--color-acento-hover);
 }
 
 .boton-tarjeta:disabled {
@@ -126,12 +197,18 @@
     cursor: wait;
 }
 
+/* El enlace de WhatsApp es un boton de comun.css; aqui toma el tamano de los de la fila */
+.tarjeta-lead__acciones .boton {
+    font-size: 13px;
+    padding: 7px 14px;
+}
+
 /* La explicacion arranca cerrada y la abre el boton de la tarjeta */
 .explicacion {
     display: none;
     padding: 4px 0 4px 16px;
     border-left: 1px solid var(--color-linea);
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .explicacion--abierta {
@@ -140,11 +217,11 @@
 
 .explicacion__titulo {
     margin: 12px 0 4px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    color: var(--color-gris-medio);
+    color: var(--color-acento);
 }
 
 .explicacion__titulo:first-child {
@@ -156,6 +233,7 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+    color: var(--color-gris-medio);
 }
 
 /* ============================================================
@@ -168,3 +246,35 @@
 .prioridad-alta    { border-left-color: var(--prioridad-alta) !important; }
 .prioridad-media   { border-left-color: var(--prioridad-media) !important; }
 .prioridad-baja    { border-left-color: var(--prioridad-baja) !important; }
+
+/* ============================================================
+   Celular
+   ============================================================ */
+
+@media (max-width: 640px) {
+    .bloque {
+        padding: 16px;
+    }
+
+    .bandeja {
+        margin: 0 -16px -16px;
+    }
+
+    .bandeja .bandeja__vacia {
+        padding: 14px 16px 16px;
+    }
+
+    .tarjeta-lead {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 14px 16px 14px 13px;
+    }
+
+    .tarjeta-lead__encabezado {
+        justify-content: flex-start;
+    }
+
+    .tarjeta-lead__monto {
+        min-width: 0;
+        margin-left: auto;
+    }
+}

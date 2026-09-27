@@ -1,44 +1,48 @@
 /* ============================================================
    Demanda del periodo
-   Una franja de cifras grandes y tres tablas sin cajas, con la
-   cifra que mas pesa de cada tabla en el violeta de la marca
+   Una franja de baldosas con las cifras del periodo y tres bloques,
+   cada uno con sus datos en una tarjeta blanca y al lado una
+   tarjeta morada que dice que hacer con ellos
    ============================================================ */
 
+.bloque--demanda {
+    border-top: none;
+    padding: 0;
+}
+
+.bloque--demanda .controles__fila {
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Control segmentado: el periodo activo es la pieza blanca */
+.control-periodo {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    background-color: #F3F1F7;
+    border-radius: var(--radio-control);
+}
+
 .boton--periodo {
-    background-color: transparent;
-    color: var(--color-gris-medio);
-    border-bottom: 2px solid var(--color-gris-claro);
-}
-
-.boton--periodo-activo {
-    color: var(--color-acento);
-    border-bottom-color: var(--color-acento);
-}
-
-.franja-demanda {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 40px;
-    padding: 24px 0;
-    margin-bottom: 40px;
-    border-bottom: 1px solid var(--color-linea);
-}
-
-.franja-demanda__cifra {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.franja-demanda__numero {
-    font-size: 36px;
-    font-weight: 800;
-    letter-spacing: -1px;
-}
-
-.franja-demanda__etiqueta {
+    padding: 7px 14px;
     font-size: 13px;
     color: var(--color-gris-medio);
+    background-color: transparent;
+    border-color: transparent;
+    border-radius: 6px;
+}
+
+.boton--periodo:hover {
+    color: var(--color-acento);
+    border-color: transparent;
+}
+
+.boton--periodo-activo,
+.boton--periodo-activo:hover {
+    color: var(--color-tinta);
+    background-color: var(--color-tarjeta);
+    box-shadow: 0 1px 3px rgba(48, 48, 57, 0.1);
 }
 
 .demanda__periodo {
@@ -47,50 +51,124 @@
     color: var(--color-acento);
 }
 
+/* ============================================================
+   Baldosas de metrica
+   reporte.js escribe primero el numero y despues la etiqueta;
+   column-reverse pone la etiqueta arriba
+   ============================================================ */
+
+/* El monto total es la cifra mas larga y la ultima baldosa, por eso su columna es mas ancha */
+.franja-demanda {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 1.8fr);
+    gap: 14px;
+    margin: 24px 0 32px;
+}
+
+.franja-demanda__cifra {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: 6px;
+    min-width: 0;
+    padding: 18px 16px;
+    background-color: var(--color-tarjeta);
+    border: 1px solid var(--color-linea);
+    border-radius: 11px;
+}
+
+.franja-demanda__cifra:first-child {
+    background-color: #F0EDFB;
+}
+
+.franja-demanda__cifra:first-child .franja-demanda__numero {
+    color: var(--color-acento);
+}
+
+/* clamp baja el numero en pantallas medianas para que el monto quepa en su baldosa */
+.franja-demanda__numero {
+    font-size: clamp(20px, 2.4vw, 29px);
+    font-weight: 570;
+    line-height: 1.1;
+    letter-spacing: -0.8px;
+    color: var(--color-tinta);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.franja-demanda__etiqueta {
+    font-size: 11px;
+    color: var(--color-gris-medio);
+}
+
+/* ============================================================
+   Bloques de demanda
+   ============================================================ */
+
 .demanda {
     display: flex;
     flex-direction: column;
-    gap: 48px;
+    gap: 24px;
+}
+
+.demanda__bloque {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    align-items: start;
+    gap: 20px;
+}
+
+.demanda__detalle {
+    min-width: 0;
+    padding: 24px;
 }
 
 .demanda__titulo {
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.4px;
+    font-size: 15px;
+    font-weight: 650;
+    letter-spacing: -0.2px;
+    color: var(--color-tinta);
 }
 
 .demanda__ayuda {
-    margin: 4px 0 16px;
+    margin: 4px 0 20px;
     max-width: 520px;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--color-gris-medio);
 }
 
 .tabla-demanda {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
 }
 
 .tabla-demanda th {
     text-align: left;
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
     color: var(--color-gris-medio);
-    padding: 8px 12px 8px 0;
-    border-bottom: 1px solid var(--color-gris-claro);
+    padding: 9px 12px;
+    background-color: #FCFAFD;
+    border-bottom: 1px solid #F0EAF4;
 }
 
 .tabla-demanda td {
-    padding: 10px 12px 10px 0;
-    border-bottom: 1px solid var(--color-linea);
+    padding: 11px 12px;
+    border-bottom: 1px solid #F0EAF4;
+}
+
+.tabla-demanda th:last-child,
+.tabla-demanda td:last-child {
+    text-align: right;
 }
 
 .tabla-demanda td.tabla-demanda__destacada {
-    font-size: 16px;
-    font-weight: 800;
+    font-size: 14px;
+    font-weight: 650;
     color: var(--color-acento);
 }
 
@@ -100,13 +178,12 @@
 
 /* ============================================================
    Graficos de demanda
-   Barras horizontales en SVG, una por fila de la tabla. Cada bloque
-   toma un color que ya existe: rojo para lo que faltó, violeta para
-   lo que no se maneja y naranja para la mercancía parada
+   Barras horizontales en SVG, una por fila de la tabla. La primera
+   de cada grafico, que es la de mayor valor, va en el acento
    ============================================================ */
 
 .grafico-demanda {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .grafico-demanda__svg {
@@ -122,13 +199,93 @@
 .grafico-demanda__valor {
     font-family: var(--fuente);
     font-size: 13px;
-    font-weight: 800;
+    font-weight: 650;
     fill: var(--color-texto);
 }
 
-.grafico-demanda__svg--no-cubierta .grafico-demanda__barra    { fill: var(--prioridad-critica); }
-.grafico-demanda__svg--fuera-catalogo .grafico-demanda__barra { fill: var(--color-acento); }
-.grafico-demanda__svg--sobrestock .grafico-demanda__barra     { fill: var(--color-naranja); }
+.grafico-demanda__barra {
+    fill: #AFA1E1;
+}
+
+/* Cada fila del SVG es texto, barra y texto, asi que el primer rect es la barra de la primera fila */
+.grafico-demanda__barra:first-of-type {
+    fill: var(--color-acento);
+}
+
+/* ============================================================
+   Tarjeta morada
+   ============================================================ */
+
+.mirada {
+    padding: 25px 23px;
+    background-color: #F1EEFA;
+    border: 1px solid #E8E0F4;
+    border-radius: 13px;
+}
+
+.mirada__icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    margin-bottom: 16px;
+    color: var(--color-acento);
+    background-color: #E4DDF6;
+    border-radius: var(--radio-control);
+}
+
+.mirada__ceja {
+    margin-bottom: 8px;
+    font-size: 9px;
+    font-weight: 650;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #7D6392;
+}
+
+.mirada__titulo {
+    margin-bottom: 10px;
+    font-size: 22px;
+    font-weight: 650;
+    line-height: 1.3;
+    letter-spacing: -0.7px;
+    color: #5B437A;
+}
+
+.mirada__texto {
+    font-size: 12px;
+    line-height: 1.8;
+    color: #776187;
+}
+
+.mirada__division {
+    margin: 18px 0;
+    border: none;
+    border-top: 1px solid #DFD5ED;
+}
+
+.mirada__subtitulo {
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #76598E;
+}
+
+.mirada__nota {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 18px;
+    font-size: 10px;
+    line-height: 1.6;
+    color: #776187;
+}
+
+.mirada__nota-icono {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
 
 /* En pantalla no se ve: solo existe para la hoja impresa */
 .pie-impresion {
@@ -139,21 +296,44 @@
    Pantallas angostas
    ============================================================ */
 
-@media (max-width: 900px) {
-    /* En angosto las tablas de demanda se desplazan de lado en vez de apretar las columnas */
+/* La tarjeta morada pasa debajo de la blanca y la franja queda en
+   una baldosa destacada arriba y las otras cuatro en dos por dos */
+@media (max-width: 1190px) {
     .demanda__bloque {
-        overflow-x: auto;
+        grid-template-columns: minmax(0, 1fr);
     }
 
-    .franja-demanda__numero {
-        font-size: 28px;
+    .franja-demanda {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .franja-demanda__cifra:first-child {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 900px) {
+    /* En angosto las tablas de demanda se desplazan de lado en vez de apretar las columnas */
+    .demanda__detalle {
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    .demanda__detalle {
+        padding: 18px 16px;
+    }
+
+    .mirada {
+        padding: 20px 18px;
     }
 }
 
 /* ============================================================
    Impresion
-   Al imprimir sale solo el reporte de demanda, con el encabezado
-   de las dos marcas y un pie con la fecha de impresion
+   Al imprimir sale solo el reporte de demanda, con el titulo de
+   la pagina y un pie con la fecha de impresion. El menu lateral
+   y la barra superior los oculta comun.css
    ============================================================ */
 
 @media print {
@@ -176,9 +356,7 @@
     }
 
     .aviso,
-    .navegacion,
-    .bloque--demanda .controles,
-    .pie {
+    .bloque--demanda .controles {
         display: none !important;
     }
 
@@ -202,8 +380,10 @@
         fill: #000000;
     }
 
-    /* Sin esto el navegador quita los rellenos al imprimir y las barras salen en blanco */
-    .grafico-demanda__barra {
+    /* Sin esto el navegador quita los rellenos al imprimir y las barras y la tarjeta morada salen en blanco */
+    .grafico-demanda__barra,
+    .mirada,
+    .mirada__icono {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }

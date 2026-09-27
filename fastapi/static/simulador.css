@@ -1,21 +1,31 @@
 /* ============================================================
    Simulador de conversacion
-   Cliente a la derecha y sistema a la izquierda, como en un chat,
-   pero con lineas finas en vez de burbujas para no salir de la marca
+   La lista de conversaciones y el chat van en dos tarjetas. Los
+   globos son los mismos del chat del cliente: el sistema a la
+   izquierda y el cliente a la derecha
    ============================================================ */
+
+.bloque {
+    border-top: none;
+    padding: 0;
+}
 
 .simulador {
     display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 40px;
+    grid-template-columns: 280px minmax(0, 1fr);
+    align-items: start;
+    gap: 20px;
 }
 
 .simulador__lateral {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding-right: 24px;
-    border-right: 1px solid var(--color-linea);
+    gap: 12px;
+    padding: 18px;
+    background-color: var(--color-tarjeta);
+    border: 1px solid var(--color-linea);
+    border-radius: var(--radio-tarjeta);
+    box-shadow: var(--sombra-tarjeta);
 }
 
 /* En la columna angosta el campo no cabe con el ancho minimo que trae de comun.css */
@@ -27,13 +37,13 @@
 
 .simulador__nueva {
     width: 100%;
-    color: var(--color-acento);
-    background-color: transparent;
-    border: 2px solid var(--color-acento);
 }
 
 .simulador__lista {
     list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
     max-height: 480px;
     overflow-y: auto;
 }
@@ -41,24 +51,29 @@
 .simulador__item {
     display: block;
     width: 100%;
-    padding: 12px 14px;
+    padding: 10px 12px;
     text-align: left;
     font-family: var(--fuente);
     color: var(--color-texto);
     background-color: transparent;
     border: none;
-    border-bottom: 1px solid var(--color-linea);
-    border-left: 3px solid transparent;
+    border-radius: var(--radio-control);
     cursor: pointer;
+    transition: background-color 0.15s ease;
 }
 
 .simulador__item:hover {
-    border-left-color: var(--color-gris-claro);
+    background-color: var(--color-fondo-menu);
 }
 
 .simulador__item--activo,
 .simulador__item--activo:hover {
-    border-left-color: var(--color-acento);
+    background-color: var(--color-acento-claro);
+}
+
+.simulador__item:focus-visible {
+    outline: 3px solid var(--color-foco);
+    outline-offset: -3px;
 }
 
 .simulador__item:disabled {
@@ -68,8 +83,9 @@
 
 .simulador__nombre {
     display: block;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
+    color: var(--color-tinta);
 }
 
 .simulador__item--activo .simulador__nombre {
@@ -79,73 +95,91 @@
 .simulador__ultimo {
     display: block;
     margin-top: 2px;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--color-gris-medio);
 }
 
 /* min-width: 0 deja que la columna del chat se encoja en vez de desbordar la grid con mensajes largos */
 .simulador__chat {
     min-width: 0;
+    padding: 20px;
+    background-color: var(--color-tarjeta);
+    border: 1px solid var(--color-linea);
+    border-radius: var(--radio-tarjeta);
+    box-shadow: var(--sombra-tarjeta);
+}
+
+.simulador__chat .controles {
+    margin-bottom: 0;
 }
 
 .conversacion {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
     max-height: 480px;
     overflow-y: auto;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .mensaje {
     max-width: 75%;
-    padding: 10px 16px;
-    font-size: 15px;
-    line-height: 1.45;
-    white-space: pre-line;          /* respeta el salto entre la confirmacion y la respuesta */
+    padding: 10px 14px;
+    font-size: 14px;
+    line-height: 1.8;
+    white-space: pre-wrap;          /* respeta el salto entre la confirmacion y la respuesta */
     word-break: break-word;
 }
 
 .mensaje--cliente {
     align-self: flex-end;
-    text-align: right;
-    border-right: 3px solid var(--color-acento);
+    color: #4B3F7B;
+    background-color: #EEEBFB;
+    border: 1px solid #E7E1F7;
+    border-radius: 13px 2px 13px 13px;
 }
 
 .mensaje--sistema {
     align-self: flex-start;
-    border-left: 3px solid var(--color-gris-claro);
+    color: #57515E;
+    background-color: #F5F4F8;
+    border-radius: 2px 13px 13px 13px;
 }
 
 .mensaje--pendiente {
     align-self: flex-start;
     color: var(--color-gris-medio);
     font-style: italic;
+    background-color: #F5F4F8;
+    border-radius: 2px 13px 13px 13px;
 }
 
-/* Lo que le llega al asesor: aparte y en naranja para que no se confunda con la respuesta al cliente */
+/* Lo que le llega al asesor: en una caja punteada para que no se confunda con la respuesta al cliente */
 .mensaje--notificacion {
     align-self: flex-start;
-    font-size: 14px;
-    border-left: 3px solid var(--color-naranja);
-    background-color: #FFF6E8;
+    font-size: 13px;
+    line-height: 1.7;
+    background-color: var(--color-tarjeta);
+    border: 1px dashed var(--color-acento);
+    border-radius: var(--radio-control);
 }
 
 .mensaje__titulo {
     display: block;
-    margin-bottom: 6px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 1.2px;
     text-transform: uppercase;
-    color: var(--color-naranja);
+    color: var(--color-acento);
 }
 
 .mensaje--error {
     align-self: flex-start;
-    border-left: 3px solid var(--prioridad-critica);
     color: var(--prioridad-critica);
+    background-color: var(--prioridad-critica-fondo);
+    border-radius: 2px 13px 13px 13px;
 }
 
 /* ============================================================
@@ -155,15 +189,7 @@
 @media (max-width: 900px) {
     /* La lista pasa arriba del chat y se limita para que el chat siga a la vista */
     .simulador {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-
-    .simulador__lateral {
-        padding-right: 0;
-        padding-bottom: 16px;
-        border-right: none;
-        border-bottom: 1px solid var(--color-linea);
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .simulador__lista {
@@ -171,6 +197,13 @@
     }
 
     .mensaje {
-        max-width: 90%;
+        max-width: 86%;
+    }
+}
+
+@media (max-width: 640px) {
+    .simulador__lateral,
+    .simulador__chat {
+        padding: 16px;
     }
 }

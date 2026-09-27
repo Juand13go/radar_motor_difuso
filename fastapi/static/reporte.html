@@ -79,34 +79,83 @@
         <section class="bloque bloque--demanda">
             <div class="controles">
                 <div class="controles__fila">
-                    <button id="btnDemanda30" class="boton boton--periodo boton--periodo-activo">Últimos 30 días</button>
-                    <button id="btnDemanda7" class="boton boton--periodo">Últimos 7 días</button>
+                    <div class="control-periodo">
+                        <button id="btnDemanda30" class="boton boton--periodo boton--periodo-activo">Últimos 30 días</button>
+                        <button id="btnDemanda7" class="boton boton--periodo">Últimos 7 días</button>
+                    </div>
                     <button id="btnImprimirDemanda" class="boton boton--primario">Imprimir reporte</button>
                 </div>
             </div>
 
             <div id="contenedorResumenDemanda" class="franja-demanda"></div>
 
+            <!-- Cada bloque tiene los datos a la izquierda y a la derecha una lectura fija de lo que significan -->
             <div class="demanda">
                 <div class="demanda__bloque">
-                    <h4 class="demanda__titulo">Pidieron y no había</h4>
-                    <p class="demanda__ayuda">Productos del catálogo que se pidieron cuando no había existencias suficientes. El monto es lo que faltó, al precio del momento.</p>
-                    <div id="graficoNoCubierta" class="grafico-demanda"></div>
-                    <div id="contenedorNoCubierta"></div>
+                    <div class="tarjeta demanda__detalle">
+                        <h4 class="demanda__titulo">Pidieron y no había</h4>
+                        <p class="demanda__ayuda">Productos del catálogo que se pidieron cuando no había existencias suficientes. El monto es lo que faltó, al precio del momento.</p>
+                        <div id="graficoNoCubierta" class="grafico-demanda"></div>
+                        <div id="contenedorNoCubierta"></div>
+                    </div>
+
+                    <aside class="mirada">
+                        <span class="mirada__icono">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3l1.8 5.4a2 2 0 0 0 1.3 1.3L20.5 12l-5.4 1.8a2 2 0 0 0-1.3 1.3L12 20.5l-1.8-5.4a2 2 0 0 0-1.3-1.3L3.5 12l5.4-1.8a2 2 0 0 0 1.3-1.3z"/></svg>
+                        </span>
+                        <p class="mirada__ceja">Una mirada más clara</p>
+                        <h5 class="mirada__titulo">Aquí hay una oportunidad de reposición.</h5>
+                        <p class="mirada__texto">Son productos que los clientes pidieron cuando el inventario no alcanzaba. Cada peso de esta lista es una venta que se pudo perder.</p>
+                        <hr class="mirada__division">
+                        <p class="mirada__subtitulo">De la conversación a la decisión</p>
+                        <p class="mirada__texto">Revisa las referencias con más monto faltante antes de programar la próxima compra.</p>
+                        <p class="mirada__nota">
+                            <svg class="mirada__nota-icono" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            Este reporte muestra solicitudes por mensajería. No equivale a ventas ni a compras a proveedores.
+                        </p>
+                    </aside>
                 </div>
 
                 <div class="demanda__bloque">
-                    <h4 class="demanda__titulo">Piden y no maneja</h4>
-                    <p class="demanda__ayuda">Productos que los clientes pidieron y que no están en el catálogo. No tienen monto porque no hay precio.</p>
-                    <div id="graficoFueraCatalogo" class="grafico-demanda"></div>
-                    <div id="contenedorFueraCatalogo"></div>
+                    <div class="tarjeta demanda__detalle">
+                        <h4 class="demanda__titulo">Piden y no maneja</h4>
+                        <p class="demanda__ayuda">Productos que los clientes pidieron y que no están en el catálogo. No tienen monto porque no hay precio.</p>
+                        <div id="graficoFueraCatalogo" class="grafico-demanda"></div>
+                        <div id="contenedorFueraCatalogo"></div>
+                    </div>
+
+                    <aside class="mirada">
+                        <span class="mirada__icono">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3l1.8 5.4a2 2 0 0 0 1.3 1.3L20.5 12l-5.4 1.8a2 2 0 0 0-1.3 1.3L12 20.5l-1.8-5.4a2 2 0 0 0-1.3-1.3L3.5 12l5.4-1.8a2 2 0 0 0 1.3-1.3z"/></svg>
+                        </span>
+                        <p class="mirada__ceja">Una mirada más clara</p>
+                        <h5 class="mirada__titulo">Tus clientes te están dando nuevas ideas.</h5>
+                        <p class="mirada__texto">Son productos que buscaron y Tornalba no vende. El agente los guarda con un nombre genérico, así que los pedidos parecidos se agrupan.</p>
+                        <hr class="mirada__division">
+                        <p class="mirada__subtitulo">De la conversación a la decisión</p>
+                        <p class="mirada__texto">Valida si se repiten antes de ampliar el catálogo.</p>
+                    </aside>
                 </div>
 
                 <div class="demanda__bloque">
-                    <h4 class="demanda__titulo">Mercancía parada</h4>
-                    <p class="demanda__ayuda">Productos con existencias que nadie pidió en el periodo, con el capital que tienen inmovilizado.</p>
-                    <div id="graficoSobrestock" class="grafico-demanda"></div>
-                    <div id="contenedorSobrestock"></div>
+                    <div class="tarjeta demanda__detalle">
+                        <h4 class="demanda__titulo">Mercancía parada</h4>
+                        <p class="demanda__ayuda">Productos con existencias que nadie pidió en el periodo, con el capital que tienen inmovilizado.</p>
+                        <div id="graficoSobrestock" class="grafico-demanda"></div>
+                        <div id="contenedorSobrestock"></div>
+                    </div>
+
+                    <aside class="mirada">
+                        <span class="mirada__icono">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3l1.8 5.4a2 2 0 0 0 1.3 1.3L20.5 12l-5.4 1.8a2 2 0 0 0-1.3 1.3L12 20.5l-1.8-5.4a2 2 0 0 0-1.3-1.3L3.5 12l5.4-1.8a2 2 0 0 0 1.3-1.3z"/></svg>
+                        </span>
+                        <p class="mirada__ceja">Una mirada más clara</p>
+                        <h5 class="mirada__titulo">Dale una nueva oportunidad a este inventario.</h5>
+                        <p class="mirada__texto">Son productos con existencias que nadie pidió en el periodo. Es capital quieto en la bodega.</p>
+                        <hr class="mirada__division">
+                        <p class="mirada__subtitulo">De la conversación a la decisión</p>
+                        <p class="mirada__texto">Revísalos antes de reponerlos; pueden salir en una promoción o en un combo.</p>
+                    </aside>
                 </div>
             </div>
         </section>
