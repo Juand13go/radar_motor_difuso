@@ -81,7 +81,7 @@ def construir_items_para_guardar(items_extraidos: list, productos_por_id: dict):
         })
     return items
 
-def texto_estado_solicitud(ciudad: str, fecha_requerida: date, items: list):
+def texto_estado_solicitud(ciudad: str, fecha_requerida: date, items: list, escalado: bool = False):
     lineas = []
     if ciudad:
         lineas.append(f"Ciudad: {ciudad}")
@@ -95,6 +95,8 @@ def texto_estado_solicitud(ciudad: str, fecha_requerida: date, items: list):
                 lineas.append(f"- {item.get('descripcion')}, cantidad sin definir")
             else:
                 lineas.append(f"- {item.get('descripcion')}, cantidad {cantidad}")
+    if escalado:
+        lineas.append("Estado: la solicitud ya está asignada a un asesor")
     if not lineas:
         return "Sin solicitud abierta"
     return "\n".join(lineas)

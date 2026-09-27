@@ -42,10 +42,10 @@ def armar_respuesta_cliente(respuesta: str, escalado: bool, fallo_tecnico: bool,
 def estado_de_la_solicitud(id_conversacion: uuid.UUID, session: Session):
     lead = obtener_lead_abierto(id_conversacion=id_conversacion, session=session)
     if not lead:
-        return texto_estado_solicitud(ciudad=None, fecha_requerida=None, items=[])
+        return texto_estado_solicitud(ciudad=None, fecha_requerida=None, items=[], escalado=False)
     # texto_estado_solicitud trabaja con diccionarios y la base devuelve objetos items_solicitados
     items = [item.model_dump() for item in obtener_items_de_lead(id_lead=lead.id_lead, session=session)]
-    return texto_estado_solicitud(ciudad=lead.ciudad, fecha_requerida=lead.fecha_requerida, items=items)
+    return texto_estado_solicitud(ciudad=lead.ciudad, fecha_requerida=lead.fecha_requerida, items=items, escalado=lead.escalado)
 
 def ultimo_mensaje_asistente(id_conversacion: uuid.UUID, session: Session):
     historial = obtener_historial_conversacion(id_conversacion=id_conversacion, session=session)

@@ -255,6 +255,11 @@ Problema: en una prueba por WhatsApp el agente prometió que un asesor confirmar
 Solución: el agente ya no anuncia asesores. Lo que no puede confirmar lo dice así y le ofrece al cliente comunicarlo con uno; si el cliente acepta, queda registrado como solicitud del cliente. Se agregó que no cierra ventas y un bloque final de revisión antes de responder (sin IDs, sin promesas de asesor, sin pedir confirmación del pedido). Solo cambió prompts/agente.md.
 Terminada cuando: las tres situaciones de la prueba se repiten por el simulador y el agente ya no promete un asesor, no muestra IDs ni pide confirmar el pedido.
 
+### 9.7 Solicitud que ya tiene asesor
+Problema: después de la 9.6 el agente ofrece comunicar al cliente con un asesor cuando no puede confirmar algo, pero no sabía si la solicitud ya estaba escalada. A un cliente que ya tenía asesor asignado le volvía a ofrecer uno.
+Solución: el estado de la solicitud que recibe el agente agrega la línea "Estado: la solicitud ya está asignada a un asesor" cuando el lead abierto está escalado. Con esa línea el agente no ofrece otro asesor: dice que eso no lo puede confirmar por aquí y le recuerda al cliente que puede tratarlo con el asesor que ya tiene, sin decir cuándo lo va a contactar. Cambiaron texto_estado_solicitud (recibe escalado), estado_de_la_solicitud en mensajes.py y prompts/agente.md.
+Terminada cuando: en el simulador, después de una escalación, el cliente pregunta por un descuento y el agente no le ofrece comunicarlo con un asesor.
+
 ## Trabajo futuro
 
 No se construye antes de la feria. Los datos que necesita ya quedan guardados.
