@@ -88,6 +88,11 @@ body {
     background-color: var(--prioridad-baja);
 }
 
+.chat-cliente__nueva {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
 .chat-cliente__conversacion {
     flex: 1;
     list-style: none;
@@ -211,6 +216,11 @@ body {
 
     .chat-cliente__encabezado {
         padding: 14px 16px;
+    }
+
+    .chat-cliente__nueva {
+        padding: 8px 12px;
+        font-size: 13px;
     }
 
     .chat-cliente__conversacion {

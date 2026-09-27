@@ -4,6 +4,7 @@ const inputClienteTelefono = document.getElementById("inputClienteTelefono");
 const textoAutorizacionCliente = document.getElementById("textoAutorizacionCliente");
 const inputClienteTexto = document.getElementById("inputClienteTexto");
 const btnEnviarCliente = document.getElementById("btnEnviarCliente");
+const btnNuevaConversacionCliente = document.getElementById("btnNuevaConversacionCliente");
 
 const CLAVE_ID_CLIENTE = "radar_canal_user_id";
 const CLAVE_TELEFONO_CLIENTE = "radar_telefono";
@@ -157,6 +158,7 @@ function bloquearCliente(bloqueado) {
     esperandoRespuesta = bloqueado;
     inputClienteTexto.disabled = bloqueado;
     btnEnviarCliente.disabled = bloqueado;
+    btnNuevaConversacionCliente.disabled = bloqueado;
 }
 
 async function cargarHistorialCliente() {
@@ -219,6 +221,18 @@ async function enviarMensajeCliente() {
     renderizarMensajeCliente(resultado.respuesta_cliente, "sistema");
 }
 
+// En un dispositivo compartido cada visitante empieza su propia conversacion; la anterior sigue en la base
+function iniciarNuevaConversacionCliente() {
+    try {
+        localStorage.removeItem(CLAVE_ID_CLIENTE);
+        localStorage.removeItem(CLAVE_TELEFONO_CLIENTE);
+    } catch (error) {
+        console.warn("No se pudo borrar la conversación guardada del cliente", error);
+    }
+
+    location.reload();
+}
+
 // Llega desde el catalogo: se deja escrito para que el cliente lo complete, sin enviarlo
 function precargarMensajeDeUrl() {
     const url = new URL(window.location.href);
@@ -237,6 +251,7 @@ function precargarMensajeDeUrl() {
 
 function iniciarCliente() {
     btnEnviarCliente.addEventListener("click", enviarMensajeCliente);
+    btnNuevaConversacionCliente.addEventListener("click", iniciarNuevaConversacionCliente);
 
     inputClienteTexto.addEventListener("keydown", (evento) => {
         if (evento.key === "Enter") {

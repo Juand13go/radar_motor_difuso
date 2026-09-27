@@ -275,6 +275,11 @@ Problema: el cliente no sabía qué productos maneja Tornalba, y cuando pedía e
 Solución: GET /catalogo/productos, pública, devuelve el catálogo sin existencias ni id a partir de una función pura con sus pruebas (9.10a). La página /catalogo lo muestra por categoría, y cada producto abre el chat con el mensaje ya escrito, sin enviarlo (9.10b). El agente responde con el enlace y la documentación queda al día (9.10c). El enlace del chat al catálogo pasó a botón y el mensaje prellenado quedó como una pregunta completa (9.10d).
 Terminada cuando: al pedir el catálogo por cualquier canal el agente da el enlace, y desde la página se llega al chat con el producto escrito.
 
+### 9.11 Nueva conversación en el chat del cliente
+Problema: en un dispositivo compartido, como el del stand de la feria, cada visitante veía la conversación del anterior y la continuaba, así que su pedido quedaba en el lead de otra persona y con su celular.
+Solución: un botón Nueva conversación, igual al del simulador, que borra del navegador el uuid y el celular guardados y recarga el chat. Solo toca el frontend: la conversación anterior y su lead siguen en la base y en el panel.
+Terminada cuando: después de hacer clic, el chat aparece vacío, pide otra vez el celular, y la conversación anterior sigue visible en el panel.
+
 ## Trabajo futuro
 
 No se construye antes de la feria. Los datos que necesita ya quedan guardados.
