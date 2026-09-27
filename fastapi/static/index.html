@@ -6,7 +6,7 @@
     <title>Tornalba Suministros Técnicos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/comun.css">
     <link rel="stylesheet" href="/static/cliente.css">
     <script src="/static/comun.js" defer></script>
@@ -17,39 +17,40 @@
     <div id="aviso" class="aviso" role="status" aria-live="polite"></div>
 
     <!-- Barra superior: solo la distribuidora y sin navegacion, porque esta pagina es la que ve el cliente -->
-    <nav class="navbar">
-        <div class="encabezado">
-            <div class="encabezado__cliente">
-                <img src="/static/tornalba.png" alt="Tornalba Suministros Técnicos S.A.S." class="encabezado__logo-cliente">
-                <div>
-                    <p class="encabezado__nombre">Tornalba Suministros Técnicos S.A.S.</p>
-                    <p class="encabezado__bajada">Distribuidora de suministros industriales y ferretería técnica</p>
-                </div>
-            </div>
-        </div>
-        <div class="navbar__linea">
-            <hr>
-            <div class="puntos">
-                <span class="punto punto--claro"></span>
-                <span class="punto punto--medio"></span>
-                <span class="punto punto--oscuro"></span>
-            </div>
-        </div>
-    </nav>
+    <header class="barra-cliente">
+        <img src="/static/tornalba.png" alt="" class="barra-cliente__logo">
+        <p class="barra-cliente__nombre">Tornalba Suministros Técnicos S.A.S.</p>
+    </header>
 
-    <main class="contenido">
+    <main class="cliente">
+
+        <div class="cliente__cabecera">
+            <p class="ceja">Su conversación</p>
+            <h1 class="titulo-pagina">Hablemos<span class="punto-final">.</span></h1>
+            <p class="cliente__subtitulo">Cuéntenos qué necesita y le ayudamos con su solicitud.</p>
+        </div>
 
         <!-- Chat del cliente, solo con su propia conversacion -->
-        <section class="chat-cliente">
+        <section class="tarjeta chat-cliente">
+            <div class="chat-cliente__encabezado">
+                <span class="chat-cliente__avatar"><img src="/static/tornalba.png" alt=""></span>
+                <div>
+                    <p class="chat-cliente__asistente">Asistente Tornalba</p>
+                    <p class="chat-cliente__estado">En línea</p>
+                </div>
+            </div>
+
             <ul id="conversacionCliente" class="chat-cliente__conversacion"></ul>
 
             <div class="chat-cliente__controles">
                 <input type="text" id="inputClienteNombre" class="campo chat-cliente__campo" placeholder="Su nombre o el de su empresa (opcional)" maxlength="80" autocomplete="off" enterkeyhint="next">
                 <input type="tel" id="inputClienteTelefono" class="campo chat-cliente__campo" placeholder="Su celular (WhatsApp)" maxlength="20" inputmode="numeric" autocomplete="tel" enterkeyhint="next">
                 <p id="textoAutorizacionCliente" class="chat-cliente__autorizacion">Al enviar su mensaje autoriza a Tornalba Suministros Técnicos a contactarlo por WhatsApp sobre esta solicitud.</p>
-                <div class="chat-cliente__fila">
+                <div class="chat-cliente__compositor">
                     <input type="text" id="inputClienteTexto" class="campo chat-cliente__campo" placeholder="Escriba su mensaje" maxlength="1000" autocomplete="off" enterkeyhint="send">
-                    <button id="btnEnviarCliente" class="boton boton--primario">Enviar</button>
+                    <button id="btnEnviarCliente" class="boton boton--primario chat-cliente__enviar" aria-label="Enviar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                    </button>
                 </div>
             </div>
         </section>
@@ -57,10 +58,7 @@
     </main>
 
     <!-- Sin la marca de Halua: el cliente le compra a Tornalba y no le interesa quien hizo el software -->
-    <footer class="pie">
-        <small>Tornalba Suministros Técnicos S.A.S.</small>
-        <small>Medellín, Colombia</small>
-    </footer>
+    <footer class="pie-cliente">Tornalba Suministros Técnicos S.A.S. · Medellín, Colombia</footer>
 
 </body>
 </html>

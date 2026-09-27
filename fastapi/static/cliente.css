@@ -1,96 +1,270 @@
 /* ============================================================
    Chat del cliente
-   Pensado primero para el celular: una sola columna que ocupa
-   el ancho disponible, y en pantallas grandes queda centrada.
-   Misma linea visual del simulador, pero sin depender de simulador.css
+   La misma familia visual del backoffice, sin menu lateral. El
+   chat es una tarjeta centrada que ocupa al menos el alto de la
+   pantalla y crece con la conversacion
    ============================================================ */
 
-.chat-cliente {
-    max-width: 720px;
+/* La columna flex deja que la tarjeta del chat llene el alto que sobra entre la barra y el pie */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.barra-cliente {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 64px;
+    padding: 0 var(--margen-contenido);
+    background-color: var(--color-tarjeta);
+    border-bottom: 1px solid var(--color-linea);
+}
+
+.barra-cliente__logo {
+    display: block;
+    height: 40px;
+    width: auto;
+}
+
+.barra-cliente__nombre {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-tinta);
+}
+
+.cliente {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 908px;               /* 860px de tarjeta mas 24px de margen a cada lado */
     margin: 0 auto;
-    padding-top: 32px;
+    padding: 32px 24px 0;
+}
+
+.cliente__cabecera {
+    margin-bottom: 24px;
+}
+
+.cliente__subtitulo {
+    margin-top: 6px;
+    color: var(--color-gris-medio);
+}
+
+.chat-cliente {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-cliente__encabezado {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--color-linea);
+}
+
+.chat-cliente__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    padding: 5px;
+    background-color: var(--color-acento-claro);
+    border-radius: var(--radio-control);
+}
+
+/* El logo trae fondo casi blanco; multiply lo funde con el lila del recuadro */
+.chat-cliente__avatar img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    mix-blend-mode: multiply;
+}
+
+.chat-cliente__asistente {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-tinta);
+}
+
+.chat-cliente__estado {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    line-height: 1.3;
+    color: var(--color-gris-medio);
+}
+
+.chat-cliente__estado::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--prioridad-baja);
 }
 
 .chat-cliente__conversacion {
+    flex: 1;
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding-bottom: 24px;
+    gap: 12px;
+    padding: 20px;
 }
 
 .chat-cliente__mensaje {
     max-width: 80%;
-    padding: 10px 16px;
-    font-size: 16px;
-    line-height: 1.45;
-    white-space: pre-line;          /* respeta el salto entre la frase del asesor y la respuesta */
+    padding: 10px 14px;
+    font-size: 14px;
+    line-height: 1.8;
+    white-space: pre-wrap;          /* respeta el salto entre la frase del asesor y la respuesta */
     word-break: break-word;
 }
 
 .chat-cliente__mensaje--cliente {
     align-self: flex-end;
-    text-align: right;
-    border-right: 3px solid var(--color-acento);
+    color: #4B3F7B;
+    background-color: #EEEBFB;
+    border: 1px solid #E7E1F7;
+    border-radius: 13px 2px 13px 13px;
 }
 
 .chat-cliente__mensaje--sistema {
     align-self: flex-start;
-    border-left: 3px solid var(--color-gris-claro);
+    color: #57515E;
+    background-color: #F5F4F8;
+    border-radius: 2px 13px 13px 13px;
 }
 
 .chat-cliente__mensaje--pendiente {
     align-self: flex-start;
     color: var(--color-gris-medio);
     font-style: italic;
+    background-color: #F5F4F8;
+    border-radius: 2px 13px 13px 13px;
 }
 
 .chat-cliente__mensaje--error {
     align-self: flex-start;
-    border-left: 3px solid var(--prioridad-critica);
     color: var(--prioridad-critica);
+    background-color: var(--prioridad-critica-fondo);
+    border-radius: 2px 13px 13px 13px;
 }
 
-/* Pegados abajo mientras se lee una conversacion larga; el fondo tapa los mensajes que pasan por debajo */
+/* Pegados abajo mientras se lee una conversacion larga; el fondo tapa los mensajes que pasan por debajo.
+   Sin display en los campos ni en la autorizacion, porque cliente.js los oculta con hidden */
 .chat-cliente__controles {
     position: sticky;
     bottom: 0;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 12px 0 16px;
-    background-color: var(--color-fondo);
+    padding: 14px 20px 18px;
+    background-color: var(--color-tarjeta);
     border-top: 1px solid var(--color-linea);
+    border-radius: 0 0 var(--radio-tarjeta) var(--radio-tarjeta);
 }
 
-.chat-cliente__fila {
-    display: flex;
-    gap: 10px;
-}
-
-/* 16px evita que el celular haga zoom al tocar el campo, y sin el ancho minimo de comun.css no se desborda */
+/* Sin el ancho minimo de comun.css el campo no se desborda en el celular */
 .chat-cliente__campo {
-    flex: 1;
     min-width: 0;
-    font-size: 16px;
 }
 
 .chat-cliente__autorizacion {
-    font-size: 13px;
-    line-height: 1.4;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-gris-medio);
+}
+
+.chat-cliente__compositor {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px;
+    background-color: var(--color-tarjeta);
+    border: 1px solid #DED9E8;
+    border-radius: 11px;
+    transition: border-color 0.15s ease;
+}
+
+.chat-cliente__compositor:focus-within {
+    border-color: var(--color-acento);
+}
+
+/* El borde lo pone la caja del compositor, no el campo */
+.chat-cliente__compositor .campo {
+    flex: 1;
+    padding: 7px 8px;
+    border: none;
+    background-color: transparent;
+}
+
+.chat-cliente__enviar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+}
+
+.chat-cliente__enviar:disabled {
+    opacity: 1;
+    background-color: #E7E2F5;
+    border-color: #E7E2F5;
+}
+
+.pie-cliente {
+    padding: 20px 24px 28px;
+    text-align: center;
+    font-size: 12px;
     color: var(--color-gris-medio);
 }
 
 /* ============================================================
-   Pantallas angostas
+   Celular
    ============================================================ */
 
-@media (max-width: 900px) {
-    .chat-cliente {
-        padding-top: 24px;
+@media (max-width: 640px) {
+    .barra-cliente {
+        min-height: 56px;
+    }
+
+    .barra-cliente__logo {
+        height: 32px;
+    }
+
+    .cliente {
+        padding: 24px 16px 0;
+    }
+
+    .chat-cliente__encabezado {
+        padding: 14px 16px;
+    }
+
+    .chat-cliente__conversacion {
+        padding: 16px;
     }
 
     .chat-cliente__mensaje {
-        max-width: 90%;
+        max-width: 86%;
+    }
+
+    .chat-cliente__controles {
+        padding: 12px 14px 14px;
+    }
+
+    /* 16px evita que el celular haga zoom al tocar el campo */
+    .chat-cliente__campo {
+        font-size: 16px;
     }
 }
