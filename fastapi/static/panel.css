@@ -161,27 +161,10 @@
 /* ============================================================
    Semaforo de prioridad
    Se aplica a las tarjetas de la bandeja segun el nivel que
-   calculo el motor, junto con la insignia del mismo color
+   calculo el motor. La insignia del mismo color esta en comun.css
    ============================================================ */
 
 .prioridad-critica { border-left-color: var(--prioridad-critica) !important; }
 .prioridad-alta    { border-left-color: var(--prioridad-alta) !important; }
 .prioridad-media   { border-left-color: var(--prioridad-media) !important; }
 .prioridad-baja    { border-left-color: var(--prioridad-baja) !important; }
-
-.insignia {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    padding: 3px 10px;
-    border-radius: 999px;
-    color: #FFFFFF;
-}
-
-.insignia--critica { background-color: var(--prioridad-critica); }
-.insignia--alta    { background-color: var(--prioridad-alta); }
-.insignia--media   { background-color: var(--prioridad-media); color: var(--color-texto); }
-.insignia--baja    { background-color: var(--prioridad-baja); }
-.insignia--sin-clasificar { background-color: var(--color-gris-claro); color: var(--color-texto); }

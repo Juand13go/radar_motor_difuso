@@ -1,31 +1,52 @@
 /* ============================================================
-   Radar - Panel de asesores
-   Identidad visual tomada de la web de Halua Studio:
-   tipografia grande, mucho blanco y lineas finas. Sin cajas.
+   Radar - Base comun
+   Identidad visual de la propuesta del diseñador de Halua Studio:
+   fondo claro, tarjetas blancas con lineas finas y el violeta de
+   la marca como acento
    ============================================================ */
 
 :root {
+    --color-tinta: #303039;         /* titulos */
     --color-texto: #4C4C4C;         /* gris oscuro, el color principal de la marca */
     --color-acento: #4C3ACA;        /* violeta, el acento fuerte */
+    --color-acento-hover: #3E2CAF;
+    --color-acento-claro: #EEEBFC;  /* fondo de lo que esta activo */
     --color-naranja: #FF9E10;
     --color-cian: #18CFED;
-    --color-gris-medio: #999999;
-    --color-gris-claro: #CCCCCC;
-    --color-linea: #E5E5E5;
-    --color-fondo: #FFFFFF;
+    --color-gris-medio: #72727D;    /* texto apagado */
+    --color-gris-claro: #DFDDE6;
+    --color-linea: #E8E8EE;
+    --color-fondo: #FAFAFB;
+    --color-fondo-menu: #F5F5F8;
+    --color-tarjeta: #FFFFFF;
+    --color-borde-boton: #DFDDE6;
+    --color-borde-campo: #E7E1ED;
+    --color-foco: #9487E2;
 
-    /* Colores del semaforo de prioridad. No son de la marca: son
-       semanticos, y se leen igual que en un triaje medico */
-    --prioridad-critica: #E5484D;
-    --prioridad-alta: #FF9E10;
-    --prioridad-media: #F2C94C;
-    --prioridad-baja: #27AE60;
+    /* Semaforo de prioridad en chips suaves. El color base es el del
+       texto del chip y tambien el de los bordes y franjas; el fondo
+       es la version clara */
+    --prioridad-critica: #B54655;
+    --prioridad-critica-fondo: #FFF0F1;
+    --prioridad-alta: #A2630B;
+    --prioridad-alta-fondo: #FFF4DF;
+    --prioridad-media: #786444;
+    --prioridad-media-fondo: #F6F2E8;
+    --prioridad-baja: #407762;
+    --prioridad-baja-fondo: #EBF5EE;
 
     /* Si Inter no carga (por ejemplo en una demo sin internet)
        cae en la tipografia del sistema sin romper el diseno */
     --fuente: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
+    --radio-tarjeta: 14px;
+    --radio-control: 8px;
+    --sombra-tarjeta: 0 3px 14px rgba(48, 48, 57, 0.03);
+
     --margen-lateral: 60px;         /* el mismo margen que usa la web de Halua */
+    --ancho-menu: 248px;
+    --alto-barra: 72px;
+    --margen-contenido: 42px;
 }
 
 * {
@@ -38,6 +59,7 @@ body {
     font-family: var(--fuente);
     color: var(--color-texto);
     background-color: var(--color-fondo);
+    font-size: 14px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
 }
@@ -64,7 +86,7 @@ body {
     right: 0;
     z-index: 10;
     padding: 14px var(--margen-lateral);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     color: #FFFFFF;
     opacity: 0;
@@ -204,12 +226,234 @@ body {
 }
 
 /* ============================================================
+   Menu lateral del backoffice
+   Fijo a la izquierda; en celular pasa a ser una barra arriba
+   ============================================================ */
+
+.menu-lateral {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    width: var(--ancho-menu);
+    padding: 26px 18px 20px;
+    overflow-y: auto;
+    background-color: var(--color-fondo-menu);
+    border-right: 1px solid var(--color-linea);
+}
+
+.menu-lateral__marca {
+    padding: 0 8px;
+    font-size: 29px;
+    font-weight: 730;
+    line-height: 1.1;
+    letter-spacing: -1.1px;
+    color: var(--color-tinta);
+}
+
+.menu-lateral__espacio {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 24px;
+    padding: 10px;
+}
+
+.menu-lateral__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 37px;
+    height: 37px;
+    flex-shrink: 0;
+    padding: 4px;
+    background-color: var(--color-tarjeta);
+    border: 1px solid var(--color-linea);
+    border-radius: var(--radio-control);
+}
+
+.menu-lateral__logo img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.menu-lateral__empresa {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-tinta);
+}
+
+.menu-lateral__detalle {
+    font-size: 11px;
+    line-height: 1.3;
+    color: var(--color-gris-medio);
+}
+
+.menu-lateral__etiqueta {
+    margin: 28px 0 8px;
+    padding: 0 12px;
+    font-size: 9px;
+    font-weight: 650;
+    letter-spacing: 1.7px;
+    text-transform: uppercase;
+    color: var(--color-gris-medio);
+}
+
+.menu-lateral__navegacion {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.menu-lateral__enlace {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 44px;
+    padding: 0 12px;
+    border-radius: var(--radio-control);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-texto);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.menu-lateral__enlace:hover {
+    color: var(--color-acento);
+}
+
+.menu-lateral__enlace--activo {
+    font-weight: 600;
+    color: var(--color-acento);
+    background-color: var(--color-acento-claro);
+}
+
+.menu-lateral__enlace:focus-visible {
+    outline: 3px solid var(--color-foco);
+    outline-offset: 2px;
+}
+
+.menu-lateral__icono {
+    flex-shrink: 0;
+}
+
+/* margin-top auto lo empuja al fondo del menu */
+.menu-lateral__pie {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-linea);
+}
+
+.menu-lateral__firma {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 12px;
+    font-size: 11px;
+    color: var(--color-gris-medio);
+}
+
+.menu-lateral__logo-halua {
+    display: block;
+    height: 12px;
+    width: auto;
+}
+
+.menu-lateral__puntos {
+    display: flex;
+    gap: 4px;
+}
+
+.menu-lateral__punto {
+    display: block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.menu-lateral__punto--acento  { background-color: var(--color-acento); }
+.menu-lateral__punto--naranja { background-color: var(--color-naranja); }
+.menu-lateral__punto--cian    { background-color: var(--color-cian); }
+
+/* ============================================================
+   Barra superior y cabecera de pagina del backoffice
+   ============================================================ */
+
+.barra-superior {
+    display: flex;
+    align-items: center;
+    min-height: var(--alto-barra);
+    margin-left: var(--ancho-menu);
+    padding: 0 var(--margen-contenido);
+    background-color: var(--color-tarjeta);
+    border-bottom: 1px solid var(--color-linea);
+}
+
+.barra-superior__miga {
+    font-size: 13px;
+    color: var(--color-gris-medio);
+}
+
+.barra-superior__actual {
+    font-weight: 600;
+    color: var(--color-tinta);
+}
+
+.cabecera-pagina {
+    margin-bottom: 32px;
+}
+
+.ceja {
+    margin-bottom: 6px;
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 1.7px;
+    text-transform: uppercase;
+    color: var(--color-gris-medio);
+}
+
+.titulo-pagina {
+    font-size: 30px;
+    font-weight: 650;
+    line-height: 1.2;
+    letter-spacing: -1.1px;
+    color: var(--color-tinta);
+}
+
+.punto-final {
+    color: var(--color-acento);
+}
+
+.tarjeta {
+    background-color: var(--color-tarjeta);
+    border: 1px solid var(--color-linea);
+    border-radius: var(--radio-tarjeta);
+    box-shadow: var(--sombra-tarjeta);
+}
+
+/* ============================================================
    Contenido
    ============================================================ */
 
 .contenido {
     margin: 0 var(--margen-lateral);
     padding-bottom: 40px;
+}
+
+.contenido--backoffice {
+    margin: 0 0 0 var(--ancho-menu);
+    padding: var(--margen-contenido);
 }
 
 /* ============================================================
@@ -252,45 +496,64 @@ body {
     flex-wrap: wrap;
 }
 
-/* Campo sin caja: solo una linea abajo, en la logica de la marca */
 .campo {
     flex: 1;
     min-width: 260px;
     font-family: var(--fuente);
-    font-size: 15px;
+    font-size: 14px;
     color: var(--color-texto);
-    padding: 10px 2px;
-    border: none;
-    border-bottom: 2px solid var(--color-gris-claro);
-    background-color: transparent;
+    padding: 10px 12px;
+    border: 1px solid var(--color-borde-campo);
+    border-radius: var(--radio-control);
+    background-color: var(--color-tarjeta);
 }
 
 .campo:focus {
     outline: none;
-    border-bottom-color: var(--color-acento);
+    border-color: var(--color-acento);
 }
 
 .campo::placeholder {
     color: var(--color-gris-claro);
 }
 
+/* La base es el boton secundario: el enlace de WhatsApp y el de
+   nueva conversacion solo llevan la clase boton */
 .boton {
+    display: inline-block;
     font-family: var(--fuente);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
-    padding: 12px 28px;
-    border: none;
+    padding: 10px 20px;
+    color: var(--color-tinta);
+    text-decoration: none;
+    background-color: var(--color-tarjeta);
+    border: 1px solid var(--color-borde-boton);
+    border-radius: var(--radio-control);
     cursor: pointer;
-    transition: opacity 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .boton:hover {
-    opacity: 0.85;
+    color: var(--color-acento);
+    border-color: var(--color-acento);
+}
+
+.boton:focus-visible {
+    outline: 3px solid var(--color-foco);
+    outline-offset: 2px;
 }
 
 .boton--primario {
-    background-color: var(--color-acento);
     color: #FFFFFF;
+    background-color: var(--color-acento);
+    border-color: var(--color-acento);
+}
+
+.boton--primario:hover {
+    color: #FFFFFF;
+    background-color: var(--color-acento-hover);
+    border-color: var(--color-acento-hover);
 }
 
 .boton:disabled {
@@ -302,6 +565,38 @@ body {
 .bandeja__vacia {
     color: var(--color-gris-medio);
 }
+
+/* ============================================================
+   Semaforo de prioridad
+   Chip suave: el texto en el color del nivel sobre su fondo
+   claro, con un punto del mismo color antes del texto
+   ============================================================ */
+
+.insignia {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+
+.insignia::before {
+    content: "";
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: currentColor;
+}
+
+.insignia--critica { color: var(--prioridad-critica); background-color: var(--prioridad-critica-fondo); }
+.insignia--alta    { color: var(--prioridad-alta); background-color: var(--prioridad-alta-fondo); }
+.insignia--media   { color: var(--prioridad-media); background-color: var(--prioridad-media-fondo); }
+.insignia--baja    { color: var(--prioridad-baja); background-color: var(--prioridad-baja-fondo); }
+.insignia--sin-clasificar { color: var(--color-gris-medio); background-color: var(--color-fondo-menu); }
 
 /* ============================================================
    Pie con la grilla de circulos de la marca
@@ -363,5 +658,83 @@ body {
 
     .bloque__titulo {
         font-size: 22px;
+    }
+}
+
+/* En celular el menu lateral pasa a ser una barra arriba: la marca y
+   Salir en una fila y los enlaces debajo, desplazables de lado */
+@media (max-width: 640px) {
+    :root {
+        --margen-contenido: 16px;
+    }
+
+    .menu-lateral {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        width: auto;
+        padding: 14px 16px 10px;
+        overflow-y: visible;
+        border-right: none;
+        border-bottom: 1px solid var(--color-linea);
+    }
+
+    .menu-lateral__marca {
+        padding: 0;
+        font-size: 24px;
+    }
+
+    .menu-lateral__espacio,
+    .menu-lateral__etiqueta,
+    .menu-lateral__firma {
+        display: none;
+    }
+
+    .menu-lateral__pie {
+        order: 1;
+        margin: 0 0 0 auto;
+        padding: 0;
+        border-top: none;
+    }
+
+    .menu-lateral__navegacion {
+        order: 2;
+        flex-direction: row;
+        width: 100%;
+        margin-top: 10px;
+        overflow-x: auto;
+    }
+
+    .menu-lateral__enlace {
+        flex-shrink: 0;
+        height: 40px;
+    }
+
+    .barra-superior {
+        min-height: 48px;
+        margin-left: 0;
+    }
+
+    .contenido--backoffice {
+        margin-left: 0;
+        padding: 24px var(--margen-contenido);
+    }
+
+    .titulo-pagina {
+        font-size: 26px;
+    }
+}
+
+/* Al imprimir sale solo el contenido, sin la navegacion del backoffice */
+@media print {
+    .menu-lateral,
+    .barra-superior {
+        display: none !important;
+    }
+
+    .contenido--backoffice {
+        margin-left: 0;
+        padding: 0;
     }
 }
