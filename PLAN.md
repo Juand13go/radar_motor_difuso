@@ -272,7 +272,7 @@ Terminada cuando: al pedir el catálogo, el agente remite al impreso o al QR y p
 
 ### 9.10 Catálogo público
 Problema: el cliente no sabía qué productos maneja Tornalba, y cuando pedía el catálogo el agente no tenía cómo dárselo.
-Solución: GET /catalogo/productos, pública, devuelve el catálogo sin existencias ni id a partir de una función pura con sus pruebas (9.10a). La página /catalogo lo muestra por categoría, y cada producto abre el chat con el mensaje ya escrito, sin enviarlo (9.10b). El agente responde con el enlace y la documentación queda al día (9.10c).
+Solución: GET /catalogo/productos, pública, devuelve el catálogo sin existencias ni id a partir de una función pura con sus pruebas (9.10a). La página /catalogo lo muestra por categoría, y cada producto abre el chat con el mensaje ya escrito, sin enviarlo (9.10b). El agente responde con el enlace y la documentación queda al día (9.10c). El enlace del chat al catálogo pasó a botón y el mensaje prellenado quedó como una pregunta completa (9.10d).
 Terminada cuando: al pedir el catálogo por cualquier canal el agente da el enlace, y desde la página se llega al chat con el producto escrito.
 
 ## Trabajo futuro

@@ -17,7 +17,7 @@ function agruparPorCategoria(productos) {
 }
 
 function enlacePreguntar(producto) {
-    return `/?mensaje=${encodeURIComponent(`Me interesa el ${producto.nombre_producto} (${producto.referencia})`)}`;
+    return `/?mensaje=${encodeURIComponent(`Hola, me interesa el ${producto.nombre_producto} (${producto.referencia}). ¿Me pueden dar más información?`)}`;
 }
 
 function renderizarProducto(producto) {
