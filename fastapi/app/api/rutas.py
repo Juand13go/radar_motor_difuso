@@ -5,10 +5,11 @@ from app.servicio.leads import funcion_listado_asesores
 from app.servicio.leads import listar_leads_por_asesor, cambiar_estado_lead_para_cierre, listar_leads_sin_asignar, listar_evaluaciones_lead
 from app.servicio.mensajes import procesar_mensaje_entrante, procesar_mensaje_web
 from app.servicio.analitica import reporte_demanda
+from app.servicio.catalogo import catalogo_publico
 import uuid
 from app.api.schemas import MensajeRespuesta, LeadsPorAsesor, CerrarLeadSalida, CerrarLeadEntrada
 from app.api.schemas import MensajeEntranteEntrada, MensajeEntranteSalida, EvaluacionLeadSalida, DemandaSalida, ConversacionResumenSalida
-from app.api.schemas import ChatEntrada, ChatSalida, ChatHistorialEntrada, EntrarEntrada, SesionSalida
+from app.api.schemas import ChatEntrada, ChatSalida, ChatHistorialEntrada, EntrarEntrada, SesionSalida, ProductoCatalogoSalida
 from app.api.seguridad import verificar_admin, abrir_sesion, cerrar_sesion
 
 router_publico = APIRouter()
@@ -53,6 +54,10 @@ def chat(datos: ChatEntrada, session=Depends(get_session)):
 @router_publico.post('/chat/historial', response_model=list[MensajeRespuesta])
 def chat_historial(datos: ChatHistorialEntrada, session=Depends(get_session)):
     return obtener_mensajes_web(canal_user_id=datos.canal_user_id, session=session)
+
+@router_publico.get('/catalogo/productos', response_model=list[ProductoCatalogoSalida])
+def catalogo_productos(session=Depends(get_session)):
+    return catalogo_publico(session=session)
 
 @router_admin.get('/demanda', response_model=DemandaSalida)
 def demanda(dias: int = 30, session=Depends(get_session)):

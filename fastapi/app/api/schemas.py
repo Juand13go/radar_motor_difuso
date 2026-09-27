@@ -107,6 +107,14 @@ class SobrestockSalida(BaseModel):
     precio_unitario: float
     capital_inmovilizado: float
 
+# Sin existencias ni id_producto a proposito: aunque el servicio los devolviera, FastAPI los descarta al responder
+class ProductoCatalogoSalida(BaseModel):
+    referencia: str
+    nombre_producto: str
+    categoria: str
+    unidad: str
+    precio_unitario: float
+
 class DemandaSalida(BaseModel):
     inicio: date
     fin: date
