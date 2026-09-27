@@ -82,12 +82,13 @@ El Dockerfile construye el servicio de FastAPI.
 La estructura de este proyecto está guiada por 3 capas (Servicio, Persistencia y API), y las tres viven dentro de fastapi/app/. En la capa de servicio encuentras toda la
 lógica de la aplicación (en Python nativo): mensajes.py orquesta un mensaje entrante de principio a fin, agente.py tiene la comunicación con el modelo y su herramienta,
 leads.py arma las variables del motor y decide la escalación, analitica.py tiene las consultas de demanda, conversacion.py el manejo de conversaciones y mensajes,
-notificaciones.py la alerta por Telegram del canal web y voz.py la descarga y transcripción de las notas de voz. En la capa de persistencia encuentras todos los queries y la comunicación de la aplicación con la base de datos (repositorio.py); y finalmente tenemos la capa de
+notificaciones.py la alerta por Telegram del canal web, voz.py la descarga y transcripción de las notas de voz y catalogo.py arma el catálogo público. En la capa de persistencia encuentras todos los queries y la comunicación de la aplicación con la base de datos (repositorio.py); y finalmente tenemos la capa de
 API con todos los endpoints de FastAPI (rutas.py), los schemas de Pydantic (schemas.py) y la autenticación del backoffice (seguridad.py). Aparte de las tres capas está app/motor/, que es el motor de lógica difusa
 (pertenencia.py, inferencia.py, reglas.py y reglas.yaml) y no depende de nada de la aplicación. En esa misma carpeta app/ está excepciones.py, donde se definen las
 excepciones propias del dominio.
 Los endpoints públicos son /chat (un mensaje del chat web, con el canal fijo en el servidor), /chat/historial (la conversación de ese cliente, identificado por el
-uuid que guarda su navegador), /entrar y /salir (abren y cierran la sesión del administrador).
+uuid que guarda su navegador), /catalogo/productos (el catálogo sin existencias ni id, que es lo que muestra la página /catalogo), /entrar y /salir (abren y cierran
+la sesión del administrador).
 Los endpoints protegidos son /mensaje_entrante (recibe un mensaje de Telegram, de WhatsApp o del simulador y ejecuta todo el flujo), /listar_asesores, /leads_por_asesor (los leads
 asignados a un asesor, ordenados por prioridad), /leads_sin_asignar (las solicitudes que el sistema atendió sin escalar), /evaluaciones_lead (el historial de cómo fue
 cambiando la prioridad de un lead), /cerrar_lead (registra el cierre como venta o no venta), /demanda (el reporte del periodo), /conversaciones_simulador y
@@ -95,7 +96,7 @@ cambiando la prioridad de un lead), /cerrar_lead (registra el cierre como venta 
 En la raíz de fastapi/ están models.py (definición de las tablas con SQLModel), database.py (conexión a la BD), seed.py (inyección del catálogo desde productos.json y de
 los asesores desde asesores.json), semilla_historia.py (historia de ejemplo para el reporte), main.py (punto de entrada de la aplicación), la carpeta prompts/ con el
 prompt del agente por fuera del código, la carpeta alembic/ con las migraciones, la carpeta tests/ con las pruebas y la carpeta static/ con el frontend (index.html y cliente.js para el
-chat del cliente, entrar.html para la entrada al backoffice, panel.html, reporte.html y simulador.html, cada uno con su CSS y su JS, y comun.css y comun.js con lo que
+chat del cliente, catalogo.html, catalogo.css y catalogo.js para el catálogo público, entrar.html para la entrada al backoffice, panel.html, reporte.html y simulador.html, cada uno con su CSS y su JS, y comun.css y comun.js con lo que
 comparten).
 docker-compose.yml: Configuración del Docker y comandos de arranque y montaje de la BD (creación del esquema, inyección de datos a la BD (seed.py), arranque de la aplicación).
 Los volúmenes y la red están declarados con nombre explícito para que no dependan del nombre de la carpeta.
@@ -112,9 +113,10 @@ lean con escala. El reporte habla solo de lo que entra por mensajería: el siste
 
 ## Pruebas
 Las pruebas se corren dentro del contenedor de FastAPI, que es donde están fijadas las versiones, con "docker exec -w /app radar_fastapi python -m pytest".
-Son 213. Cubren el motor completo (funciones de pertenencia, operadores, activación de reglas, agregación, carga y validación del YAML, la evaluación con su explicación y
+Son 220. Cubren el motor completo (funciones de pertenencia, operadores, activación de reglas, agregación, carga y validación del YAML, la evaluación con su explicación y
 el comportamiento de las quince reglas reales de Tornalba), las funciones puras de la capa de servicio (las cuatro variables, la validación de lo que devuelve el modelo, la
-decisión de escalación, el texto de la alerta con el enlace de WhatsApp y la respuesta al cliente) y la firma de la sesión del administrador.
+decisión de escalación, el texto de la alerta con el enlace de WhatsApp, la respuesta al cliente y la función que arma el catálogo público) y la firma de la sesión del
+administrador.
 Las pruebas del motor se escribieron antes que las funciones, con los valores calculados a mano.
 
 ## Estado del proyecto

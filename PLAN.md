@@ -270,6 +270,11 @@ Problema: cuando el cliente pedía el catálogo, el agente decía que ya lo hab�
 Solución: el prompt dice que no envía archivos ni afirma haberlos enviado, y remite al catálogo impreso o al código QR de la feria.
 Terminada cuando: al pedir el catálogo, el agente remite al impreso o al QR y pregunta qué producto necesita.
 
+### 9.10 Catálogo público
+Problema: el cliente no sabía qué productos maneja Tornalba, y cuando pedía el catálogo el agente no tenía cómo dárselo.
+Solución: GET /catalogo/productos, pública, devuelve el catálogo sin existencias ni id a partir de una función pura con sus pruebas (9.10a). La página /catalogo lo muestra por categoría, y cada producto abre el chat con el mensaje ya escrito, sin enviarlo (9.10b). El agente responde con el enlace y la documentación queda al día (9.10c).
+Terminada cuando: al pedir el catálogo por cualquier canal el agente da el enlace, y desde la página se llega al chat con el producto escrito.
+
 ## Trabajo futuro
 
 No se construye antes de la feria. Los datos que necesita ya quedan guardados.
