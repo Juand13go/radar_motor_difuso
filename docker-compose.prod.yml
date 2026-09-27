@@ -1,0 +1,24 @@
+# Se aplica encima de docker-compose.yml: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+services:
+
+  fastapi:
+    command: sh -c "alembic upgrade head && python seed.py && uvicorn main:app --host 0.0.0.0 --port 8000"
+    ports: !reset [] # !reset borra lo que trae el archivo de desarrollo en vez de sumarle; todo el tráfico entra por el túnel
+    volumes: !reset [] # El código ya va dentro de la imagen por el COPY del Dockerfile
+
+  n8n:
+    ports: !reset []
+
+  cloudflared:
+    image: cloudflare/cloudflared:2026.8.2 # Fija por la misma razón que n8n
+    container_name: radar_cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN} # Los hostnames del túnel se configuran en el panel de Cloudflare, no acá
+    networks:
+      - radar_net
+    depends_on:
+      - fastapi
+      - n8n

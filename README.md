@@ -34,7 +34,7 @@ Docker (Herramienta esencial para mantenibilidad, una arquitectura limpia y para
 Migraciones con Alembic
 Schemas de Pydantic (Validación de los datos que entran y salen)
 SQLModel (ORM - Definición de las tablas y comunicación con PostgreSQL)
-Cloudfared (Proxy inverso para exponer n8n por HTTPS y recibir los webhooks de Telegram y de WhatsApp)
+Cloudfared (Proxy inverso para exponer n8n por HTTPS y recibir los webhooks de Telegram y de WhatsApp; en producción es un túnel con nombre fijo que corre como un contenedor más)
 Whisper en Groq (Transcripción de las notas de voz de Telegram; el modelo se define en la variable GROQ_MODELO_VOZ)
 Frontend (HTML, CSS y JS sin frameworks) separado en dos partes: la página del cliente, que solo tiene el chat, y el backoffice (panel de los asesores, reporte de demanda y
 simulador de conversaciones), protegido con usuario y clave
@@ -143,6 +143,17 @@ Aplicada de la Universidad EIA para la Cámara de Comercio Aburrá Sur.
 
 Las decisiones de diseño que se tomaron durante el desarrollo, con la razón de cada una,
 están en DECISIONES.md. El orden en que se construyó cada pieza está en PLAN.md.
+
+## Despliegue
+En producción se usa docker-compose.prod.yml aplicado encima de docker-compose.yml, que sigue siendo el de desarrollo. El archivo de producción solo trae las
+diferencias: FastAPI arranca sin recarga automática y sin montar la carpeta del código (el código ya va dentro de la imagen), ni FastAPI ni n8n exponen puertos, y se
+agrega un contenedor con el túnel de Cloudflare, por donde entra todo el tráfico.
+El túnel se crea en el panel de Cloudflare, con nombre fijo y dos hostnames públicos: radar.haluastudio.com hacia http://fastapi:8000 y n8n.haluastudio.com hacia
+http://n8n:5678 (son los nombres de los servicios dentro de la red de Docker). El panel entrega un token, que va en la variable CLOUDFLARE_TUNNEL_TOKEN del .env del
+servidor y nunca en el repositorio. En ese mismo .env, WEBHOOK_URL pasa a ser https://n8n.haluastudio.com.
+Para levantarlo se usa "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build".
+El firewall del servidor solo deja entrar SSH. No hace falta abrir ningún otro puerto porque la conexión del túnel sale desde el servidor hacia Cloudflare, y es
+Cloudflare quien le entrega por ahí las peticiones de los dos hostnames.
 
 ## Levantamiento
 La primera vez: 
