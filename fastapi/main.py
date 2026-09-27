@@ -23,6 +23,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 def index():
     return FileResponse("static/index.html")
 
+@app.get("/catalogo")
+def catalogo():
+    return FileResponse("static/catalogo.html")
+
 @app.get("/panel", dependencies=[Depends(verificar_pagina_admin)])
 def panel():
     return FileResponse("static/panel.html")

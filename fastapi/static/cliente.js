@@ -219,6 +219,22 @@ async function enviarMensajeCliente() {
     renderizarMensajeCliente(resultado.respuesta_cliente, "sistema");
 }
 
+// Llega desde el catalogo: se deja escrito para que el cliente lo complete, sin enviarlo
+function precargarMensajeDeUrl() {
+    const url = new URL(window.location.href);
+    const mensaje = url.searchParams.get("mensaje");
+
+    if (!mensaje) {
+        return;
+    }
+
+    // maxlength solo limita lo que se teclea; un texto mas largo haria que el backend respondiera 422
+    inputClienteTexto.value = mensaje.slice(0, inputClienteTexto.maxLength);
+    // Sin el parametro, recargar la pagina no vuelve a escribir el mensaje
+    url.searchParams.delete("mensaje");
+    history.replaceState(null, "", url);
+}
+
 function iniciarCliente() {
     btnEnviarCliente.addEventListener("click", enviarMensajeCliente);
 
@@ -245,6 +261,7 @@ function iniciarCliente() {
         ocultarCampoTelefono();
     }
 
+    precargarMensajeDeUrl();
     cargarHistorialCliente();
 }
 

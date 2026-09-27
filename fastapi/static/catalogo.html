@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo · Tornalba Suministros Técnicos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/comun.css">
+    <link rel="stylesheet" href="/static/catalogo.css">
+    <script src="/static/comun.js" defer></script>
+    <script src="/static/catalogo.js" defer></script>
+</head>
+<body>
+    <!-- Aviso de exito o error: arranca vacio y oculto, lo llena mostrarAviso en comun.js -->
+    <div id="aviso" class="aviso" role="status" aria-live="polite"></div>
+
+    <!-- La misma barra del chat: solo la distribuidora y sin navegacion del backoffice -->
+    <header class="barra-cliente">
+        <img src="/static/tornalba.png" alt="" class="barra-cliente__logo">
+        <p class="barra-cliente__nombre">Tornalba Suministros Técnicos S.A.S.</p>
+    </header>
+
+    <main class="catalogo">
+
+        <div class="catalogo__cabecera">
+            <p class="ceja">Catálogo</p>
+            <h1 class="titulo-pagina">Nuestros productos<span class="punto-final">.</span></h1>
+            <p class="cliente__subtitulo">Pregúntenos por cualquiera de ellos en el chat y le confirmamos precio y disponibilidad.</p>
+            <a href="/" class="boton boton--primario catalogo__ir-chat">Ir al chat</a>
+        </div>
+
+        <!-- Sin existencias: la disponibilidad se consulta en la conversacion. Lo llena catalogo.js -->
+        <div id="listaCatalogo" class="catalogo__lista"></div>
+
+        <p class="catalogo__cierre">¿No encuentra lo que busca? <a href="/" class="catalogo__enlace">Pregúntenos igual por el chat.</a></p>
+
+    </main>
+
+    <footer class="pie-cliente">Tornalba Suministros Técnicos S.A.S. · Medellín, Colombia</footer>
+
+</body>
+</html>

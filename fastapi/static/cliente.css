@@ -12,28 +12,6 @@ body {
     min-height: 100vh;
 }
 
-.barra-cliente {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-height: 64px;
-    padding: 0 var(--margen-contenido);
-    background-color: var(--color-tarjeta);
-    border-bottom: 1px solid var(--color-linea);
-}
-
-.barra-cliente__logo {
-    display: block;
-    height: 40px;
-    width: auto;
-}
-
-.barra-cliente__nombre {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--color-tinta);
-}
-
 .cliente {
     flex: 1;
     display: flex;
@@ -48,9 +26,21 @@ body {
     margin-bottom: 24px;
 }
 
-.cliente__subtitulo {
-    margin-top: 6px;
-    color: var(--color-gris-medio);
+.cliente__enlace-catalogo {
+    display: inline-block;
+    margin-top: 10px;
+    font-weight: 600;
+    color: var(--color-acento);
+    text-decoration: none;
+}
+
+.cliente__enlace-catalogo:hover {
+    text-decoration: underline;
+}
+
+.cliente__enlace-catalogo:focus-visible {
+    outline: 3px solid var(--color-foco);
+    outline-offset: 2px;
 }
 
 .chat-cliente {
@@ -223,26 +213,11 @@ body {
     border-color: #E7E2F5;
 }
 
-.pie-cliente {
-    padding: 20px 24px 28px;
-    text-align: center;
-    font-size: 12px;
-    color: var(--color-gris-medio);
-}
-
 /* ============================================================
    Celular
    ============================================================ */
 
 @media (max-width: 640px) {
-    .barra-cliente {
-        min-height: 56px;
-    }
-
-    .barra-cliente__logo {
-        height: 32px;
-    }
-
     .cliente {
         padding: 24px 16px 0;
     }
