@@ -250,6 +250,11 @@ Problema: el canal de WhatsApp de la 4.6 no se había hecho, y era la forma de m
 Solución: un flujo aparte en n8n (n8n/radar_whatsapp.json) con dos webhooks en /webhook/whatsapp: el GET responde la verificación de Meta si el verify token coincide, y el POST recibe los mensajes. Un condicional descarta los avisos de estado (enviado, entregado, leído), el flujo llama a /mensaje_entrante con canal whatsapp, responde con el nodo de WhatsApp y, si hubo escalación, manda la alerta al asesor por Telegram. Usa el número de prueba de Meta. FastAPI no cambió.
 Terminada cuando: un mensaje por WhatsApp recibe respuesta y, si escala, la alerta le llega al asesor por Telegram.
 
+### 9.6 Prompt del agente
+Problema: en una prueba por WhatsApp el agente prometió que un asesor confirmaría la disponibilidad sin que hubiera escalación, mostró el ID interno de un producto y le preguntó al cliente si deseaba confirmar, como si cerrara una venta. Lo primero venía del propio prompt, que en cuatro lugares le decía que respondiera que un asesor se lo confirma.
+Solución: el agente ya no anuncia asesores. Lo que no puede confirmar lo dice así y le ofrece al cliente comunicarlo con uno; si el cliente acepta, queda registrado como solicitud del cliente. Se agregó que no cierra ventas y un bloque final de revisión antes de responder (sin IDs, sin promesas de asesor, sin pedir confirmación del pedido). Solo cambió prompts/agente.md.
+Terminada cuando: las tres situaciones de la prueba se repiten por el simulador y el agente ya no promete un asesor, no muestra IDs ni pide confirmar el pedido.
+
 ## Trabajo futuro
 
 No se construye antes de la feria. Los datos que necesita ya quedan guardados.
