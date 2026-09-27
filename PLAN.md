@@ -260,6 +260,16 @@ Problema: después de la 9.6 el agente ofrece comunicar al cliente con un asesor
 Solución: el estado de la solicitud que recibe el agente agrega la línea "Estado: la solicitud ya está asignada a un asesor" cuando el lead abierto está escalado. Con esa línea el agente no ofrece otro asesor: dice que eso no lo puede confirmar por aquí y le recuerda al cliente que puede tratarlo con el asesor que ya tiene, sin decir cuándo lo va a contactar. Cambiaron texto_estado_solicitud (recibe escalado), estado_de_la_solicitud en mensajes.py y prompts/agente.md.
 Terminada cuando: en el simulador, después de una escalación, el cliente pregunta por un descuento y el agente no le ofrece comunicarlo con un asesor.
 
+### 9.8 Piel nueva
+Problema: el frontend se veía como un prototipo, y la feria es la primera vez que el sistema se muestra frente a clientes.
+Solución: una base visual nueva y un menú lateral en el backoffice (9.8a), el panel, el reporte y el simulador con esa base (9.8b), y el chat del cliente y la página de entrada con la misma identidad, retirando las reglas de estilo viejas (9.8c). Al lado de la marca va el logo de Tornalba.
+Terminada cuando: todas las páginas usan la misma base visual y no quedan reglas de estilo sin uso.
+
+### 9.9 El agente no envía el catálogo
+Problema: cuando el cliente pedía el catálogo, el agente decía que ya lo había enviado, aunque no puede enviar archivos.
+Solución: el prompt dice que no envía archivos ni afirma haberlos enviado, y remite al catálogo impreso o al código QR de la feria.
+Terminada cuando: al pedir el catálogo, el agente remite al impreso o al QR y pregunta qué producto necesita.
+
 ## Trabajo futuro
 
 No se construye antes de la feria. Los datos que necesita ya quedan guardados.
