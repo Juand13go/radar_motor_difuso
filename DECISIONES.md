@@ -124,6 +124,11 @@ En Colombia mucha gente le escribe a un negocio por nota de voz. El agente solo 
 El modelo de voz, igual que el del agente, está en una variable de entorno (GROQ_MODELO_VOZ). Transcribir una nota de voz de veinte segundos cuesta una fracción de peso.
 Si la nota no se puede descargar o transcribir, el cliente recibe un texto fijo que le pide escribirla, sin llamar al agente ni guardar nada. Los audios de más de 5 MB no se procesan.
 
+## WhatsApp entra por n8n, igual que Telegram
+Agregar WhatsApp era la prueba de que el canal es intercambiable, y lo fue: no se tocó una línea de FastAPI. El flujo nuevo de n8n recibe el mensaje, llama a /mensaje_entrante con canal whatsapp y el número del cliente como canal_user_id, le responde por WhatsApp y, si hubo escalación, le manda la alerta al asesor por Telegram, igual que el flujo de Telegram.
+Lo único propio del canal se queda en n8n. Meta verifica el webhook con una petición GET que trae un token acordado, y el flujo solo devuelve el challenge si ese token coincide. Además Meta avisa por el mismo webhook cuándo un mensaje fue enviado, entregado o leído, así que un condicional descarta todo lo que no sea un mensaje del cliente antes de llamar a FastAPI.
+Usé el número de prueba de Meta porque es gratis y no exige verificar el negocio. El costo es que solo le escribe a cinco destinatarios cargados de antemano, así que en la feria WhatsApp se muestra con esos números y Telegram y el chat web siguen siendo los canales abiertos. Las notas de voz por WhatsApp todavía no se transcriben: llegan sin texto y el cliente recibe la respuesta fija que le pide escribir.
+
 ## Deuda técnica y limitaciones conocidas
 La mayor parte de lo que estaba en esta lista en la versión clásica ya se resolvió: n8n está fijado en la versión 2.37.7, el prompt vive en prompts/agente.md, hay 213 pruebas automatizadas, lo que pide el cliente queda estructurado en items_solicitados, el asesor menos cargado sale de una sola consulta agrupada y el backoffice tiene autenticación. Lo que queda:
 catalogo_a_texto consulta la base y arma el texto del catálogo en cada mensaje, cuando se podría cachear; con cientos de referencias habría que pasar a búsqueda semántica.

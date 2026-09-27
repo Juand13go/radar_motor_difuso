@@ -1,7 +1,7 @@
 # RADAR
 Este sistema plantea la automatización de la atención y la clasificación de las solicitudes comerciales que le entran a una empresa por sus canales de mensajería.
-El flujo inicia con un mensaje del cliente por alguno de los canales de la empresa. Hoy son dos: Telegram (donde n8n recibe el mensaje, escrito o como nota de voz, y
-llama a un único endpoint de FastAPI) y el chat web de la empresa (que llama directo a FastAPI). En los dos casos toda la lógica vive en FastAPI. Ahí se guarda la conversación, el agente de IA lee el mensaje con el catálogo al frente y extrae lo que el cliente está pidiendo (los productos
+El flujo inicia con un mensaje del cliente por alguno de los canales de la empresa. Hoy son tres: Telegram (donde n8n recibe el mensaje, escrito o como nota de voz, y
+llama a un único endpoint de FastAPI), WhatsApp (que entra igual por n8n, con el número de prueba de Meta) y el chat web de la empresa (que llama directo a FastAPI). En los tres casos toda la lógica vive en FastAPI. Ahí se guarda la conversación, el agente de IA lee el mensaje con el catálogo al frente y extrae lo que el cliente está pidiendo (los productos
 con su cantidad, la ciudad y para cuándo lo necesita), y con esos datos el sistema arma la solicitud, la valora contra el catálogo y la pasa por un motor de lógica difusa
 que calcula su prioridad. Si esa prioridad alcanza el umbral, si el cliente pidió hablar con una persona o si el modelo falló, la solicitud se escala: se le asigna el
 asesor menos cargado y se le avisa por Telegram (si el cliente escribió por la web, la alerta trae su celular con un enlace de WhatsApp para contactarlo). Al cliente se
@@ -26,7 +26,7 @@ El motor es código puro: no importa FastAPI, ni la base de datos, ni el cliente
 
 ## Arquitectura
 PostgreSQL BD (Sistema gestor de datos, almacena conversaciones, mensajes, leads, ítems solicitados, evaluaciones del motor, asesores y el catálogo de productos)
-n8n (Automatización de flujos; acá queda solo como canal, recibe el mensaje de Telegram y llama al endpoint)
+n8n (Automatización de flujos; acá queda solo como canal, recibe los mensajes de Telegram y de WhatsApp, un flujo por canal, y llama al endpoint)
 FastAPI - Python (Framework - Usado para la lógica del proyecto y para orquestar todo el flujo de un mensaje)
 Motor de lógica difusa propio (Python puro, con sus reglas en un archivo YAML)
 Groq API (LLM, agente IA - con tool calling para extraer los datos de la solicitud; el modelo se define en la variable de entorno GROQ_MODEL y no está escrito dentro del código)
@@ -34,7 +34,7 @@ Docker (Herramienta esencial para mantenibilidad, una arquitectura limpia y para
 Migraciones con Alembic
 Schemas de Pydantic (Validación de los datos que entran y salen)
 SQLModel (ORM - Definición de las tablas y comunicación con PostgreSQL)
-Cloudfared (Proxy inverso para exponer n8n por HTTPS y recibir el webhook de Telegram)
+Cloudfared (Proxy inverso para exponer n8n por HTTPS y recibir los webhooks de Telegram y de WhatsApp)
 Whisper en Groq (Transcripción de las notas de voz de Telegram; el modelo se define en la variable GROQ_MODELO_VOZ)
 Frontend (HTML, CSS y JS sin frameworks) separado en dos partes: la página del cliente, que solo tiene el chat, y el backoffice (panel de los asesores, reporte de demanda y
 simulador de conversaciones), protegido con usuario y clave
@@ -43,7 +43,7 @@ pytest (Pruebas automatizadas del motor, de la lógica de servicio y de la sesi�
 ## Requisitos
 El sistema corre en Docker, esta tecnología se encarga de que el sistema funcione sin tener que instalar nada; las dependencias del proyecto están en el
 requirements.txt.
-Necesitas: Docker y Docker Compose, un bot de Telegram (creado con @BotFather) y una API Key de Groq.
+Necesitas: Docker y Docker Compose, un bot de Telegram (creado con @BotFather) y una API Key de Groq. El canal de WhatsApp es opcional y necesita una app de Meta con el número de prueba de WhatsApp Business.
 
 ## Configuración
 En la raíz del proyecto está el archivo .env.example con todas las variables que necesita el sistema, sin valores. Se copia como .env y se completa:
@@ -60,6 +60,9 @@ COMPOSE_PROJECT_NAME (Nombre del proyecto en Docker; fija los nombres de los vol
 El .env nunca se sube al repositorio, por eso existe el .env.example: documenta qué hace falta sin exponer los valores.
 El token del bot de Telegram se configura además como credencial dentro de n8n, y el usuario y la clave del backoffice como una credencial de autenticación básica
 en el nodo que llama a FastAPI.
+Para WhatsApp, el token de acceso de Meta se configura como la credencial de WhatsApp en n8n (el token temporal vence a las 24 horas; para dejarlo fijo se usa el token permanente de un System User).
+En el flujo de WhatsApp hay dos valores que se cambian a mano después de importarlo: el verify token en el nodo Validar token (debe ser el mismo que se escribe en Meta) y el identificador del número en el nodo Responder WhatsApp.
+En la configuración del webhook de la app de Meta va la URL de n8n terminada en /webhook/whatsapp, y la app se suscribe al campo messages.
 Después de cambiar cualquier variable del .env hay que recrear los contenedores con "docker compose up -d" (un restart no vuelve a leer el .env).
 
 ## Cómo levantar el entorno
@@ -67,8 +70,8 @@ Clonar el repositorio
 Crear el .env a partir del .env.example (ver sección de configuración)
 Para el proxy inverso con cloudfare: "cloudflared tunnel --url http://localhost:5678" (Recibirás una URL HTTPS como esta: "https://vitamin-barrier-odds-performing.trycloudflare.com", colócala en la variable WEBHOOK_URL del .env)
 docker compose up (al arrancar se ejecutan automáticamente las migraciones con Alembic y el seed.py que puebla el catálogo de productos y los asesores)
-Abrir n8n en la URL de cloudfare (HTTPS) e importar el archivo con el flujo (carpeta n8n/)
-Configurar en n8n la credencial de Telegram y la de autenticación básica (con ADMIN_USUARIO y ADMIN_CLAVE) en el nodo que llama a FastAPI, y activar el flujo
+Abrir n8n en la URL de cloudfare (HTTPS) e importar los flujos de la carpeta n8n/ (radar.json para Telegram y radar_whatsapp.json para WhatsApp)
+Configurar en n8n la credencial de Telegram, la de WhatsApp y la de autenticación básica (con ADMIN_USUARIO y ADMIN_CLAVE) en el nodo que llama a FastAPI, y activar los flujos
 El chat del cliente queda en http://localhost:8000/. El backoffice se abre entrando por http://localhost:8000/entrar con el usuario y la clave del .env, y desde ahí
 quedan el panel de los asesores (/panel), el reporte de demanda (/reporte), el simulador de conversaciones (/simulador) y la documentación interactiva de la API (/docs)
 Si quieres ver el reporte con datos, el script fastapi/semilla_historia.py carga unas semanas de solicitudes cerradas de ejemplo; se ejecuta con
@@ -85,7 +88,7 @@ API con todos los endpoints de FastAPI (rutas.py), los schemas de Pydantic (sche
 excepciones propias del dominio.
 Los endpoints públicos son /chat (un mensaje del chat web, con el canal fijo en el servidor), /chat/historial (la conversación de ese cliente, identificado por el
 uuid que guarda su navegador), /entrar y /salir (abren y cierran la sesión del administrador).
-Los endpoints protegidos son /mensaje_entrante (recibe un mensaje de Telegram o del simulador y ejecuta todo el flujo), /listar_asesores, /leads_por_asesor (los leads
+Los endpoints protegidos son /mensaje_entrante (recibe un mensaje de Telegram, de WhatsApp o del simulador y ejecuta todo el flujo), /listar_asesores, /leads_por_asesor (los leads
 asignados a un asesor, ordenados por prioridad), /leads_sin_asignar (las solicitudes que el sistema atendió sin escalar), /evaluaciones_lead (el historial de cómo fue
 cambiando la prioridad de un lead), /cerrar_lead (registra el cierre como venta o no venta), /demanda (el reporte del periodo), /conversaciones_simulador y
 /mensajes_simulador (la lista y el historial del simulador). Aceptan la cookie de sesión del administrador o, para n8n, autenticación básica.
@@ -133,7 +136,7 @@ decisión.
 
 En la última etapa el sistema se preparó para salir del computador de desarrollo: la página del cliente quedó separada del
 backoffice, el chat web pide el celular para que el asesor lo contacte por WhatsApp, el backoffice quedó detrás de una sesión de administrador, el bot entiende notas de
-voz y se corrigieron dos reglas del motor que diluían la prioridad. El detalle de cada pieza está en PLAN.md (fases 8 y 9).
+voz, WhatsApp quedó como tercer canal con el número de prueba de Meta y se corrigieron dos reglas del motor que diluían la prioridad. El detalle de cada pieza está en PLAN.md (fases 8 y 9).
 
 Este desarrollo es el entregable del diplomado en Inteligencia Artificial Avanzada y
 Aplicada de la Universidad EIA para la Cámara de Comercio Aburrá Sur.

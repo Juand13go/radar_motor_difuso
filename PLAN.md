@@ -221,6 +221,7 @@ Solución: autenticación básica con usuario y clave en ADMIN_USUARIO y ADMIN_C
 ### 8.9 Despliegue
 Problema: el sistema solo corre mientras el computador de Juan Diego está encendido, y la URL del túnel cambia en cada reinicio.
 Solución: servidor en Hetzner, dominio en Cloudflare y un túnel con nombre fijo. docker-compose de producción sin recarga automática, sin montar el código y sin exponer el puerto 8000.
+Incluye mover el webhook de Telegram y el de Meta al dominio fijo y cambiar el token temporal de WhatsApp por el permanente de un System User.
 Pendiente del pago del servidor y del dominio.
 
 ### 8.10 Sesión del administrador
@@ -244,6 +245,11 @@ Retiro de código sin uso (crear_lead, actualizar_estado_conversacion y la ruta 
 Problema: en Colombia la gente escribe mucho por nota de voz, y el sistema solo entendía texto.
 Solución: n8n manda el file_id de la nota de voz. FastAPI la descarga desde Telegram (máximo 5 MB), la transcribe con Whisper en Groq (modelo en GROQ_MODELO_VOZ) y sigue el flujo como si el cliente la hubiera escrito. Si no se puede transcribir, el cliente recibe un texto fijo que le pide escribirla.
 
+### 9.5 WhatsApp como tercer canal
+Problema: el canal de WhatsApp de la 4.6 no se había hecho, y era la forma de mostrar que el canal es intercambiable.
+Solución: un flujo aparte en n8n (n8n/radar_whatsapp.json) con dos webhooks en /webhook/whatsapp: el GET responde la verificación de Meta si el verify token coincide, y el POST recibe los mensajes. Un condicional descarta los avisos de estado (enviado, entregado, leído), el flujo llama a /mensaje_entrante con canal whatsapp, responde con el nodo de WhatsApp y, si hubo escalación, manda la alerta al asesor por Telegram. Usa el número de prueba de Meta. FastAPI no cambió.
+Terminada cuando: un mensaje por WhatsApp recibe respuesta y, si escala, la alerta le llega al asesor por Telegram.
+
 ## Trabajo futuro
 
 No se construye antes de la feria. Los datos que necesita ya quedan guardados.
@@ -262,7 +268,9 @@ Una herramienta de exploración de datos conectada a la base, para que el client
 
 Entorno de desarrollo local con las dependencias instaladas fuera de Docker, para correr las pruebas sin levantar los contenedores.
 
-Búsqueda semántica sobre el catálogo, calibración del motor con los cierres reales y otros canales como WhatsApp.
+Búsqueda semántica sobre el catálogo y calibración del motor con los cierres reales.
+
+WhatsApp con un número propio del negocio (verificación de Meta) y transcripción de sus notas de voz.
 
 Reintento de las alertas al asesor que fallan: hoy el lead queda escalado aunque Telegram no haya recibido la alerta.
 
@@ -281,6 +289,8 @@ Una alerta al asesor que falla (Telegram caído, token mal cargado) no se reinte
 Con audio en silencio o puro ruido, Whisper puede devolver frases que nadie dijo, y esas frases llegan al agente como si el cliente las hubiera escrito.
 
 La relación con el cliente se cuenta por conversación, así que en la web cada navegador es un cliente nuevo.
+
+WhatsApp corre con el número de prueba de Meta, que solo le escribe a cinco destinatarios cargados de antemano, y sus notas de voz reciben la respuesta fija de solo texto.
 
 Los archivos HTML del backoffice también se sirven desde /static sin clave. Salen vacíos, porque todos los datos vienen de la API y la API pide sesión.
 

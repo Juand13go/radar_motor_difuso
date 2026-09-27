@@ -36,7 +36,7 @@ Las excepciones propias del dominio viven en app/excepciones.py y sus manejadore
 
 ## Flujo de un mensaje
 
-Python es el orquestador. n8n deja de tener lógica de negocio: recibe el mensaje de Telegram, llama a un solo endpoint, le envía al cliente la respuesta, y si el endpoint devolvió una notificación se la envía al asesor. Nada más. El flujo de n8n lo arma Juan Diego a mano en la interfaz y lo exporta a n8n/; no edites ese JSON.
+Python es el orquestador. n8n deja de tener lógica de negocio: recibe el mensaje de Telegram o de WhatsApp (un flujo por canal), llama a un solo endpoint, le envía al cliente la respuesta, y si el endpoint devolvió una notificación se la envía al asesor por Telegram. Nada más. Los flujos de n8n los arma Juan Diego a mano en la interfaz y los exporta a n8n/ (radar.json para Telegram y radar_whatsapp.json para WhatsApp); no edites esos JSON.
 
 El endpoint es POST /mensaje_entrante. Recibe canal, canal_user_id, nombre (puede faltar) y texto. Devuelve respuesta_cliente y notificacion_asesor, que es nula cuando no hubo escalación en ese mensaje y, cuando la hubo, trae chat_id y texto. La ruta llama a una sola función de servicio en mensajes.py, que hace estos pasos en este orden.
 
@@ -55,6 +55,8 @@ Por último se guarda la respuesta con rol assistant y se devuelve la salida.
 Si el agente falla, no se evalúa el motor porque no hay datos. Si no había lead abierto se crea uno sin ítems, se escala con motivo fallo_tecnico, la notificación le avisa al asesor que revise la conversación, y el cliente recibe solo el texto fijo de fallo técnico, sin la frase de confirmación. Si ya había un lead abierto, sus ítems no se tocan. Los fallos transitorios del proveedor se siguen resolviendo con los reintentos del cliente, antes de llegar al except.
 
 Si el mensaje llega sin texto, se responde un texto fijo sin llamar al agente ni guardar nada. Si trae voz_file_id (nota de voz de Telegram), antes se descarga y se transcribe con Whisper, y la transcripción sigue el flujo como si el cliente la hubiera escrito; si no se puede transcribir, se responde otro texto fijo que le pide escribirla.
+
+El canal whatsapp llega por /mensaje_entrante como cualquier otro, con el número del cliente como canal_user_id. FastAPI no tiene código propio de WhatsApp: la verificación del webhook de Meta y el descarte de los avisos de estado viven en el flujo de n8n. Sus notas de voz llegan sin texto y reciben la respuesta fija.
 
 El canal web no pasa por n8n. Entra por POST /chat, que fija canal = "web" en el servicio, exige un teléfono celular colombiano y nunca devuelve notificacion_asesor al navegador. Si la conversación web escala, FastAPI le manda la alerta al asesor directo por Telegram (notificaciones.py). El canal_user_id del canal web es un uuid que funciona como llave de la conversación: viaja en el cuerpo, nunca en la URL, y no se escribe en los logs.
 
