@@ -61,6 +61,14 @@ def test_estado_con_ciudad_la_contiene():
 def test_estado_con_fecha_la_contiene_en_formato_iso():
     assert "2026-09-25" in texto_estado_solicitud(ciudad=None, fecha_requerida=date(2026, 9, 25), items=[])
 
+def test_estado_solicitud_escalada_dice_que_tiene_asesor():
+    items = [{"descripcion": "rotomartillo", "cantidad": 5}]
+    assert "Estado: la solicitud ya está asignada a un asesor" in texto_estado_solicitud(ciudad=None, fecha_requerida=None, items=items, escalado=True)
+
+def test_estado_solicitud_sin_escalar_no_menciona_asesor():
+    items = [{"descripcion": "rotomartillo", "cantidad": 5}]
+    assert "asignada a un asesor" not in texto_estado_solicitud(ciudad=None, fecha_requerida=None, items=items, escalado=False)
+
 def item(id_producto: int, cantidad: int, precio: Decimal):
     return {"id_producto": id_producto, "descripcion": "producto de prueba", "cantidad": cantidad, "precio_al_momento": precio, "existencias_al_momento": None}
 
