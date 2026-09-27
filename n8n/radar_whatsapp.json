@@ -1,0 +1,346 @@
+{
+  "name": "Radar WhatsApp",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2283be3e-e2ba-4700-b5dc-3161e61a778d",
+      "name": "Mensaje WhatsApp",
+      "webhookId": "bfa1e472-1b35-4692-9a27-774e7717f48f"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5a6a5cc2-c293-4d01-bfa9-bc1b75072670",
+              "leftValue": "={{ $json.body.entry[0].changes[0].value.messages ? 'si' : 'no' }}",
+              "rightValue": "si",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "be5f6e76-bdb7-4605-a5f8-9d2b6772c4d0",
+      "name": "Es mensaje"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "=1367791816409688",
+        "recipientPhoneNumber": "={{ $('Mensaje WhatsApp').item.json.body.entry[0].changes[0].value.messages[0].from }}",
+        "textBody": "={{ $('Radar (FastAPI)').item.json.respuesta_cliente }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "8978c259-105a-4050-a891-8d5e8ddd0732",
+      "name": "Responder WhatsApp",
+      "webhookId": "fafef578-10d9-499f-8cce-cf69f664af4a",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "pDUpyPtaKY2t64Fx",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fastapi:8000/mensaje_entrante",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ canal: 'whatsapp', canal_user_id: $json.body.entry[0].changes[0].value.messages[0].from, nombre: ($json.body.entry[0].changes[0].value.contacts ? $json.body.entry[0].changes[0].value.contacts[0].profile.name : null), texto: ($json.body.entry[0].changes[0].value.messages[0].text ? $json.body.entry[0].changes[0].value.messages[0].text.body : null) }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        -96
+      ],
+      "id": "d93fc487-6ae0-47f8-ae4b-ed9498317231",
+      "name": "Radar (FastAPI)",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "8S3Fu1o2sCT8tOaj",
+          "name": "Radar backoffice"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5a496485-8656-4108-a511-5d196c76aaf5",
+              "leftValue": "={{ $('Radar (FastAPI)').item.json.notificacion_asesor ? 'si' : 'no' }}",
+              "rightValue": "si",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        -96
+      ],
+      "id": "24e5eaba-c74f-4fc1-b2af-0767f9eca38b",
+      "name": "Hubo escalacion"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Radar (FastAPI)').item.json.notificacion_asesor.chat_id }}",
+        "text": "={{ $('Radar (FastAPI)').item.json.notificacion_asesor.texto }}",
+        "additionalFields": {
+          "appendAttribution": "={{ false }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1136,
+        -176
+      ],
+      "id": "3a216597-8941-4cd9-ba22-8576eb867de8",
+      "name": "Alerta al asesor",
+      "webhookId": "radar-alerta-asesor",
+      "credentials": {
+        "telegramApi": {
+          "id": "Hd8GAwym0jecDUxS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "whatsapp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        256,
+        208
+      ],
+      "id": "914540b4-8b23-4169-8191-30136cc9bee4",
+      "name": "Verificacion Meta",
+      "webhookId": "ba984603-04b4-43f7-b5dc-fc609f9142f4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6b69e2fa-6c51-4674-88f5-601c2a5b09b1",
+              "leftValue": "={{ $json.query['hub.verify_token'] }}",
+              "rightValue": "radar-tornalba-2026",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        480,
+        208
+      ],
+      "id": "fba29bc6-b909-469c-a1fd-e06972bd96f4",
+      "name": "Validar token"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $('Verificacion Meta').item.json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        704,
+        112
+      ],
+      "id": "f1e56f2a-5c14-42c0-9eb6-0bf6cccc87cb",
+      "name": "Devolver challenge"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "token invalido",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        704,
+        304
+      ],
+      "id": "1a2590d1-5497-431c-b5cb-0992cd42f60d",
+      "name": "Rechazar token"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Mensaje WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Es mensaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Es mensaje": {
+      "main": [
+        [
+          {
+            "node": "Radar (FastAPI)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Radar (FastAPI)": {
+      "main": [
+        [
+          {
+            "node": "Responder WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Responder WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Hubo escalacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hubo escalacion": {
+      "main": [
+        [
+          {
+            "node": "Alerta al asesor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificacion Meta": {
+      "main": [
+        [
+          {
+            "node": "Validar token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar token": {
+      "main": [
+        [
+          {
+            "node": "Devolver challenge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rechazar token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "06e5513e-4529-46fa-84a4-4cbd80a267f6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "12b512e7d0516be0d23252aa8806b4440928a64ebd849c639058d8c8f4c06606"
+  },
+  "nodeGroups": [],
+  "id": "v5IgjP4onAP11wO2",
+  "tags": []
+}
