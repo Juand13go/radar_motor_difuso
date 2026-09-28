@@ -285,6 +285,11 @@ Problema: el enlace para escribirle al cliente por WhatsApp se armaba con el cel
 Solución: al llegar un mensaje por WhatsApp, si el canal_user_id es un celular colombiano (57 y diez dígitos que empiezan por 3), esos diez dígitos se guardan como teléfono de la conversación. El resto del sistema ya los usaba. Un número extranjero queda sin enlace.
 Terminada cuando: un lead de WhatsApp muestra el botón Escribir por WhatsApp en el panel y el enlace en la alerta.
 
+### 9.13 El agente no remite a otros canales
+Problema: con la solicitud ya escalada, el cliente pidió de nuevo un asesor y el agente le recomendó comunicarse con un equipo de atención que no existe como canal aparte. El sistema no repite la frase de confirmación en un lead ya escalado, y el prompt no decía qué responder.
+Solución: el prompt dice que, si la solicitud ya tiene asesor, el agente le confirma al cliente que está en sus manos, y que nunca lo remite a otro canal, teléfono, correo, sede o equipo. También dice que cada respuesta se entrega siempre llamando a la herramienta registrar_solicitud y nunca con texto directo, porque con la regla anterior el modelo tendía a contestar sin la herramienta y el cliente recibía el texto de fallo técnico.
+Terminada cuando: en una conversación ya escalada, pedir un asesor recibe la confirmación de que ya está en manos de uno.
+
 ## Trabajo futuro
 
 No se construye antes de la feria. Los datos que necesita ya quedan guardados.
