@@ -290,6 +290,11 @@ Problema: con la solicitud ya escalada, el cliente pidió de nuevo un asesor y e
 Solución: el prompt dice que, si la solicitud ya tiene asesor, el agente le confirma al cliente que está en sus manos, y que nunca lo remite a otro canal, teléfono, correo, sede o equipo. También dice que cada respuesta se entrega siempre llamando a la herramienta registrar_solicitud y nunca con texto directo, porque con la regla anterior el modelo tendía a contestar sin la herramienta y el cliente recibía el texto de fallo técnico.
 Terminada cuando: en una conversación ya escalada, pedir un asesor recibe la confirmación de que ya está en manos de uno.
 
+### 9.14 La semana resuelta para el agente
+Problema: el prompt solo traía la fecha de hoy, y el modelo tenía que saber qué día de la semana era y contar. Un lunes, para el viernes quedaba registrado como martes o miércoles, y el motor veía un pedido más urgente de lo que era.
+Solución: Python le entrega al agente los próximos catorce días con su nombre, y el prompt le dice que busque el día en esa lista en lugar de calcularlo. Es la misma regla de todo el sistema: el modelo extrae y Python calcula.
+Terminada cuando: para el viernes queda registrado como el viernes correcto en la gran mayoría de las llamadas.
+
 ## Trabajo futuro
 
 No se construye antes de la feria. Los datos que necesita ya quedan guardados.

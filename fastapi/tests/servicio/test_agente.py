@@ -1,5 +1,5 @@
 from datetime import date
-from app.servicio.agente import validar_extraccion, TEXTO_FALLO_TECNICO
+from app.servicio.agente import validar_extraccion, TEXTO_FALLO_TECNICO, calendario_para_agente
 
 HOY = date(2026, 9, 18)
 IDS_VALIDOS = [1, 2, 3, 4, 5]
@@ -107,3 +107,15 @@ def test_id_producto_cero_es_fuera_de_catalogo_y_conserva_descripcion_y_cantidad
     extraccion = extraccion_completa()
     extraccion["items"] = [{"id_producto": 0, "descripcion": "hamburguesa", "cantidad": 1}]
     assert validar(extraccion)["items"] == [{"id_producto": None, "descripcion": "hamburguesa", "cantidad": 1}]
+
+def test_calendario_empieza_hoy_marcado():
+    assert calendario_para_agente(hoy=date(2026, 9, 28)).startswith("lunes 2026-09-28 (hoy)")
+
+def test_calendario_incluye_el_viernes_siguiente():
+    assert "viernes 2026-10-02" in calendario_para_agente(hoy=date(2026, 9, 28))
+
+def test_calendario_tiene_catorce_dias_y_termina_en_domingo():
+    assert calendario_para_agente(hoy=date(2026, 9, 28)).endswith("domingo 2026-10-11")
+
+def test_calendario_cruza_el_ano():
+    assert "viernes 2027-01-01" in calendario_para_agente(hoy=date(2026, 12, 30))

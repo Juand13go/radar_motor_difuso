@@ -2,7 +2,7 @@ from sqlmodel import Session
 from app.persistencia.repositorio import obtener_productos
 from app.servicio.conversacion import obtener_historial_conversacion
 from models import hoy_bogota
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from functools import lru_cache
 from openai import OpenAI, OpenAIError, BadRequestError
@@ -24,6 +24,9 @@ MODELO_AGENTE = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
 PROMPT_AGENTE = (Path(__file__).resolve().parents[2] / "prompts" / "agente.md").read_text(encoding="utf-8")
 
 TEXTO_FALLO_TECNICO = "Tuvimos un inconveniente técnico con nuestro sistema, pero su solicitud ya quedó registrada y un asesor lo va a contactar en breve."
+
+# Lista propia y no el locale, porque el contenedor no tiene por que estar en espanol
+DIAS_SEMANA = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
 
 HERRAMIENTA_AGENTE = {
     "type": "function",
@@ -65,7 +68,7 @@ HERRAMIENTA_AGENTE = {
                 },
                 "fecha_requerida": {
                     "type": ["string", "null"],
-                    "description": "Fecha para la que el cliente necesita los productos, en formato AAAA-MM-DD, calculada contra la fecha de hoy. Nula si el cliente no mencionó ninguna fecha ni plazo."
+                    "description": "Fecha para la que el cliente necesita los productos, en formato AAAA-MM-DD, tomada de la lista de días que trae el prompt. Nula si el cliente no mencionó ninguna fecha ni plazo."
                 },
                 "solicita_asesor": {
                     "type": "boolean",
@@ -83,8 +86,17 @@ def catalogo_a_texto(session: Session):
     catalogo_productos_variable = "\n".join(catalogo_productos)
     return catalogo_productos_variable
 
+def calendario_para_agente(hoy: date):
+    dias = []
+    for i in range(14):
+        dia = hoy + timedelta(days=i)
+        dias.append(f"{DIAS_SEMANA[dia.weekday()]} {dia.isoformat()}")
+    dias[0] += " (hoy)"
+    return ", ".join(dias)
+
 def armar_prompt_agente(catalogo: str, estado_solicitud: str):
-    return PROMPT_AGENTE.format(fecha_actual=hoy_bogota().isoformat(), catalogo=catalogo, estado_solicitud=estado_solicitud)
+    hoy = hoy_bogota()
+    return PROMPT_AGENTE.format(fecha_actual=hoy.isoformat(), calendario=calendario_para_agente(hoy=hoy), catalogo=catalogo, estado_solicitud=estado_solicitud)
 
 def convertir_fecha(texto: str):
     # strptime acepta meses y dias de un digito, por eso se exige el largo exacto de AAAA-MM-DD
