@@ -56,7 +56,7 @@ Si el agente falla, no se evalúa el motor porque no hay datos. Si no había lea
 
 Si el mensaje llega sin texto, se responde un texto fijo sin llamar al agente ni guardar nada. Si trae voz_file_id (nota de voz de Telegram), antes se descarga y se transcribe con Whisper, y la transcripción sigue el flujo como si el cliente la hubiera escrito; si no se puede transcribir, se responde otro texto fijo que le pide escribirla.
 
-El canal whatsapp llega por /mensaje_entrante como cualquier otro, con el número del cliente como canal_user_id. FastAPI no tiene código propio de WhatsApp: la verificación del webhook de Meta y el descarte de los avisos de estado viven en el flujo de n8n. Sus notas de voz llegan sin texto y reciben la respuesta fija.
+El canal whatsapp llega por /mensaje_entrante como cualquier otro, con el número del cliente como canal_user_id. Si ese canal_user_id es un celular colombiano, sus diez dígitos se guardan también en conversaciones.telefono para el enlace de WhatsApp. Lo único propio de WhatsApp en FastAPI es esa conversión del número: la verificación del webhook de Meta y el descarte de los avisos de estado viven en el flujo de n8n. Sus notas de voz llegan sin texto y reciben la respuesta fija.
 
 El canal web no pasa por n8n. Entra por POST /chat, que fija canal = "web" en el servicio, exige un teléfono celular colombiano y nunca devuelve notificacion_asesor al navegador. Si la conversación web escala, FastAPI le manda la alerta al asesor directo por Telegram (notificaciones.py). El canal_user_id del canal web es un uuid que funciona como llave de la conversación: viaja en el cuerpo, nunca en la URL, y no se escribe en los logs.
 

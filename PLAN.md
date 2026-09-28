@@ -222,7 +222,7 @@ Solución: autenticación básica con usuario y clave en ADMIN_USUARIO y ADMIN_C
 Problema: el sistema solo corre mientras el computador de Juan Diego está encendido, y la URL del túnel cambia en cada reinicio.
 Solución: servidor en Hetzner, dominio en Cloudflare y un túnel con nombre fijo. docker-compose de producción sin recarga automática, sin montar el código y sin exponer el puerto 8000.
 Incluye mover el webhook de Telegram y el de Meta al dominio fijo y cambiar el token temporal de WhatsApp por el permanente de un System User.
-Pendiente del pago del servidor y del dominio.
+Hecho: servidor CPX22 de Hetzner en Nuremberg (el CX23 no estaba disponible), dominio haluastudio.com en Cloudflare, túnel con nombre hacia radar.haluastudio.com y n8n.haluastudio.com, docker-compose.prod.yml (8.9a), firewall que solo deja entrar SSH con llave, webhooks de Telegram y de Meta apuntando al dominio fijo y token permanente de un System User para WhatsApp.
 
 ### 8.10 Sesión del administrador
 Problema: la ventana de usuario y clave que dibuja el navegador con la autenticación básica no se puede estilizar y da impresión de producto sin terminar.
@@ -279,6 +279,11 @@ Terminada cuando: al pedir el catálogo por cualquier canal el agente da el enla
 Problema: en un dispositivo compartido, como el del stand de la feria, cada visitante veía la conversación del anterior y la continuaba, así que su pedido quedaba en el lead de otra persona y con su celular.
 Solución: un botón Nueva conversación, igual al del simulador, que borra del navegador el uuid y el celular guardados y recarga el chat. Solo toca el frontend: la conversación anterior y su lead siguen en la base y en el panel.
 Terminada cuando: después de hacer clic, el chat aparece vacío, pide otra vez el celular, y la conversación anterior sigue visible en el panel.
+
+### 9.12 Celular de los clientes de WhatsApp
+Problema: el enlace para escribirle al cliente por WhatsApp se armaba con el celular que se escribe en el chat web, y en el canal whatsapp el número llega como canal_user_id, así que esos leads no tenían enlace ni en el panel ni en la alerta.
+Solución: al llegar un mensaje por WhatsApp, si el canal_user_id es un celular colombiano (57 y diez dígitos que empiezan por 3), esos diez dígitos se guardan como teléfono de la conversación. El resto del sistema ya los usaba. Un número extranjero queda sin enlace.
+Terminada cuando: un lead de WhatsApp muestra el botón Escribir por WhatsApp en el panel y el enlace en la alerta.
 
 ## Trabajo futuro
 

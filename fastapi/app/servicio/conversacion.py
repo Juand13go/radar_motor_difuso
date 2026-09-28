@@ -3,9 +3,17 @@ from app.persistencia.repositorio import creacion_conversacion, verificacion_exi
 from app.persistencia.repositorio import obtener_conversacion_por_id, conversaciones_por_canal, mensajes_de_conversacion, completar_telefono_conversacion
 from app.excepciones import ConversacionNoEncontrada
 import uuid
+import re
 
 CANAL_SIMULADOR = "simulador"
 CANAL_WEB = "web"
+CANAL_WHATSAPP = "whatsapp"
+
+def telefono_desde_whatsapp(canal_user_id: str):
+    coincidencia = re.fullmatch(r"57(3[0-9]{9})", canal_user_id)
+    if not coincidencia:
+        return None
+    return coincidencia.group(1)
 
 def obtener_o_crear_conversacion(canal_user_id: str, canal: str, nombre: str, session: Session, telefono: str = None):
     conversacion = verificacion_existencia_conversacion(canal=canal, canal_user_id=canal_user_id, session=session)

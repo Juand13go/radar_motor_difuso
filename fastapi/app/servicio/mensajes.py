@@ -1,6 +1,7 @@
 from sqlmodel import Session
 from app.persistencia.repositorio import obtener_lead_abierto, obtener_items_de_lead
 from app.servicio.conversacion import obtener_o_crear_conversacion, guardado_mensajes, obtener_historial_conversacion, CANAL_WEB
+from app.servicio.conversacion import CANAL_WHATSAPP, telefono_desde_whatsapp
 from app.servicio.agente import comunicacion_agente, TEXTO_FALLO_TECNICO
 from app.servicio.leads import texto_estado_solicitud, registrar_solicitud, evaluar_y_escalar, frase_confirmacion_cliente
 from app.servicio.notificaciones import enviar_alerta_telegram
@@ -61,6 +62,8 @@ def procesar_mensaje_entrante(canal: str, canal_user_id: str, nombre: Optional[s
         logger.info(f"Mensaje sin texto legible por el canal {canal}, se respondió el texto fijo")
         return {"respuesta_cliente": respuesta_sin_contenido(hubo_voz=bool(voz_file_id)), "notificacion_asesor": None, "id_conversacion": None}
 
+    if canal == CANAL_WHATSAPP and not telefono:
+        telefono = telefono_desde_whatsapp(canal_user_id=canal_user_id)
     conversacion = obtener_o_crear_conversacion(canal_user_id=canal_user_id, canal=canal, nombre=nombre, session=session, telefono=telefono)
     mensaje_cliente = guardado_mensajes(id_conversacion=conversacion.id_conversacion, rol="user", contenido=texto_cliente, session=session)
 
