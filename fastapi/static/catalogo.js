@@ -1,5 +1,15 @@
 const listaCatalogo = document.getElementById("listaCatalogo");
 
+const ICONOS_CATEGORIA = {
+    "Abrasivos y corte": "abrasivos-y-corte.svg",
+    "Fijación y tornillería": "fijacion-y-tornilleria.svg",
+    "Herramienta eléctrica": "herramienta-electrica.svg",
+    "Herramienta manual y medición": "herramienta-manual-y-medicion.svg",
+    "Material eléctrico": "material-electrico.svg",
+    "Protección personal": "proteccion-personal.svg",
+    "Soldadura": "soldadura.svg"
+};
+
 async function solicitarProductos() {
     return llamarBackend('/catalogo/productos', "No se pudo cargar el catálogo. Intente de nuevo en un momento.");
 }
@@ -40,6 +50,21 @@ function renderizarProducto(producto) {
     preguntar.className = "catalogo__preguntar";
     preguntar.href = enlacePreguntar(producto);
     preguntar.textContent = "Preguntar por este producto";
+
+    const archivoIcono = ICONOS_CATEGORIA[producto.categoria];
+    if (archivoIcono) {
+        const icono = document.createElement("span");
+        icono.className = "catalogo__icono";
+
+        const imagen = document.createElement("img");
+        imagen.src = "/static/categorias/" + archivoIcono;
+        imagen.alt = "";
+        imagen.width = 28;
+        imagen.height = 28;
+
+        icono.appendChild(imagen);
+        li.appendChild(icono);
+    }
 
     li.append(nombre, detalle, precio, preguntar);
     return li;

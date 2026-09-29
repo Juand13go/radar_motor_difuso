@@ -96,7 +96,7 @@ cambiando la prioridad de un lead), /cerrar_lead (registra el cierre como venta 
 En la raíz de fastapi/ están models.py (definición de las tablas con SQLModel), database.py (conexión a la BD), seed.py (inyección del catálogo desde productos.json y de
 los asesores desde asesores.json), semilla_historia.py (historia de ejemplo para el reporte), main.py (punto de entrada de la aplicación), la carpeta prompts/ con el
 prompt del agente por fuera del código, la carpeta alembic/ con las migraciones, la carpeta tests/ con las pruebas y la carpeta static/ con el frontend (index.html y cliente.js para el
-chat del cliente, catalogo.html, catalogo.css y catalogo.js para el catálogo público, entrar.html para la entrada al backoffice, panel.html, reporte.html y simulador.html, cada uno con su CSS y su JS, y comun.css y comun.js con lo que
+chat del cliente, catalogo.html, catalogo.css y catalogo.js para el catálogo público, la carpeta categorias/ con los íconos del catálogo, entrar.html para la entrada al backoffice, panel.html, reporte.html y simulador.html, cada uno con su CSS y su JS, y comun.css y comun.js con lo que
 comparten).
 docker-compose.yml: Configuración del Docker y comandos de arranque y montaje de la BD (creación del esquema, inyección de datos a la BD (seed.py), arranque de la aplicación).
 Los volúmenes y la red están declarados con nombre explícito para que no dependan del nombre de la carpeta.

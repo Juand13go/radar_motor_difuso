@@ -295,6 +295,11 @@ Problema: el prompt solo traía la fecha de hoy, y el modelo tenía que saber qu
 Solución: Python le entrega al agente los próximos catorce días con su nombre, y el prompt le dice que busque el día en esa lista en lugar de calcularlo. Es la misma regla de todo el sistema: el modelo extrae y Python calcula.
 Terminada cuando: para el viernes queda registrado como el viernes correcto en la gran mayoría de las llamadas.
 
+### 9.15 Íconos del catálogo
+Problema: el catálogo público era solo texto y costaba recorrerlo de un vistazo.
+Solución: siete íconos SVG propios, uno por categoría, en static/categorias/, con el violeta de la marca sobre el fondo lila del sistema. Cada tarjeta muestra el de su categoría. No se tocó la base de datos ni la API: el JavaScript mapea la categoría al archivo, y una categoría sin ícono simplemente no lo muestra.
+Terminada cuando: las 40 tarjetas muestran el ícono de su categoría y la página sigue viéndose bien en el celular.
+
 ## Trabajo futuro
 
 No se construye antes de la feria. Los datos que necesita ya quedan guardados.
