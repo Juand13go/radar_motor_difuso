@@ -1,7 +1,7 @@
 /* ============================================================
    Entrada al backoffice
    Sin menu lateral porque todavia no hay sesion: una tarjeta
-   centrada con la marca de Radar y la firma de Halua debajo
+   centrada con la marca de Radar y su firma debajo
    ============================================================ */
 
 .entrar {
@@ -100,36 +100,9 @@
    ============================================================ */
 
 .firma-entrar {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
     font-size: 11px;
     color: var(--color-gris-medio);
 }
-
-.firma-entrar__logo {
-    display: block;
-    height: 12px;
-    width: auto;
-}
-
-.firma-entrar__puntos {
-    display: flex;
-    gap: 4px;
-}
-
-.firma-entrar__punto {
-    display: block;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-}
-
-.firma-entrar__punto--acento  { background-color: var(--color-acento); }
-.firma-entrar__punto--naranja { background-color: var(--color-naranja); }
-.firma-entrar__punto--cian    { background-color: var(--color-cian); }
 
 /* ============================================================
    Celular

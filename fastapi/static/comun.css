@@ -11,8 +11,6 @@
     --color-acento: #4C3ACA;        /* violeta, el acento fuerte */
     --color-acento-hover: #3E2CAF;
     --color-acento-claro: #EEEBFC;  /* fondo de lo que esta activo */
-    --color-naranja: #FF9E10;
-    --color-cian: #18CFED;
     --color-gris-medio: #72727D;    /* texto apagado */
     --color-gris-claro: #DFDDE6;
     --color-linea: #E8E8EE;
@@ -199,36 +197,10 @@ body {
 }
 
 .menu-lateral__firma {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
     padding: 0 12px;
     font-size: 11px;
     color: var(--color-gris-medio);
 }
-
-.menu-lateral__logo-halua {
-    display: block;
-    height: 12px;
-    width: auto;
-}
-
-.menu-lateral__puntos {
-    display: flex;
-    gap: 4px;
-}
-
-.menu-lateral__punto {
-    display: block;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-}
-
-.menu-lateral__punto--acento  { background-color: var(--color-acento); }
-.menu-lateral__punto--naranja { background-color: var(--color-naranja); }
-.menu-lateral__punto--cian    { background-color: var(--color-cian); }
 
 /* ============================================================
    Barra superior y cabecera de pagina del backoffice
