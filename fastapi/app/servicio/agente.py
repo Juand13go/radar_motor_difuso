@@ -88,7 +88,7 @@ def catalogo_a_texto(session: Session):
 
 def calendario_para_agente(hoy: date):
     dias = []
-    for i in range(14):
+    for i in range(45):
         dia = hoy + timedelta(days=i)
         dias.append(f"{DIAS_SEMANA[dia.weekday()]} {dia.isoformat()}")
     dias[0] += " (hoy)"

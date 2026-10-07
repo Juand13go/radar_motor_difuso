@@ -114,8 +114,8 @@ def test_calendario_empieza_hoy_marcado():
 def test_calendario_incluye_el_viernes_siguiente():
     assert "viernes 2026-10-02" in calendario_para_agente(hoy=date(2026, 9, 28))
 
-def test_calendario_tiene_catorce_dias_y_termina_en_domingo():
-    assert calendario_para_agente(hoy=date(2026, 9, 28)).endswith("domingo 2026-10-11")
+def test_calendario_tiene_cuarenta_y_cinco_dias_y_termina_en_miercoles():
+    assert calendario_para_agente(hoy=date(2026, 9, 28)).endswith("miércoles 2026-11-11")
 
 def test_calendario_cruza_el_ano():
     assert "viernes 2027-01-01" in calendario_para_agente(hoy=date(2026, 12, 30))
